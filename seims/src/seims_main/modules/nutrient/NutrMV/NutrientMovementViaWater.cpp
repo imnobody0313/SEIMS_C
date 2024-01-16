@@ -144,7 +144,7 @@ bool NutrientMovementViaWater::CheckInputData() {
     CHECK_POINTER(MID_NUTRMV, m_anionExclFr);
 
     CHECK_NONNEGATIVE(MID_NUTRMV, m_isep_opt);
-    CHECK_POINTER(MID_NUTRMV, m_distToRch);
+    //CHECK_POINTER(MID_NUTRMV, m_distToRch);
     CHECK_POINTER(MID_NUTRMV, m_surfRf);
     CHECK_POSITIVE(MID_NUTRMV, m_nperco);
     CHECK_POSITIVE(MID_NUTRMV, m_cod_n);
