@@ -29,7 +29,8 @@
 0 | Nutrient | Soluble nutrient loss | NUTRMV
 ### Route Modules, including water, sediment, and nutrient
 #0 | Wetland | SWAT wetland| WETLAND
-0 | Groundwater | Linear reservoir | GWA_RE
+#0 | Groundwater | Linear reservoir | GWA_RE
+0 | Groundwater | Linear reservoir | GWA_MOD
 ###ljj++ test GW waterlevel
 #0 | Groundwater | Linear reservoir | GWA_WB
 ###ljj--

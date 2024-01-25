@@ -51,6 +51,10 @@ extern "C" SEIMS_MODULE_API const char* MetadataInformation() {
 
     mdi.AddOutput(VAR_SBIF, UNIT_FLOW_CMS, DESC_SBIF, DT_Array1D);
 
+    //ljj++
+    mdi.AddParameter(VAR_AHRU, UNIT_AREA_M2, DESC_AHRU, Source_ParameterDB, DT_Raster1D);
+    mdi.AddParameter(VAR_FLOWOUT_LEN, UNIT_LEN_M, DESC_FLOWOUT_LEN, Source_ParameterDB, DT_Raster1D);
+
     string res = mdi.GetXMLDocument();
 
     char* tmp = new char[res.size() + 1];

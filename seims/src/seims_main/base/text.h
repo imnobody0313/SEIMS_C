@@ -1957,6 +1957,30 @@
 #define MONG_SITELIST_DB                       "DB"
 
 
+//ljj++
+#define VAR_GWH                                 "GW_HEIGHT"
+#define VAR_GW_SH                                "GW_SH"
+#define VAR_GWMIN                               "GWMIN" 
+#define VAR_CHSEEPAGE                           "CHSEEPAGE" 
+#define VAR_CHK                                 "CHK"
+#define VAR_ALPHABF                             "ALPHABF"
+#define VAR_DELAY                               "DELAY"
+#define VAR_QGS                                  "QGS" /// m_qgsRchOut, 
+#define VAR_AHRU                                 "CELLAREA" /// m_qgsRchOut, 
+#define VAR_FLOWOUT_LEN                                 "flowout_length" /// m_qgsRchOut, 
+#define REACH_PERMAFORST                                "is_permafrost" /// m_qgsRchOut, 
+#define REACH_SPYLD                            "GW_SPYLD"
+
+#define DESC_GWH                                "groundwater height"
+#define DESC_GW_SH                              "shallow groundwater stroage"
+#define DESC_GWMIN                              "Minumum groundwater storage"
+#define DESC_CHSEEPAGE                          "channel to groundwater"
+#define DESC_ALPHABF                             "alpha factor for groundwater recession curve"
+#define DESC_DELAY                               "time required for water leaving the bottom of the root zone to reach the shallow aquifer"
+#define DESC_SPYLD                               "specific yield for shallow aquifer"
+#define DESC_QGS                               "Showllow Groundwater discharge at each reach outlet and at each time stepr"
+#define DESC_AHRU                               "total area of HRU"
+#define DESC_FLOWOUT_LEN                               "flowout length"
 //////////////////////////////////////////////////////////////////////////
 /// Define Raster/ related constant strings used in SEIMS and preprocess//
 /// By LiangJun Zhu, May. 5, 2016  ///////////////////////////////////////

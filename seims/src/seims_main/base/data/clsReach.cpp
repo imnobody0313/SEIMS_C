@@ -11,7 +11,7 @@ using namespace utils_array;
 using namespace utils_string;
 using namespace utils_math;
 
-const int REACH_PARAM_NUM = 48; /// Numerical parameters, except GROUP related
+const int REACH_PARAM_NUM = 50; /// Numerical parameters, except GROUP related
 const char* REACH_PARAM_NAME[] = {
     REACH_SUBBASIN, REACH_NUMCELLS,                           // 0-1
     REACH_DOWNSTREAM, REACH_UPDOWN_ORDER, REACH_DOWNUP_ORDER, // 2-4
@@ -26,7 +26,9 @@ const char* REACH_PARAM_NAME[] = {
     REACH_DISOX, REACH_BOD, REACH_ALGAE,                      // 35-37
     REACH_ORGN, REACH_NH4, REACH_NO2, REACH_NO3,              // 38-41
     REACH_ORGP, REACH_SOLP, REACH_GWNO3, REACH_GWSOLP,        // 42-45
-    REACH_BEDTC, REACH_BNKTC                                  // 46-47
+    REACH_BEDTC, REACH_BNKTC,                                  // 46-47
+    //ljj++
+    REACH_PERMAFORST,REACH_SPYLD
 };
 const int REACH_GROUP_METHOD_NUM = 2; /// Group methods
 const char* REACH_GROUP_NAME[] = {REACH_KMETIS, REACH_PMETIS};

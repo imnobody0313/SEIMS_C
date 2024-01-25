@@ -140,6 +140,10 @@ private:
     float **m_subSurfRfVol;
     /// subsurface to streams from each subbasin, the first element is the whole watershed, m3/s, VAR_SBIF
     float *m_ifluQ2Rch;
+
+    //ljj++
+    float* m_area;
+    float* m_flowout_length;
 };
 
 #endif /* SEIMS_MODULE_SSR_DA_H */

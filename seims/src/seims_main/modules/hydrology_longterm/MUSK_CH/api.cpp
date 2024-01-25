@@ -62,6 +62,14 @@ extern "C" SEIMS_MODULE_API const char* MetadataInformation() {
     mdi.AddOutput(VAR_CHBTMWIDTH, UNIT_LEN_M, DESC_CHBTMWIDTH, DT_Array1D);
     mdi.AddOutput(VAR_CHCROSSAREA, UNIT_AREA_M2, DESC_CHCROSSAREA, DT_Array1D);
 
+    //ljj++
+    mdi.AddParameter(VAR_GWMAX, UNIT_DEPTH_MM, DESC_GWMAX, Source_ParameterDB, DT_Single);
+    mdi.AddInput(VAR_GW_SH, UNIT_VOL_M3, DESC_GW_SH, Source_Module, DT_Array1D);
+    mdi.AddInput(VAR_GWH, UNIT_LEN_M, DESC_GWH, Source_Module, DT_Array1D);
+    mdi.AddOutput(VAR_CHSEEPAGE, UNIT_DEPTH_MM, DESC_CHSEEPAGE, DT_Array1D);
+    mdi.AddInOutput(VAR_QGS, UNIT_NON_DIM, DESC_QGS, DT_Array1D, TF_SingleValue);
+
+
     res = mdi.GetXMLDocument();
     char* tmp = new char[res.size() + 1];
     strprintf(tmp, res.size() + 1, "%s", res.c_str());

@@ -34,6 +34,9 @@ extern "C" SEIMS_MODULE_API const char* MetadataInformation() {
     mdi.AddOutput(VAR_OLFLOW, UNIT_DEPTH_MM, DESC_OLFLOW, DT_Raster1D);
     mdi.AddOutput(VAR_SBOF, UNIT_FLOW_CMS, DESC_SBOF, DT_Array1D);
 
+    //ljj++
+    mdi.AddParameter(VAR_AHRU, UNIT_AREA_M2, DESC_AHRU, Source_ParameterDB, DT_Raster1D);
+
     // write out the XML file.
     string res = mdi.GetXMLDocument();
 

@@ -160,6 +160,19 @@ private:
     float* m_chWtrWth;    ///< channel water width (m), topw in SWAT
     float* m_chBtmWth;    ///< bottom width of channel (m), phi(6,:) in SWAT
     float* m_chCrossArea; ///< cross-sectional area (m^2), rcharea in SWAT
+
+    //ljj++
+    //! maximum ground water storage
+    float m_GWMAX;
+
+    float* m_ispermafrost;
+
+    float* gw_height;
+
+    float* m_gw_sh;
+
+    float* m_rch_ht;   //river height
+    float* m_qgsRchOut; ///<shallow groundwater part of channel outflow
 };
 
 #endif /* SEIMS_MODULE_MUSK_CH_H */

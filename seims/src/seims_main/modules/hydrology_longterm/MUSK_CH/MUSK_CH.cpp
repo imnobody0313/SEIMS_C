@@ -22,7 +22,11 @@ MUSK_CH::MUSK_CH() :
     // Outputs
     m_qRchOut(nullptr), m_qsRchOut(nullptr), m_qiRchOut(nullptr), m_qgRchOut(nullptr),
     m_chSto(nullptr), m_rteWtrIn(nullptr), m_rteWtrOut(nullptr), m_bankSto(nullptr),
-    m_chWtrDepth(nullptr), m_chWtrWth(nullptr), m_chBtmWth(nullptr), m_chCrossArea(nullptr) {
+    m_chWtrDepth(nullptr), m_chWtrWth(nullptr), m_chBtmWth(nullptr), m_chCrossArea(nullptr),
+    //ljj++
+    m_GWMAX(NODATA_VALUE),m_ispermafrost(nullptr),
+    gw_height(nullptr), m_rch_ht(nullptr), m_gw_sh(nullptr),m_qgsRchOut(nullptr)
+{
 }
 
 MUSK_CH::~MUSK_CH() {
@@ -48,6 +52,10 @@ MUSK_CH::~MUSK_CH() {
     if (nullptr != m_chWtrWth) Release1DArray(m_chWtrWth);
     if (nullptr != m_chBtmWth) Release1DArray(m_chBtmWth);
     if (nullptr != m_chCrossArea) Release1DArray(m_chCrossArea);
+
+    //ljj++
+    if (nullptr != m_rch_ht) Release1DArray(m_rch_ht);
+    if (nullptr != m_qgsRchOut) Release1DArray(m_qgsRchOut);
 }
 
 bool MUSK_CH::CheckInputData() {
@@ -109,6 +117,9 @@ void MUSK_CH::InitialOutputs() {
     m_chBtmWth = new(nothrow) float[m_nreach + 1];
     m_chCrossArea = new(nothrow) float[m_nreach + 1];
 
+    //ljj++
+    m_rch_ht = new(nothrow) float[m_nreach + 1];
+    m_qgsRchOut = new(nothrow) float[m_nreach + 1];
     for (int i = 1; i <= m_nreach; i++) {
         m_qRchOut[i] = m_olQ2Rch[i];
         m_qsRchOut[i] = m_olQ2Rch[i];
@@ -135,6 +146,8 @@ void MUSK_CH::InitialOutputs() {
         m_flowOut[i] = m_chSto[i];
         m_rteWtrIn[i] = 0.f;
         m_rteWtrOut[i] = 0.f;
+        //ljj++
+        m_rch_ht[i] = m_chWtrDepth[i];
     }
     /// initialize point source loadings
     if (nullptr == m_ptSub) {
@@ -217,6 +230,8 @@ void MUSK_CH::SetValue(const char* key, const float value) {
     else if (StringMatch(sk, VAR_B_BNK)) m_bBank = value;
     else if (StringMatch(sk, VAR_MSK_X)) m_mskX = value;
     else if (StringMatch(sk, VAR_MSK_CO1)) m_mskCoef1 = value;
+    //ljj++
+    else if (StringMatch(sk, VAR_GWMAX)) m_GWMAX = value;
     else {
         throw ModelException(MID_MUSK_CH, "SetValue", "Parameter " + sk + " does not exist.");
     }
@@ -233,6 +248,7 @@ void MUSK_CH::SetValueByIndex(const char* key, const int index, const float valu
     else if (StringMatch(sk, VAR_QS)) m_qsRchOut[index] = value;
     else if (StringMatch(sk, VAR_QI)) m_qiRchOut[index] = value;
     else if (StringMatch(sk, VAR_QG)) m_qgRchOut[index] = value;
+    else if (StringMatch(sk, VAR_QGS)) m_qgsRchOut[index] = value;
     else {
         throw ModelException(MID_MUSK_CH, "SetValueByIndex", "Parameter " + sk + " does not exist.");
     }
@@ -258,7 +274,17 @@ void MUSK_CH::Set1DData(const char* key, const int n, float* data) {
     } else if (StringMatch(sk, VAR_SBQG)) {
         CheckInputSize(MID_MUSK_CH, key, n - 1, m_nreach);
         m_gndQ2Rch = data;
-    } else {
+    }
+    //ljj++
+    else if (StringMatch(sk, VAR_GWH)) {
+        CheckInputSize(MID_MUSK_CH, key, n - 1, m_nreach);
+        gw_height = data;
+    }
+    else if (StringMatch(sk, VAR_GW_SH)) {
+        CheckInputSize(MID_MUSK_CH, key, n - 1, m_nreach);
+        m_gw_sh = data;
+    } 
+    else {
         throw ModelException(MID_MUSK_CH, "Set1DData", "Parameter " + sk + " does not exist.");
     }
 }
@@ -271,6 +297,7 @@ void MUSK_CH::GetValue(const char* key, float* value) {
     else if (StringMatch(sk, VAR_QS) && m_inputSubbsnID > 0) *value = m_qsRchOut[m_inputSubbsnID];
     else if (StringMatch(sk, VAR_QI) && m_inputSubbsnID > 0) *value = m_qiRchOut[m_inputSubbsnID];
     else if (StringMatch(sk, VAR_QG) && m_inputSubbsnID > 0) *value = m_qgRchOut[m_inputSubbsnID];
+     else if (StringMatch(sk, VAR_QGS) && m_inputSubbsnID > 0) *value = m_qgsRchOut[m_inputSubbsnID];
     else {
         throw ModelException(MID_MUSK_CH, "GetValue", "Parameter " + sk + " does not exist.");
     }
@@ -316,7 +343,16 @@ void MUSK_CH::Get1DData(const char* key, int* n, float** data) {
     } else if (StringMatch(sk, VAR_CHCROSSAREA)) {
         m_chCrossArea[0] = m_chCrossArea[m_outletID];
         *data = m_chCrossArea;
-    } else {
+    } 
+    //ljj++
+    else if (StringMatch(sk, VAR_CHSEEPAGE)) {
+        m_seepage[0] = m_seepage[m_outletID];
+        *data = m_seepage;
+    }else if (StringMatch(sk, VAR_QGS)) {
+        m_qgsRchOut[0] = m_qgsRchOut[m_outletID];
+        *data = m_qgsRchOut;
+    }
+    else {
         throw ModelException(MID_MUSK_CH, "Get1DData", "Output " + sk + " does not exist.");
     }
 }
@@ -355,6 +391,7 @@ void MUSK_CH::SetReaches(clsReaches* reaches) {
     if (nullptr == m_Kbank) reaches->GetReachesSingleProperty(REACH_BNKK, &m_Kbank);
     if (nullptr == m_Kchb) reaches->GetReachesSingleProperty(REACH_BEDK, &m_Kchb);
     if (nullptr == m_reachDownStream) reaches->GetReachesSingleProperty(REACH_DOWNSTREAM, &m_reachDownStream);
+    if (nullptr == m_ispermafrost) reaches->GetReachesSingleProperty(REACH_PERMAFORST, &m_ispermafrost);
 
     m_reachUpStream = reaches->GetUpStreamIDs();
     m_rteLyrs = reaches->GetReachLayers();
@@ -384,6 +421,7 @@ bool MUSK_CH::ChannelFlow(const int i) {
     float qsUp = 0.f;
     float qiUp = 0.f;
     float qgUp = 0.f;
+    float qgsUp = 0.f;
     for (auto upRchID = m_reachUpStream.at(i).begin(); upRchID != m_reachUpStream.at(i).end(); ++upRchID) {
         if (m_qsRchOut[*upRchID] != m_qsRchOut[*upRchID]) {
             cout << "DayOfYear: " << m_dayOfYear << ", rchID: " << i << ", upRchID: " << *upRchID <<
@@ -403,8 +441,9 @@ bool MUSK_CH::ChannelFlow(const int i) {
         if (m_qsRchOut[*upRchID] > 0.f) qsUp += m_qsRchOut[*upRchID];
         if (m_qiRchOut[*upRchID] > 0.f) qiUp += m_qiRchOut[*upRchID];
         if (m_qgRchOut[*upRchID] > 0.f) qgUp += m_qgRchOut[*upRchID];
+        if (m_qgsRchOut[*upRchID] > 0.f) qgsUp += m_qgsRchOut[*upRchID];
     }
-    qIn += qsUp + qiUp + qgUp;
+    qIn += qsUp + qiUp + qgUp + qgsUp;
 #ifdef PRINT_DEBUG
     cout << "ID: " << i << ", surfaceQ: " << m_qsSub[i] << ", subsurfaceQ: " << qiSub <<
         ", groundQ: " << qgSub << ", pointQ: " << ptSub <<
@@ -493,6 +532,71 @@ bool MUSK_CH::ChannelFlow(const int i) {
     float rttlc = 0.f;             // transmission losses from reach on day, m^3
     float qinday = 0.f;            // m^3
     float qoutday = 0.f;           // m^3
+    //ljj++
+    // Calculate River to hband
+    float rchareaa = (m_chSto[i]+qIn * m_dt)/m_chLen[i];
+    m_rch_ht[i] = sqrt(rchareaa/m_chSideSlope[i] + pow(m_chBtmWth[i]/(2*m_chSideSlope[i]),2))-m_chBtmWth[i]/(2*m_chSideSlope[i]); //m     
+    float he = gw_height[i] - m_GWMAX*0.001f; //head of Ele GW
+    if (m_ispermafrost[i]==1) he = gw_height[i]; 
+    float dh = m_rch_ht[i]-he;
+
+    float K = m_Kbank[i];
+    float Q = 0.f;   //flux  River to Element
+
+    Q = 1.f*dh* K * m_chArea[i];//m3
+
+    float qsep = 0.f;
+    float rto = m_gw_sh[i]/gw_height[i];
+    //the height from topsoil to gw bottom
+    float gw_max = 0.f; 
+    //for permafrost, the groundwater is very shallow
+    if (m_ispermafrost[i]==1) gw_max = 2.5f*rto;
+    float qgsSub = 0.f; /// shallow groundwater flow
+    if (Q > 0.f){
+        qsep = Min(Q, m_chSto[i]+qIn * m_dt);   //m3
+        qgUp -= qsep/m_dt*(qgUp/(qIn+UTIL_ZERO));
+        qsUp -= qsep/m_dt*(qsUp/(qIn+UTIL_ZERO));
+        qiUp -= qsep/m_dt*(qiUp/(qIn+UTIL_ZERO));
+        qgSub -= qsep/m_dt*(qgSub/(qIn+UTIL_ZERO));
+        m_olQ2Rch[i] -= qsep/m_dt*(m_olQ2Rch[i]/(qIn+UTIL_ZERO));
+        qiSub -= qsep/m_dt*(qiSub/(qIn+UTIL_ZERO));
+        qIn  -= qsep/m_dt;
+        if(qIn<=0){
+            m_chSto[i] +=qIn/m_dt;
+            qIn = 0.f;
+            qgUp = 0.f;
+            qsUp = 0.f;
+            qiUp = 0.f;
+            qgSub = 0.f;
+            m_olQ2Rch[i] = 0.f;
+            qiSub = 0.f;
+            m_chSto[i] = Max(m_chSto[i],0.f);
+        }
+    }else{  
+        qsep = Max(Q, -1.f*m_gw_sh[i]);   //m3
+        if(m_gw_sh[i]<=UTIL_ZERO) qsep = 0.f;
+       //qsep = Q;
+        qgsSub -= qsep/m_dt;
+        qIn  -= qsep/m_dt;
+    }
+    float gw_sh_o = m_gw_sh[i];
+    if (nullptr != m_gw_sh) {
+        m_gw_sh[i] += qsep; // m3
+        m_gw_sh[i] = Max(m_gw_sh[i],0.f);
+    }
+    //if higher than gwmax, water could flow out immediately
+    if (m_ispermafrost[i]==1) {
+        if(m_gw_sh[i]>=gw_max){
+            float ul_water = m_gw_sh[i] - gw_max;
+            qgsSub += ul_water/m_dt;
+            qIn  += ul_water/m_dt;
+            m_gw_sh[i] = gw_max;
+        }
+    }
+    m_seepage[i] = m_gw_sh[i] - gw_sh_o;
+    m_rteWtrOut[i] = qIn * m_dt;
+    wtrin = qIn * m_dt / nn;
+    //if (i==11) cout<<dh<<"  "<<m_seepage[i]<<"  "<< gw_height[i]<<endl;
 
     // Iterate for the day
     for (int ii = 0; ii < nn; ii++) {
@@ -509,15 +613,24 @@ bool MUSK_CH::ChannelFlow(const int i) {
         if (volrt > max_rate) {
             m_chWtrDepth[i] = m_chDepth[i];
             sdti = max_rate;
+            //a = b * d + chsslope * d * d
+            rcharea = m_chBtmWth[i] * m_chDepth[i] + m_chSideSlope[i] * m_chDepth[i] * m_chDepth[i];
+            rchp = m_chDepth[i];
+            float p = m_chBtmWth[i] + 2. * m_chDepth[i] * sqrt(1. + m_chSideSlope[i] * m_chSideSlope[i]);
             // Find the cross-sectional area and depth for volrt by iteration method at 1cm interval depth.
             // Find the depth until the discharge rate is equal to volrt
             while (sdti < volrt) {
                 m_chWtrDepth[i] += 0.01f; // Increase 1cm at each interation
-                rcharea = ChannelCrossSectionalArea(m_chBtmWth[i], m_chDepth[i], m_chWtrDepth[i],
-                                                    m_chSideSlope[i], m_chWth[i], 4.f);
-                rchp = ChannelWettingPerimeter(m_chBtmWth[i], m_chDepth[i], m_chWtrDepth[i],
-                                               m_chSideSlope[i], m_chWth[i], 4.f);
-                radius = rcharea / rchp;
+                float addarea = rcharea + ((m_chWth[i] * 5) + 4 * m_chWtrDepth[i]) * m_chWtrDepth[i];
+                float addp = p + (m_chWth[i] * 4) + 2. * m_chWtrDepth[i] * sqrt(1. + 4 * 4);
+                radius = addarea / addp;
+                rcharea = addarea;
+	            rchp = addp;
+                // rcharea = ChannelCrossSectionalArea(m_chBtmWth[i], m_chDepth[i], m_chWtrDepth[i],
+                //                                     m_chSideSlope[i], m_chWth[i], 4.f);
+                // rchp = ChannelWettingPerimeter(m_chBtmWth[i], m_chDepth[i], m_chWtrDepth[i],
+                //                                m_chSideSlope[i], m_chWth[i], 4.f);
+                // radius = rcharea / rchp;
                 sdti = manningQ(rcharea, radius, m_chMan[i], m_chSlope[i]);
             }
             sdti = volrt;
@@ -526,8 +639,10 @@ bool MUSK_CH::ChannelFlow(const int i) {
             // Find the depth until the discharge rate is equal to volrt.
             while (sdti < volrt) {
                 m_chWtrDepth[i] += 0.01f;
-                rcharea = ChannelCrossSectionalArea(m_chBtmWth[i], m_chWtrDepth[i], m_chSideSlope[i]);
-                rchp = ChannelWettingPerimeter(m_chBtmWth[i], m_chWtrDepth[i], m_chSideSlope[i]);
+                rcharea = (m_chBtmWth[i] + m_chSideSlope[i] * m_chWtrDepth[i]) * m_chWtrDepth[i];
+                rchp = m_chBtmWth[i] + 2. * m_chWtrDepth[i] * sqrt(1. + m_chSideSlope[i] * m_chSideSlope[i]);
+                // rcharea = ChannelCrossSectionalArea(m_chBtmWth[i], m_chWtrDepth[i], m_chSideSlope[i]);
+                // rchp = ChannelWettingPerimeter(m_chBtmWth[i], m_chWtrDepth[i], m_chSideSlope[i]);
                 rchradius = rcharea / rchp;
                 sdti = manningQ(rcharea, rchradius, m_chMan[i], m_chSlope[i]);
             }
@@ -625,19 +740,23 @@ bool MUSK_CH::ChannelFlow(const int i) {
     m_qRchOut[i] = sdti;
     m_rteWtrOut[i] = rtwtr;
     m_chCrossArea[i] = rcharea;
+    m_qRchOut[i] = rtwtr / m_dt;
+    if(m_qRchOut[i]<=UTIL_ZERO) m_rteWtrOut[i] = 0.f;
 
-    float qInSum = m_olQ2Rch[i] + qiSub + qgSub + qsUp + qiUp + qgUp;
+    float qInSum = m_olQ2Rch[i] + qiSub + qgSub + qsUp + qiUp + qgUp +qgsSub + qgsUp;
     if (qInSum < UTIL_ZERO) {
         // In case of divided by zero.
         m_qsRchOut[i] = 0.f;
         m_qiRchOut[i] = 0.f;
         m_qgRchOut[i] = 0.f;
+        m_qgsRchOut[i] = 0.f;
         m_qRchOut[i] = 0.f;
     } else {
         // In my opinion, these lines should use `qIn` instead of `qInSum`. By lj.
-        m_qsRchOut[i] = m_qRchOut[i] * (m_olQ2Rch[i] + qsUp) / qIn;
-        m_qiRchOut[i] = m_qRchOut[i] * (qiSub + qiUp) / qIn;
-        m_qgRchOut[i] = m_qRchOut[i] * (qgSub + qgUp) / qIn;
+        m_qsRchOut[i] = m_qRchOut[i] * (m_olQ2Rch[i] + qsUp) / (qIn+UTIL_ZERO);
+        m_qiRchOut[i] = m_qRchOut[i] * (qiSub + qiUp) / (qIn+UTIL_ZERO);
+        m_qgRchOut[i] = m_qRchOut[i] * (qgSub + qgUp) / (qIn+UTIL_ZERO);
+        m_qgsRchOut[i] = m_qRchOut[i] * (qgsSub + qgsUp) / (qIn+UTIL_ZERO);
     }
 
     // Add transmission losses to bank storage/deep aquifer (i.e., groundwater in current version)

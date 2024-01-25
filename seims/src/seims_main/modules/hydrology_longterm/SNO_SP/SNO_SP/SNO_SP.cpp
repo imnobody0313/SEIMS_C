@@ -11,7 +11,8 @@ SNO_SP::SNO_SP() :
     m_snowCoverMax(NODATA_VALUE), m_snowCover50(NODATA_VALUE),
     m_snowCoverCoef1(NODATA_VALUE), m_snowCoverCoef2(NODATA_VALUE),
     m_meanTemp(nullptr), m_maxTemp(nullptr), m_netPcp(nullptr),
-    m_snowAccum(nullptr), m_SE(nullptr), m_packT(nullptr), m_snowMelt(nullptr), m_SA(nullptr) {
+    m_snowAccum(nullptr), m_SE(nullptr), m_packT(nullptr), m_snowMelt(nullptr), m_SA(nullptr),
+    m_landCover(nullptr) {
 }
 
 SNO_SP::~SNO_SP() {
@@ -65,6 +66,7 @@ int SNO_SP::Execute() {
     float cmelt = (m_csnow6 + m_csnow12) * 0.5f + (m_csnow6 - m_csnow12) * 0.5f * sinv;
 #pragma omp parallel for
     for (int rw = 0; rw < m_nCells; rw++) {
+        //if(m_landCover[rw]==300) continue;  //ljj++ ignore glacier
         /// estimate snow pack temperature
         m_packT[rw] = m_packT[rw] * (1 - m_lagSnow) + m_meanTemp[rw] * m_lagSnow;
         /// calculate snow fall
@@ -126,6 +128,7 @@ void SNO_SP::Set1DData(const char* key, const int n, float* data) {
     if (StringMatch(s, VAR_TMEAN)) m_meanTemp = data;
     else if (StringMatch(s, VAR_TMAX)) m_maxTemp = data;
     else if (StringMatch(s, VAR_NEPR)) m_netPcp = data;
+    else if (StringMatch(s, VAR_LANDUSE)) m_landCover = data;
     else {
         throw ModelException(MID_SNO_SP, "Set1DData", "Parameter " + s + " does not exist.");
     }

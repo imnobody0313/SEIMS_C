@@ -221,3 +221,7 @@ Routing,ch_bnk_erod,Channel bank erodibility factor,none,ChannelRouting,-9999,1,
 Routing,ch_bed_erod,Channel bank erodibility factor,none,ChannelRouting,-9999,1,RC,3.75,0.001
 Routing,ch_bnk_d50,D50(median) particle size diameter of channel bank sediment,micrometer,ChannelRouting,-9999,1,RC,20,0.001
 Routing,ch_bed_d50,D50(median) particle size diameter of channel bed sediment,micrometer,ChannelRouting,-9999,1,RC,20,0.001
+# ljj++
+Groundwater,gwmin,Minimum groundwater storage,mm,GW_MOD,300,0,AC,50000,1
+Groundwater,alphabf,alpha factor for groundwater recession curve,1/days,GW_MOD,0.48,0,AC,1,0
+Groundwater,delay,time required for water leaving the bottom of the root zone to reach the shallow aquifer,days,GW_MOD,31,0,AC,300,1

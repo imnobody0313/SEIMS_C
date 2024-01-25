@@ -13,7 +13,10 @@ SSR_DA::SSR_DA() :
     m_rchID(nullptr), m_flowInIdxD8(nullptr), m_rteLyrs(nullptr),
     m_nRteLyrs(-1), m_nSubbsns(-1), m_subbsnID(nullptr),
     /// outputs
-    m_subSurfRf(nullptr), m_subSurfRfVol(nullptr), m_ifluQ2Rch(nullptr) {
+    m_subSurfRf(nullptr), m_subSurfRfVol(nullptr), m_ifluQ2Rch(nullptr),
+    //ljj++
+    m_area(nullptr),m_flowout_length(nullptr)
+     {
 }
 
 SSR_DA::~SSR_DA() {
@@ -24,11 +27,13 @@ SSR_DA::~SSR_DA() {
 
 bool SSR_DA::FlowInSoil(const int id) {
     float s0 = Max(m_slope[id], 0.01f);
-    float flowWidth = m_CellWth;
+    // float flowWidth = m_CellWth;
+    float flowWidth = m_flowout_length[id]; //ljj
     // there is no land in this cell
-    if (m_rchID[id] > 0) {
-        flowWidth -= m_chWidth[id];
-    }
+    //TODO ljj:23-10-13:对于河道的地块，流路宽度应该等于河道长度
+    // if (m_rchID[id] > 0) {
+    //     flowWidth -= m_chWidth[id];
+    // }
     // initialize for current cell of current timestep
     for (int j = 0; j < CVT_INT(m_nSoilLyrs[id]); j++) {
         m_subSurfRf[id][j] = 0.f;
@@ -113,7 +118,8 @@ bool SSR_DA::FlowInSoil(const int id) {
         }
         m_subSurfRf[id][j] = Max(0.f, m_subSurfRf[id][j]);
 
-        m_subSurfRfVol[id][j] = m_subSurfRf[id][j] * 0.001f * m_CellWth * flowWidth; //m3
+       // m_subSurfRfVol[id][j] = m_subSurfRf[id][j] * 0.001f * m_CellWth * flowWidth; //m3
+		m_subSurfRfVol[id][j] = m_subSurfRf[id][j] * 0.001f * m_area[id]; //ljj change for field
         m_subSurfRfVol[id][j] = Max(UTIL_ZERO, m_subSurfRfVol[id][j]);
         //Adjust the moisture content in the current layer, and the layer immediately below it
         m_soilWtrSto[id][j] -= m_subSurfRf[id][j];
@@ -225,7 +231,12 @@ void SSR_DA::Set1DData(const char* key, const int nrows, float* data) {
         m_nSoilLyrs = data;
     } else if (StringMatch(s, VAR_SOL_SW)) {
         m_soilWtrStoPrfl = data;
-    } else {
+    }
+    //ljj++
+    else if (StringMatch(s, VAR_AHRU)) m_area = data;
+    else if (StringMatch(s, VAR_FLOWOUT_LEN)) m_flowout_length= data;
+    
+    else {
         throw ModelException(MID_SSR_DA, "Set1DData", "Parameter " + s + " does not exist.");
     }
 }
