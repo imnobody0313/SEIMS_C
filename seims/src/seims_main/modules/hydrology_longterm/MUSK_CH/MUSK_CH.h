@@ -164,6 +164,8 @@ private:
     //ljj++
     //! maximum ground water storage
     float m_GWMAX;
+    float m_Kg;
+    float m_Base_ex;
 
     float* m_ispermafrost;
 

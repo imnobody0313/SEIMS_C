@@ -91,8 +91,7 @@ int ReservoirMethod::Execute() {
             int index = curCells[i];
             float tmp_perc = m_soilPerco[index][CVT_INT(m_nSoilLyrs[index]) - 1];
             if (tmp_perc > 0) {
-                perco += tmp_perc * (m_area[index] / curBasinArea)*(1-gw_delaye[subID])+rchrg1;// + rchrg1*gw_delaye[subID];
-                perco1 += tmp_perc * (m_area[index] / curBasinArea)*(gw_delaye[subID]);
+                perco += tmp_perc * (m_area[index] / curBasinArea)*(1-gw_delaye[subID])+rchrg1* (m_area[index] / curBasinArea)*gw_delaye[subID];// + rchrg1*gw_delaye[subID];
             } else {
                 m_soilPerco[index][CVT_INT(m_nSoilLyrs[index]) - 1] = 0.f;
             }
@@ -105,7 +104,7 @@ int ReservoirMethod::Execute() {
             m_revap[index] = m_revap[index] * m_gwSto[subID] / m_GWMAX;
             revap += m_revap[index] * (m_area[index] / curBasinArea);
         }
-
+        perco1 = perco;
         //perco /= curCellsNum; // mean mm
         //fPET /= curCellsNum;
         //revap /= curCellsNum;

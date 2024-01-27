@@ -145,5 +145,7 @@ private:
     //! All subbasins information
     clsSubbasins* m_subbasinsInfo;
 
+    float* m_area;
+
 };
 #endif /* SEIMS_MODULE_GWA_RE_H */

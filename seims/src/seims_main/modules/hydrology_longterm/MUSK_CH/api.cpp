@@ -63,9 +63,11 @@ extern "C" SEIMS_MODULE_API const char* MetadataInformation() {
     mdi.AddOutput(VAR_CHCROSSAREA, UNIT_AREA_M2, DESC_CHCROSSAREA, DT_Array1D);
 
     //ljj++
+    mdi.AddParameter(VAR_KG, UNIT_NON_DIM, DESC_KG, Source_ParameterDB, DT_Single);
+    mdi.AddParameter(VAR_Base_ex, UNIT_NON_DIM, DESC_BASE_EX, Source_ParameterDB, DT_Single);
     mdi.AddParameter(VAR_GWMAX, UNIT_DEPTH_MM, DESC_GWMAX, Source_ParameterDB, DT_Single);
-    mdi.AddInput(VAR_GW_SH, UNIT_VOL_M3, DESC_GW_SH, Source_Module, DT_Array1D);
-    mdi.AddInput(VAR_GWH, UNIT_LEN_M, DESC_GWH, Source_Module, DT_Array1D);
+    mdi.AddInput(VAR_GW_SH, UNIT_VOL_M3, DESC_GW_SH, Source_Module_Optional, DT_Array1D);
+    mdi.AddInput(VAR_GWH, UNIT_LEN_M, DESC_GWH, Source_Module_Optional, DT_Array1D);
     mdi.AddOutput(VAR_CHSEEPAGE, UNIT_DEPTH_MM, DESC_CHSEEPAGE, DT_Array1D);
     mdi.AddInOutput(VAR_QGS, UNIT_NON_DIM, DESC_QGS, DT_Array1D, TF_SingleValue);
 

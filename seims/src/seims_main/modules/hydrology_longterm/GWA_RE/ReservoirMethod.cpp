@@ -16,7 +16,8 @@ ReservoirMethod::ReservoirMethod() :
     m_T_PerDep(nullptr), m_T_RG(nullptr),
     /// outputs
     m_T_QG(nullptr), m_T_Revap(nullptr), m_T_GWWB(nullptr),
-    m_nSubbsns(-1), m_inputSubbsnID(-1), m_subbasinsInfo(nullptr) {
+    m_nSubbsns(-1), m_inputSubbsnID(-1), m_subbasinsInfo(nullptr),
+    m_area(nullptr) {
 }
 
 ReservoirMethod::~ReservoirMethod() {
@@ -48,7 +49,9 @@ void ReservoirMethod::InitialOutputs() {
 int ReservoirMethod::Execute() {
     CheckInputData();
     InitialOutputs();
-    float QGConvert = 1.f * m_cellWth * m_cellWth / m_dt * 0.001f; // mm ==> m3/s
+    //float QGConvert = 1.f * m_cellWth * m_cellWth / m_dt * 0.001f; // mm ==> m3/s
+    float QGConvert = 1.f * 0.001f / m_dt;
+    float total_area =0.f;
     for (auto it = m_subbasinIDs.begin(); it != m_subbasinIDs.end(); ++it) {
         int subID = *it;
         Subbasin* curSub = m_subbasinsInfo->GetSubbasinByID(subID);
@@ -58,26 +61,34 @@ int ReservoirMethod::Execute() {
         float perco = 0.f;
         float fPET = 0.f;
         float revap = 0.f;
+        float curBasinArea =0.f;
+        for (int i = 0; i < curCellsNum; i++) {
+			curBasinArea += m_area[curCells[i]];
+		}
+        total_area += curBasinArea;
 #pragma omp parallel for reduction(+:perco, fPET, revap)
         for (int i = 0; i < curCellsNum; i++) {
             int index = curCells[i];
             float tmp_perc = m_soilPerco[index][CVT_INT(m_nSoilLyrs[index]) - 1];
             if (tmp_perc > 0) {
-                perco += tmp_perc;
+                //perco += tmp_perc;
+                perco += tmp_perc * (m_area[index] / curBasinArea);
             } else {
                 m_soilPerco[index][CVT_INT(m_nSoilLyrs[index]) - 1] = 0.f;
             }
             if (m_pet[index] > 0.f) {
-                fPET += m_pet[index];
+                //fPET += m_pet[index];
+                fPET += m_pet[index] * (m_area[index] / curBasinArea);
             }
             m_revap[index] = m_pet[index] - m_IntcpET[index] - m_deprStoET[index] - m_soilET[index] - m_actPltET[index];
             m_revap[index] = Max(m_revap[index], 0.f);
             m_revap[index] = m_revap[index] * m_gwSto[subID] / m_GWMAX;
-            revap += m_revap[index];
+            //revap += m_revap[index];
+            revap += m_revap[index] * (m_area[index] / curBasinArea);
         }
-        perco /= curCellsNum; // mean mm
-        fPET /= curCellsNum;
-        revap /= curCellsNum;
+        // perco /= curCellsNum; // mean mm
+        // fPET /= curCellsNum;
+        // revap /= curCellsNum;
         /// percolated water ==> vadose zone ==> shallow aquifer ==> deep aquifer
         /// currently, for convenience, we assume a small portion of the percolated water
         /// will enter groundwater. By LJ. 2016-9-2
@@ -98,7 +109,8 @@ int ReservoirMethod::Execute() {
         float slopeCoef = curSub->GetSlopeCoef();
         float kg = m_Kg * slopeCoef;
         float groundRunoff = kg * pow(m_gwSto[subID], m_Base_ex); // mm
-        float groundQ = groundRunoff * curCellsNum * QGConvert;     // groundwater discharge (m3/s)
+        //float groundQ = groundRunoff * curCellsNum * QGConvert;     // groundwater discharge (m3/s)
+        float groundQ = groundRunoff * curBasinArea * QGConvert; 
         float groundStorage = m_gwSto[subID];
         groundStorage += perco - revap - percoDeep - groundRunoff;
 
@@ -113,7 +125,8 @@ int ReservoirMethod::Execute() {
         groundStorage = Max(groundStorage, 0.f);
         if (groundStorage > m_GWMAX) {
             groundRunoff += groundStorage - m_GWMAX;
-            groundQ = groundRunoff * curCellsNum * QGConvert; // groundwater discharge (m3/s)
+            //groundQ = groundRunoff * curCellsNum * QGConvert; // groundwater discharge (m3/s)
+            groundQ = groundRunoff * curBasinArea * QGConvert; 
             groundStorage = m_GWMAX;
         }
 
@@ -150,13 +163,18 @@ int ReservoirMethod::Execute() {
         m_T_QG[subID] = curSub->GetQg(); //get qg of specific subbasin
         m_gwSto[subID] = curSub->GetGw();
     }
-
-    m_T_Perco[0] = m_subbasinsInfo->Subbasin2Basin(VAR_PERCO);
-    m_T_PerDep[0] = m_subbasinsInfo->Subbasin2Basin(VAR_PERDE);
-    m_T_Revap[0] = m_subbasinsInfo->Subbasin2Basin(VAR_REVAP);
-    m_T_RG[0] = m_subbasinsInfo->Subbasin2Basin(VAR_RG); // get rg of entire watershed
-    m_T_QG[0] = m_subbasinsInfo->Subbasin2Basin(VAR_QG); // get qg of entire watershed
-    m_gwSto[0] = m_subbasinsInfo->Subbasin2Basin(VAR_GW_Q);
+	m_petSubbsn[0] /= total_area;
+	m_T_Perco[0] /= total_area;
+	m_T_PerDep[0] /= total_area;
+	m_T_Revap[0] /= total_area;
+	m_T_RG[0] /= total_area;
+	m_gwSto[0] /= total_area;
+    // m_T_Perco[0] = m_subbasinsInfo->Subbasin2Basin(VAR_PERCO);
+    // m_T_PerDep[0] = m_subbasinsInfo->Subbasin2Basin(VAR_PERDE);
+    // m_T_Revap[0] = m_subbasinsInfo->Subbasin2Basin(VAR_REVAP);
+    // m_T_RG[0] = m_subbasinsInfo->Subbasin2Basin(VAR_RG); // get rg of entire watershed
+    // m_T_QG[0] = m_subbasinsInfo->Subbasin2Basin(VAR_QG); // get qg of entire watershed
+    // m_gwSto[0] = m_subbasinsInfo->Subbasin2Basin(VAR_GW_Q);
 
     // output to GWWB, the sequence is coincident with the header information defined in PrintInfo.cpp, line 528.
     for (int i = 0; i <= m_nSubbsns; i++) {
@@ -248,7 +266,10 @@ void ReservoirMethod::Set1DData(const char* key, const int n, float* data) {
         m_slope = data;
     } else if (StringMatch(sk, VAR_SOILLAYERS)) {
         m_nSoilLyrs = data;
-    } else {
+    } //ljj++
+    else if (StringMatch(sk, VAR_AHRU)) {
+		m_area = data;
+	}else {
         throw ModelException(MID_GWA_RE, "Set1DData", "Parameter " + sk + " does not exist in current module.");
     }
 }

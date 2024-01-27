@@ -24,7 +24,7 @@ MUSK_CH::MUSK_CH() :
     m_chSto(nullptr), m_rteWtrIn(nullptr), m_rteWtrOut(nullptr), m_bankSto(nullptr),
     m_chWtrDepth(nullptr), m_chWtrWth(nullptr), m_chBtmWth(nullptr), m_chCrossArea(nullptr),
     //ljj++
-    m_GWMAX(NODATA_VALUE),m_ispermafrost(nullptr),
+    m_GWMAX(NODATA_VALUE),m_Kg(NODATA_VALUE), m_Base_ex(NODATA_VALUE),m_ispermafrost(nullptr),
     gw_height(nullptr), m_rch_ht(nullptr), m_gw_sh(nullptr),m_qgsRchOut(nullptr)
 {
 }
@@ -232,6 +232,8 @@ void MUSK_CH::SetValue(const char* key, const float value) {
     else if (StringMatch(sk, VAR_MSK_CO1)) m_mskCoef1 = value;
     //ljj++
     else if (StringMatch(sk, VAR_GWMAX)) m_GWMAX = value;
+    else if (StringMatch(sk, VAR_KG)) m_Kg = value;
+    else if (StringMatch(sk, VAR_Base_ex)) m_Base_ex = value;
     else {
         throw ModelException(MID_MUSK_CH, "SetValue", "Parameter " + sk + " does not exist.");
     }
@@ -417,6 +419,7 @@ bool MUSK_CH::ChannelFlow(const int i) {
         ptSub = m_ptSub[i];
         qIn += ptSub;
     }
+    float qgsSub = 0.f; /// shallow groundwater flow
     // 1.2. water from upstream reaches
     float qsUp = 0.f;
     float qiUp = 0.f;
@@ -537,13 +540,12 @@ bool MUSK_CH::ChannelFlow(const int i) {
     float rchareaa = (m_chSto[i]+qIn * m_dt)/m_chLen[i];
     m_rch_ht[i] = sqrt(rchareaa/m_chSideSlope[i] + pow(m_chBtmWth[i]/(2*m_chSideSlope[i]),2))-m_chBtmWth[i]/(2*m_chSideSlope[i]); //m     
     float he = gw_height[i] - m_GWMAX*0.001f; //head of Ele GW
-    if (m_ispermafrost[i]==1) he = gw_height[i]; 
     float dh = m_rch_ht[i]-he;
-
+    if (m_ispermafrost[i]==1) dh = -1.f*gw_height[i];   //河道深切峡谷
+    if (abs(dh) <= 1e-6) dh = 0.f;
     float K = m_Kbank[i];
     float Q = 0.f;   //flux  River to Element
-
-    Q = 1.f*dh* K * m_chArea[i];//m3
+    //Q = 1.f*dh* K * m_chArea[i];//m3
 
     float qsep = 0.f;
     float rto = m_gw_sh[i]/gw_height[i];
@@ -551,8 +553,8 @@ bool MUSK_CH::ChannelFlow(const int i) {
     float gw_max = 0.f; 
     //for permafrost, the groundwater is very shallow
     if (m_ispermafrost[i]==1) gw_max = 2.5f*rto;
-    float qgsSub = 0.f; /// shallow groundwater flow
-    if (Q > 0.f){
+    if (dh > 0.f){
+        Q = m_Kg * pow(abs(dh), m_Base_ex) * rto; // m3
         qsep = Min(Q, m_chSto[i]+qIn * m_dt);   //m3
         qgUp -= qsep/m_dt*(qgUp/(qIn+UTIL_ZERO));
         qsUp -= qsep/m_dt*(qsUp/(qIn+UTIL_ZERO));
@@ -573,6 +575,7 @@ bool MUSK_CH::ChannelFlow(const int i) {
             m_chSto[i] = Max(m_chSto[i],0.f);
         }
     }else{  
+        Q = -1.f *m_Kg* pow(abs(dh), m_Base_ex) * rto; // m3
         qsep = Max(Q, -1.f*m_gw_sh[i]);   //m3
         if(m_gw_sh[i]<=UTIL_ZERO) qsep = 0.f;
        //qsep = Q;
@@ -585,14 +588,14 @@ bool MUSK_CH::ChannelFlow(const int i) {
         m_gw_sh[i] = Max(m_gw_sh[i],0.f);
     }
     //if higher than gwmax, water could flow out immediately
-    if (m_ispermafrost[i]==1) {
-        if(m_gw_sh[i]>=gw_max){
-            float ul_water = m_gw_sh[i] - gw_max;
-            qgsSub += ul_water/m_dt;
-            qIn  += ul_water/m_dt;
-            m_gw_sh[i] = gw_max;
-        }
-    }
+    // if (m_ispermafrost[i]==1) {
+    //     if(m_gw_sh[i]>=gw_max){
+    //         float ul_water = m_gw_sh[i] - gw_max;
+    //         qgsSub += ul_water/m_dt;
+    //         qIn  += ul_water/m_dt;
+    //         m_gw_sh[i] = gw_max;
+    //     }
+    // }
     m_seepage[i] = m_gw_sh[i] - gw_sh_o;
     m_rteWtrOut[i] = qIn * m_dt;
     wtrin = qIn * m_dt / nn;
