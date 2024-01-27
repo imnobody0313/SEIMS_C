@@ -161,4 +161,11 @@ NutrientTransport,GWSOLP,soluble P amount in groundwater,mg/L,NONE,1970-01-01 00
 //ljj++
 Groundwater,GW_HEIGHT,groundwater height,m,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,OUTLET,GW_HEIGHT.txt,1
 Groundwater,CHSEEPAGE,channel to groundwater,mm,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,OUTLET,CHSEEPAGE.txt,1
-ChannelRouting,QGS,Shallow Groundwater discharge at each reach outlet,m3/s,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,OUTLET,QGS.txt,0
+ChannelRouting,QGS,Shallow Groundwater discharge at each reach outlet,m3/s,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,OUTLET,QGS.txt,1
+Plant growth,BIOMS,Land cover/crop biomass (dry weight),kg/ha,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,OUTLET,BIOMS.txt,1
+Nutrient,LMC,metabolic litter C pool,kg/ha,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,OUTLET,LMC.txt,1
+Nutrient,LSC,structural litter C pool,kg/ha,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,OUTLET,LSC.txt,1
+Nutrient,BMC,ass of C in soil microbial biomass and associated products,kg/ha,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,OUTLET,BMC.txt,1
+Nutrient,WOC, C pool,kg/ha,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,OUTLET,WOC.txt,1
+Nutrient,HPC,mass of C present in passive humus,kg/ha,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,OUTLET,HPC.txt,1
+Nutrient,HSC,mass of C present in slow humus,kg/ha,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,OUTLET,HSC.txt,1

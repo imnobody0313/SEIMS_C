@@ -127,6 +127,15 @@ extern "C" SEIMS_MODULE_API const char* MetadataInformation() {
 
     mdi.AddOutput(VAR_CONV_WT, UNIT_NON_DIM, DESC_CONV_WT, DT_Raster2D);
 
+    //ljj++
+    mdi.AddOutput(VAR_LMC, UNIT_NON_DIM, DESC_SOL_LMC, DT_Array2D);
+    mdi.AddOutput(VAR_LSC, UNIT_NON_DIM, DESC_SOL_LSC, DT_Array2D);
+    mdi.AddOutput(VAR_WOC, UNIT_NON_DIM, DESC_SOL_WOC, DT_Array2D);
+    mdi.AddOutput(VAR_BMC, UNIT_NON_DIM, DESC_SOL_BMC, DT_Array2D);
+    mdi.AddOutput(VAR_HSC, UNIT_NON_DIM, DESC_SOL_HSC, DT_Array2D);
+    mdi.AddOutput(VAR_HPC, UNIT_NON_DIM, DESC_SOL_HPC, DT_Array2D);
+    
+
     string res = mdi.GetXMLDocument();
     char* tmp = new char[res.size() + 1];
     strprintf(tmp, res.size() + 1, "%s", res.c_str());

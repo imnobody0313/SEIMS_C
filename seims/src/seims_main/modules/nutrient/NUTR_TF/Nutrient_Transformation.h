@@ -279,5 +279,7 @@ private:
 
     /// factor which converts kg/kg soil to kg/ha, could be used in other nutrient modules
     float** m_conv_wt;
+
+    float** m_soil_carbon;
 };
 #endif /* SEIMS_MODULE_NUTR_TF_H */

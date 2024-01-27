@@ -1970,6 +1970,14 @@
 #define VAR_FLOWOUT_LEN                                 "flowout_length" /// m_qgsRchOut, 
 #define REACH_PERMAFORST                                "is_permafrost" /// m_qgsRchOut, 
 #define REACH_SPYLD                            "GW_SPYLD"
+#define VAR_BM_DIEOFF                           "BM_DIEOFF"
+#define VAR_BIOMS                           "BIOMS"
+#define VAR_LMC                             "LMC"
+#define VAR_LSC                             "LSC"
+#define VAR_WOC                             "WOC"
+#define VAR_BMC                             "BMC"
+#define VAR_HSC                             "HSC"
+#define VAR_HPC                             "HPC"
 
 #define DESC_GWH                                "groundwater height"
 #define DESC_GW_SH                              "shallow groundwater stroage"
@@ -1981,6 +1989,8 @@
 #define DESC_QGS                               "Showllow Groundwater discharge at each reach outlet and at each time stepr"
 #define DESC_AHRU                               "total area of HRU"
 #define DESC_FLOWOUT_LEN                               "flowout length"
+#define DESC_BM_DIEOFF                               "fraction above ground biomass that dies off at dormancy"
+#define DESC_BIOMS                               "land cover/crop biomass (dry weight)"
 //////////////////////////////////////////////////////////////////////////
 /// Define Raster/ related constant strings used in SEIMS and preprocess//
 /// By LiangJun Zhu, May. 5, 2016  ///////////////////////////////////////

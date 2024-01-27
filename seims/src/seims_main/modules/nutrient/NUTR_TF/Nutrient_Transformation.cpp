@@ -32,7 +32,7 @@ Nutrient_Transformation::Nutrient_Transformation() :
     m_soilNH4(nullptr), m_soilWP(nullptr), m_wshd_dnit(-1.f), m_wshd_hmn(-1.f), m_wshd_hmp(-1.f),
     m_wshd_rmn(-1.f), m_wshd_rmp(-1.f), m_wshd_rwn(-1.f), m_wshd_nitn(-1.f), m_wshd_voln(-1.f),
     m_wshd_pal(-1.f), m_wshd_pas(-1.f),
-    m_conv_wt(nullptr) {
+    m_conv_wt(nullptr),m_soil_carbon(nullptr) {
 }
 
 Nutrient_Transformation::~Nutrient_Transformation() {
@@ -72,6 +72,8 @@ Nutrient_Transformation::~Nutrient_Transformation() {
     if (m_sol_RSPC != nullptr) Release2DArray(m_nCells, m_sol_RSPC);
 
     if (m_conv_wt != nullptr) Release2DArray(m_nCells, m_conv_wt);
+
+    if (m_soil_carbon != nullptr) Release2DArray(m_nCells, m_soil_carbon);
 }
 
 bool Nutrient_Transformation::CheckInputData() {
@@ -396,6 +398,8 @@ void Nutrient_Transformation::InitialOutputs() {
 
             Initialize2DArray(m_nCells, m_maxSoilLyrs, m_sol_RNMN, 0.f);
             Initialize2DArray(m_nCells, m_maxSoilLyrs, m_sol_RSPC, 0.f);
+
+            Initialize2DArray(m_nCells, m_maxSoilLyrs, m_soil_carbon, 0.f);
 
 #pragma omp parallel for
             for (int i = 0; i < m_nCells; i++) {
@@ -1295,6 +1299,8 @@ void Nutrient_Transformation::MineralizationCenturyModel(const int i) {
             m_soilFrshOrgN[i][k] = m_sol_LMN[i][k] + m_sol_LSN[i][k];
             m_soilCbn[i][k] = 100.f * (m_sol_LSC[i][k] + m_sol_LMC[i][k] + m_sol_HSC[i][k] +
                 m_sol_HPC[i][k] + m_sol_BMC[i][k]) / m_soilMass[i][k];
+            m_soil_carbon[i][k] = (m_sol_LSC[i][k] + m_sol_LMC[i][k] + m_sol_HSC[i][k] +
+                m_sol_HPC[i][k] + m_sol_BMC[i][k]);
 
             // summary calculations
             float hmn = 0.f;
@@ -1453,7 +1459,39 @@ void Nutrient_Transformation::Get2DData(const char* key, int* nRows, int* nCols,
         *data = m_sol_RSPC;
     } else if (StringMatch(sk, VAR_CONV_WT)) {
         *data = m_conv_wt;
-    } else {
+    }
+    //ljj++
+    else if (StringMatch(sk, VAR_LMC)) {
+        *data = m_sol_LMC;
+        *nRows = m_nCells;
+        *nCols = CVT_INT(m_nSoilLyrs[0]);
+    }
+    else if (StringMatch(sk, VAR_LSC)) {
+        *data = m_sol_LSC;
+        *nRows = m_nCells;
+        *nCols = CVT_INT(m_nSoilLyrs[0]);
+    }
+    else if (StringMatch(sk, VAR_WOC)) {
+        *data = m_soil_carbon;
+        *nRows = m_nCells;
+        *nCols = CVT_INT(m_nSoilLyrs[0]);
+    }
+    else if (StringMatch(sk, VAR_BMC)) {
+        *data = m_sol_BMC;
+        *nRows = m_nCells;
+        *nCols = CVT_INT(m_nSoilLyrs[0]);
+    }
+    else if (StringMatch(sk, VAR_HSC)) {
+        *data = m_sol_HSC;
+        *nRows = m_nCells;
+        *nCols = CVT_INT(m_nSoilLyrs[0]);
+    }
+    else if (StringMatch(sk, VAR_HPC)) {
+        *data = m_sol_HPC;
+        *nRows = m_nCells;
+        *nCols = CVT_INT(m_nSoilLyrs[0]);
+    } 
+    else {
         throw ModelException(MID_NUTR_TF, "Get2DData", "Parameter " + sk + " does not exist.");
     }
 }

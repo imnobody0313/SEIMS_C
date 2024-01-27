@@ -268,6 +268,13 @@ void ModelMain::AppendOutputData(const time_t time) {
                         StringMatch(param->BasicName, "RESB") || //reservoir sediment balance
                         StringMatch(param->BasicName, "CHSB") ||
                         StringMatch(param->BasicName, VAR_GWWB) || // groundwater water balance
+                        //ljj++
+                        StringMatch(param->BasicName, VAR_LMC) || // groundwater water balance
+                        StringMatch(param->BasicName, VAR_LSC) || // groundwater water balance
+                        StringMatch(param->BasicName, VAR_WOC) || // groundwater water balance
+                        StringMatch(param->BasicName, VAR_BMC) || // groundwater water balance
+                        StringMatch(param->BasicName, VAR_HPC) || // groundwater water balance
+                        StringMatch(param->BasicName, VAR_HSC) || // groundwater water balance
                         StringMatch(param->BasicName, VAR_SOWB)    // soil water balance
                     ) {
                         // TODO: more conditions will be added in the future.

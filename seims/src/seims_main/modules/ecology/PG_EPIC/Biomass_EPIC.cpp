@@ -44,7 +44,12 @@ Biomass_EPIC::Biomass_EPIC() :
     m_pltP(nullptr), m_frPltN(nullptr), m_frPltP(nullptr), m_NO3Defic(nullptr),
     m_frStrsAe(nullptr), m_frStrsN(nullptr),
     m_frStrsP(nullptr), m_frStrsTmp(nullptr), m_frStrsWtr(nullptr),
-    m_biomassDelta(nullptr), m_biomass(nullptr) {
+    m_biomassDelta(nullptr), m_biomass(nullptr),
+    //ljj++
+    m_bmdieoff(nullptr),
+    m_soilLMN(nullptr), m_soilLSC(nullptr), m_soilLSN(nullptr), m_soilLS(nullptr),
+    m_soilLSL(nullptr),m_soilNH4(nullptr),m_soilFrshOrgN(nullptr), m_soilFrshOrgP(nullptr),
+    m_soilLSLC(nullptr), m_soilLSLNC(nullptr){
 }
 
 Biomass_EPIC::~Biomass_EPIC() {
@@ -151,7 +156,14 @@ void Biomass_EPIC::Set1DData(const char* key, const int n, float* data) {
     else if (StringMatch(sk, VAR_BIOINIT)) m_initBiom = data;
     else if (StringMatch(sk, VAR_PHUPLT)) m_phuPlt = data;
     else if (StringMatch(sk, VAR_CHT)) m_canHgt = data;
-    else if (StringMatch(sk, VAR_DORMI)) m_dormFlag = data;
+    else if (StringMatch(sk, VAR_DORMI)) {
+        m_dormFlag = data;
+        //ljj test for dormant
+        //for (int i = 0; i < m_nCells; i++) {m_dormFlag[i] = 0;}
+    }
+    
+    //ljj++
+    else if (StringMatch(sk, VAR_BM_DIEOFF)) m_bmdieoff = data;
     else {
         throw ModelException(MID_PG_EPIC, "Set1DData", "Parameter " + sk + " does not exist.");
     }
@@ -167,6 +179,34 @@ void Biomass_EPIC::Set2DData(const char* key, const int nrows, const int ncols, 
     else if (StringMatch(sk, VAR_SOL_ST)) m_soilWtrSto = data;
     else if (StringMatch(sk, VAR_SOL_NO3)) m_soilNO3 = data;
     else if (StringMatch(sk, VAR_SOL_SOLP)) m_soilSolP = data;
+    //ljj++
+    else if (StringMatch(sk, VAR_SOL_HSN)) {
+        m_soilHSN = data;
+    } else if (StringMatch(sk, VAR_SOL_LM)) {
+        m_soilLM = data;
+    } else if (StringMatch(sk, VAR_SOL_LMC)) {
+        m_soilLMC = data;
+    } else if (StringMatch(sk, VAR_SOL_LMN)) {
+        m_soilLMN = data;
+    } else if (StringMatch(sk, VAR_SOL_LSC)) {
+        m_soilLSC = data;
+    } else if (StringMatch(sk, VAR_SOL_LSN)) {
+        m_soilLSN = data;
+    } else if (StringMatch(sk, VAR_SOL_LS)) {
+        m_soilLS = data;
+    } else if (StringMatch(sk, VAR_SOL_LSL)) {
+        m_soilLSL = data;
+    } else if (StringMatch(sk, VAR_SOL_LSLC)) {
+        m_soilLSLC = data;
+    } else if (StringMatch(sk, VAR_SOL_LSLNC)) {
+        m_soilLSLNC = data;
+    }else if (StringMatch(sk, VAR_SOL_NH4)) {
+        m_soilNH4 = data;
+    }else if (StringMatch(sk, VAR_SOL_FORGN)) {
+        m_soilFrshOrgN = data;
+    }else if (StringMatch(sk, VAR_SOL_FORGP)) {
+        m_soilFrshOrgP = data;
+    }
     else {
         throw ModelException(MID_PG_EPIC, "Set2DData", "Parameter " + sk + " does not exist.");
     }
@@ -785,6 +825,169 @@ void Biomass_EPIC::PlantPhosphorusUptake(const int i) {
 
 void Biomass_EPIC::CheckDormantStatus(const int i) {
     /// TODO
+    //ljj++
+    int idc = CVT_INT(m_landCoverCls[i]);
+    //check for beginning of dormant season
+    if (idc == CROP_IDC_WARM_SEASON_ANNUAL_LEGUME || idc == CROP_IDC_WARM_SEASON_ANNUAL ) return;
+    if (m_dormFlag[i] == 0 && m_dayLen[i]-m_dormHr[i] < m_dayLenMin[i])  {
+        //beginning of forest dormant period
+        if (idc == CROP_IDC_TREES) {
+            m_dormFlag[i] = 1;
+            float resnew = 0.;
+            resnew = m_biomass[i] * m_biomDropFr[i];
+            //insert new biomss
+            float BLG1 = 0.f, BLG2 = 0.f, BLG3 = 0.f, CLG = 0.f;
+            float sf = 0.f, sol_min_n = 0.f, resnew_n = 0.f, resnew_ne = 0.f;
+            float LMF = 0.f, LSF = 0.f;
+            float RLN = 0.f, RLR = 0.f;
+            BLG1 = 0.01f / 0.10f;
+            BLG2 = 0.99f;
+            BLG3 = 0.10f;
+            float XX = log(0.5f / BLG1 - 0.5f);
+            BLG2 = (XX -log(1./BLG2-1.))/(1.-0.5);
+            BLG1 = XX + 0.5*BLG2;
+            CLG = BLG3 * m_phuAccum[i] / (m_phuAccum[i] + exp(BLG1 - BLG2 * m_phuAccum[i]));
+            sf = 0.05;
+
+            sol_min_n = 0.f;
+            sol_min_n = m_soilNO3[i][0] + m_soilNH4[i][0];
+
+            resnew = m_biomass[i] * m_biomDropFr[i];
+            resnew_n = resnew * m_pltN[i];
+            resnew_ne = resnew_n + sf * sol_min_n;
+
+            RLN = resnew * CLG / (resnew_n + 1.e-5f);
+            RLR = Min(0.8f, resnew * CLG /1000 / (resnew /1000 + 1.e-5f));
+            LMF = 0.85f - 0.018f * RLN;
+            if (LMF < 0.01f) { LMF = 0.01f; } else if (LMF > 0.7f) LMF = 0.7f;
+            LSF = 1.f - LMF;
+            m_soilLM[i][0] += LMF * resnew;
+            m_soilLS[i][0] += LSF * resnew;
+
+            m_soilLSL[i][0] +=  RLR  * LSF * resnew;
+            m_soilLSC[i][0] += 0.42f * LSF * resnew;
+
+            m_soilLSLC[i][0] += RLR * 0.42f * LSF * resnew;
+            m_soilLSLNC[i][0] = m_soilLSC[i][0] - m_soilLSLC[i][0];
+            if (resnew_ne > 0.42f * LSF * resnew / 150.f) {
+                m_soilLSN[i][0] += 0.42f * LSF * resnew / 150.f;
+                m_soilLMN[i][0] += resnew_ne - (0.42f * LSF * resnew / 150.f) + 1.e-25f;
+            } else {
+                m_soilLSN[i][0] += resnew_ne;
+                m_soilLMN[i][0] += 1.e-25f;
+            }
+            m_soilLMC[i][0] += 0.42f * LMF * resnew;
+
+            /// update no3 and nh4 in soil
+            m_soilNO3[i][0] *= 1.f - sf;
+            m_soilNH4[i][0] *= 1.f - sf;
+
+            m_soilRsd[i][0] = m_soilRsd[i][0] + resnew;
+            m_soilRsd[i][0]  = Max(m_soilRsd[i][0] ,0.);
+            m_soilFrshOrgN[i][0]  =  m_soilFrshOrgN[i][0] +  resnew * m_frPltN[i];
+            m_soilFrshOrgP[i][0]  =  m_soilFrshOrgP[i][0] +  resnew * m_frPltP[i];
+            m_biomass[i] = m_biomass[i] * (1. - m_biomDropFr[i]);
+            m_pltN[i] = m_pltN[i] - resnew * m_frPltN[i];
+            m_pltP[i] = m_pltP[i] - resnew * m_frPltP[i];
+            m_frStrsWtr[i] = 1.;
+            m_lai[i] = m_minLaiDorm[i];
+            m_phuAccum[i] = 0.;
+            m_LaiMaxFr[i] = 0.;
+        }  //idc == CROP_IDC_TREES
+
+        if (idc == CROP_IDC_PERENNIAL_LEGUME || idc == CROP_IDC_PERENNIAL) {
+            m_dormFlag[i] = 1;
+            float resnew = 0.; 
+            resnew = m_bmdieoff[i] * m_biomass[i];
+
+            float BLG1 = 0.f, BLG2 = 0.f, BLG3 = 0.f, CLG = 0.f;
+            float sf = 0.f, sol_min_n = 0.f, resnew_n = 0.f, resnew_ne = 0.f;
+            float LMF = 0.f, LSF = 0.f;
+            float RLN = 0.f, RLR = 0.f;
+            BLG1 = 0.01f / 0.10f;
+            BLG2 = 0.99f;
+            BLG3 = 0.10f;
+            float XX = log(0.5f / BLG1 - 0.5f);
+            BLG2 = (XX -log(1./BLG2-1.))/(1.-0.5);
+            BLG1 = XX + 0.5*BLG2;
+            CLG = BLG3 * m_phuAccum[i] / (m_phuAccum[i] + exp(BLG1 - BLG2 * m_phuAccum[i]));
+
+            sf = 0.05;
+
+            sol_min_n = 0.f;
+            sol_min_n = m_soilNO3[i][0] + m_soilNH4[i][0];
+
+            resnew = m_bmdieoff[i] * m_biomass[i];
+            resnew_n = m_bmdieoff[i] *  m_pltN[i];	 
+            resnew_ne = resnew_n + sf * sol_min_n;
+
+            RLN = resnew * CLG / (resnew_n + 1.e-5f);
+            RLR = Min(0.8f, resnew * CLG/1000 / (resnew/1000 + 1.e-5f));
+
+            LMF = 0.85f - 0.018f * RLN;
+            if (LMF < 0.01f) { LMF = 0.01f; } else if (LMF > 0.7f) LMF = 0.7f;
+
+            LSF = 1.f - LMF;
+
+            m_soilLM[i][0] += LMF * resnew;
+            m_soilLS[i][0] += LSF * resnew;
+
+            m_soilLSL[i][0] += RLR * resnew;
+            m_soilLSC[i][0] += 0.42f * LSF * resnew;
+
+            m_soilLSLC[i][0] += RLR * 0.42f * resnew;
+            m_soilLSLNC[i][0] = m_soilLSC[i][0] - m_soilLSLC[i][0];
+
+            if (resnew_ne > 0.42f * LSF * resnew / 150.f) {
+                m_soilLSN[i][0] += 0.42f * LSF * resnew / 150.f;
+                m_soilLMN[i][0] += resnew_ne - (0.42f * LSF * resnew / 150.f) + 1.e-25f;
+            } else {
+                m_soilLSN[i][0] += resnew_ne;
+                m_soilLMN[i][0] += 1.e-25f;
+            }
+
+            m_soilLMC[i][0] += 0.42f * LMF * resnew;
+
+            /// update no3 and nh4 in soil
+            m_soilNO3[i][0] *= 1.f - sf;
+            m_soilNH4[i][0] *= 1.f - sf; 
+
+            m_soilRsd[i][0] = m_soilRsd[i][0] + resnew;
+            m_soilRsd[i][0]  = Max(m_soilRsd[i][0] ,0.);
+            m_soilFrshOrgN[i][0]  =  m_soilFrshOrgN[i][0] +  m_bmdieoff[i] *  m_pltN[i];
+            m_soilFrshOrgP[i][0]  =  m_soilFrshOrgP[i][0] +  m_bmdieoff[i] *  m_pltP[i];
+            // bio_hv(icr(j),j) = bio_ms(j) * m_bmdieoff[i] +  bio_hv(icr(j),j)
+            // bio_yrms(j) = bio_yrms(j) + bio_ms(j) * m_bmdieoff[i] / 1000.
+            m_biomass[i] = (1. - m_bmdieoff[i]) *  m_biomass[i];
+            m_pltN[i] = (1. - m_bmdieoff[i]) *  m_pltN[i];
+            m_pltP[i] = (1. - m_bmdieoff[i]) *  m_pltP[i];
+            m_frStrsWtr[i] = 1.;
+            m_lai[i] = m_minLaiDorm[i];
+            m_phuAccum[i] = 0.;
+            //ncrops(icr(j),j) = ncrops(icr(j),j) + 1;
+        } //idc == CROP_IDC_PERENNIAL_LEGUME || idc == CROP_IDC_PERENNIAL
+        //beginning of cool season annual dormant period
+        if (idc == CROP_IDC_COLD_SEASON_ANNUAL_LEGUME || idc == CROP_IDC_COLD_SEASON_ANNUAL) {
+            if (m_phuAccum[i]< 0.75) {
+                m_dormFlag[i] = 1;
+                m_frStrsWtr[i] = 1.;
+            }
+        }
+
+    }
+    //check if end of dormant period
+    if (m_dormFlag[i] == 1 && m_dayLen[i]-m_dormHr[i] >= m_dayLenMin[i])  {
+        // end of perennial dormant period
+        if (idc == CROP_IDC_PERENNIAL_LEGUME||idc == CROP_IDC_PERENNIAL||idc == CROP_IDC_TREES) {
+            m_dormFlag[i] = 0;
+        }
+
+        // end of cool season annual dormant period
+        if (idc == CROP_IDC_COLD_SEASON_ANNUAL_LEGUME || idc == CROP_IDC_COLD_SEASON_ANNUAL ) {
+            m_dormFlag[i] = 0;
+            m_phuAccum[i]= 0.f;
+        }
+    }
     return;
 }
 
@@ -793,6 +996,7 @@ int Biomass_EPIC::Execute() {
     InitialOutputs();
 #pragma omp parallel for
     for (int i = 0; i < m_nCells; i++) {
+        if(0<m_dormFlag[i] && m_dormFlag[i]<1) m_dormFlag[i] = 1;  //ljj for averged parameter in HRU
         /// calculate albedo in current day, albedo.f of SWAT
         float cej = -5.e-5f;
         float eaj = exp(cej * (m_rsdCovSoil[i] + 0.1f)); // eq. 1:1.2.16 in SWAT theory 2009
@@ -848,6 +1052,7 @@ void Biomass_EPIC::Get1DData(const char* key, int* n, float** data) {
     else if (StringMatch(sk, VAR_FR_STRSWTR)) *data = m_frStrsWtr;
     else if (StringMatch(sk, VAR_SOL_COV)) *data = m_rsdCovSoil;
     else if (StringMatch(sk, VAR_SOL_SW)) *data = m_soilWtrStoPrfl;
+    else if (StringMatch(sk, VAR_BIOMS)) *data = m_biomass;
     else {
         throw ModelException(MID_PG_EPIC, "Get1DData", "Result " + sk + " does not exist.");
     }

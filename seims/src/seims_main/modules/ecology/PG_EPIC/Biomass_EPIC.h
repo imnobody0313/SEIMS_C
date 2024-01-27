@@ -318,5 +318,23 @@ private:
     float* m_biomassDelta;
     /// land cover/crop biomass (dry weight), bio_ms in SWAT
     float* m_biomass;
+
+    //ljj++
+    float** m_soilFrshOrgN;
+    ///    sol_fop(:,:)  |kg P/ha       |amount of phosphorus stored in the fresh organic (residue) pool
+    float** m_soilFrshOrgP;
+    float** m_soilHSN;   ///< slow Nitrogen pool in soil, equals to soil active organic n pool in SWAT
+    float** m_soilLM;    ///< metabolic litter SOM pool
+    float** m_soilLMC;   ///< metabolic litter C pool
+    float** m_soilLMN;   ///< metabolic litter N pool
+    float** m_soilLSC;   ///< structural litter C pool
+    float** m_soilLSN;   ///< structural litter N pool
+    float** m_soilLS;    ///< structural litter SOM pool
+    float** m_soilLSL;   ///< lignin weight in structural litter
+    float** m_soilLSLC;  ///< lignin amount in structural litter pool
+    float** m_soilLSLNC; ///< non-lignin part of the structural litter C
+    float** m_soilNH4;
+    
+    float* m_bmdieoff;
 };
 #endif /* SEIMS_MODULE_PG_EPIC_H */
