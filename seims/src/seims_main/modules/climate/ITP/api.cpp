@@ -22,7 +22,8 @@ extern "C" SEIMS_MODULE_API const char* MetadataInformation() {
     mdi.SetHelpfile("");
 
     //from parameter database, e.g., Weight_P, Weight_PET, Weight_T.
-    mdi.AddParameter(Tag_Weight, UNIT_NON_DIM, DESC_WEIGHT_ITP, Source_ParameterDB, DT_Array1D);
+    //mdi.AddParameter(Tag_Weight, UNIT_NON_DIM, DESC_WEIGHT_ITP, Source_ParameterDB, DT_Array1D);
+    mdi.AddParameter(Tag_Weight[0], UNIT_NON_DIM, Tag_Weight[1], Source_ParameterDB, DT_Array2D);
     // from config.fig, e.g. Interpolation_P_1
     mdi.AddParameter(Tag_VerticalInterpolation, UNIT_NON_DIM, DESC_VER_ITP, File_Config, DT_Single);
     // these three parameters are just read when it will do vertical interpolation
@@ -39,6 +40,7 @@ extern "C" SEIMS_MODULE_API const char* MetadataInformation() {
 
     /// Must be "D". This is used to match with output id in file.out with data type.
     mdi.AddOutput(DataType_Prefix_DIS, UNIT_NON_DIM, DESC_NONE, DT_Raster1D);
+    mdi.AddInput(VAR_DATATYPES, UNIT_NON_DIM, DESC_NONE, Source_Module_Optional, DT_Array1D);
 
     string res = mdi.GetXMLDocument();
 

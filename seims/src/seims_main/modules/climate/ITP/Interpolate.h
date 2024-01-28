@@ -56,7 +56,8 @@ private:
     /// count of valid cells
     int m_nCells;
     /// weights of each sites of all valid cells
-    float* m_itpWeights;
+    //float* m_itpWeights;
+    float** m_itpWeights;
 
     /// whether using vertical interpolation
     bool m_itpVertical;
@@ -68,5 +69,10 @@ private:
     float** m_lapseRate;
     /// interpolation result
     float* m_itpOutput;
+
+    //ljj++
+    float m_lapse;
+
+    float* m_datatypes;
 };
 #endif /* SEIMS_MODULE_ITP_H */

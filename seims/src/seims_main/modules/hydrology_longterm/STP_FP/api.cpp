@@ -43,6 +43,11 @@ extern "C" SEIMS_MODULE_API const char* MetadataInformation() {
     mdi.AddOutput(VAR_TMEAN1, UNIT_TEMP_DEG, DESC_TMEAN1, DT_Raster1D); /// mean air temperature of the day(d-1)
     mdi.AddOutput(VAR_TMEAN2, UNIT_TEMP_DEG, DESC_TMEAN2, DT_Raster1D); /// mean air temperature of the day(d-2)
 
+    //ljj++
+    mdi.AddParameter(VAR_SOILDEPTH, UNIT_DEPTH_MM, DESC_SOILTHICK, Source_ParameterDB, DT_Raster2D);
+
+    mdi.AddOutput(VAR_SOILT, UNIT_TEMP_DEG, DESC_SOTE, DT_Array2D);
+
     string res = mdi.GetXMLDocument();
     char* tmp = new char[res.size() + 1];
     strprintf(tmp, res.size() + 1, "%s", res.c_str());

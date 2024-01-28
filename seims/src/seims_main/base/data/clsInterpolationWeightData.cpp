@@ -23,6 +23,22 @@ void ItpWeightData::GetWeightData(int* n, float** data) {
     *data = itp_weight_data_;
 }
 
+void ItpWeightData::GetWeightData2D(int* n, int* n_stations, float*** data) {
+    *n = n_rows_;
+    *n_stations = n_cols_;
+    if (nullptr == itp_weight_data2d_) {
+        Initialize2DArray(n_rows_, n_cols_, itp_weight_data2d_, 0.);
+    }
+    int index = 0;
+    for (int i = 0; i < n_rows_; i++) {
+        for (int j = 0; j < n_cols_; j++) {
+            index = i * n_cols_ + j;
+            itp_weight_data2d_[i][j] = itp_weight_data_[index];
+        }
+    }
+
+    *data = itp_weight_data2d_;
+}
 void ItpWeightData::Dump(std::ostream* fs) {
     if (fs == nullptr) return;
     int index = 0;

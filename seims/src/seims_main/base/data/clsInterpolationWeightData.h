@@ -40,6 +40,14 @@ public:
      * \param[out] data
      */
     void GetWeightData(int* n, float** data);
+    /*!
+    * \brief Get the weight data read from mongoDB in form of 2DArray
+    *
+    * \param[out] n Rows
+    * \param[out] n_stations Cols
+    * \param[out] data data
+    */
+    void GetWeightData2D(int* n, int* n_stations, float*** data);
 
     /*!
      * \brief Output the weight data to \a ostream
@@ -72,6 +80,8 @@ private:
     string filename_;
     //! iterpolation weight data array
     float* itp_weight_data_;
+
+    float** itp_weight_data2d_;
     //! row of weight data
     int n_rows_;
     //! column of weight data, i.e., number of stations

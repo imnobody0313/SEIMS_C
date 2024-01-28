@@ -6,7 +6,9 @@
 Interpolate::Interpolate() : m_dataType(0), m_nStatioins(-1),
                              m_stationData(nullptr), m_nCells(-1), m_itpWeights(nullptr), m_itpVertical(false),
                              m_hStations(nullptr), m_dem(nullptr), m_lapseRate(nullptr),
-                             m_itpOutput(nullptr) {
+                             m_itpOutput(nullptr),
+                             //ljj+
+                             m_datatypes(nullptr),m_lapse(NODATA_VALUE) {
 }
 
 void Interpolate::SetClimateDataType(const float value) {
@@ -29,22 +31,31 @@ int Interpolate::Execute() {
     CheckInputData();
     if (nullptr == m_itpOutput) { Initialize1DArray(m_nCells, m_itpOutput, 0.f); }
     size_t err_count = 0;
+    if(m_dataType == 0) m_lapse = 0.00012; //
+    if(m_dataType == 1) m_lapse = -0.005; //青藏高原多种分辨率月温度递减率网格数据集 zhangfan
+    if(m_dataType == 2) m_lapse = 0;
+    if(m_dataType == 3) m_lapse = 0;
 #pragma omp parallel for reduction(+: err_count)
     for (int i = 0; i < m_nCells; i++) {
         int index = 0;
         float value = 0.f;
         for (int j = 0; j < m_nStatioins; j++) {
             index = i * m_nStatioins + j;
-            value += m_stationData[j] * m_itpWeights[index];
+            //value += m_stationData[j] * m_itpWeights[index];
+            value += m_stationData[j] * m_itpWeights[i][j];
             if (value != value) {
                 err_count++;
                 cout << "CELL:" << i << ", Site: " << j << ", Weight: " << m_itpWeights[index] <<
                         ", siteData: " << m_stationData[j] << ", Value:" << value << ";" << endl;
             }
+            //ljj++ did not use itp directly due to the m_lapseRate is not defined
+            float delta = m_dem[i] - m_hStations[j];
+            float adjust = m_itpWeights[i][j] * m_lapse * delta;
+            value += adjust;
             if (m_itpVertical) {
                 float delta = m_dem[i] - m_hStations[j];
                 float factor = m_lapseRate[m_month - 1][m_dataType];
-                float adjust = m_itpWeights[index] * delta * factor * 0.01f;
+                float adjust = m_itpWeights[i][j] * delta * factor * 0.01f;
                 value += adjust;
             }
         }
@@ -75,7 +86,13 @@ void Interpolate::Set2DData(const char* key, const int n_rows, const int n_cols,
             CheckInputSize(MID_ITP, key, n_rows, n_month);
             m_lapseRate = data;
         }
-    } else {
+    }
+    else if (StringMatch(sk, Tag_Weight[0])) 
+    {
+        CheckInputSize2D(MID_ITP, key, n_rows, n_cols, m_nCells, m_nStatioins);
+        m_itpWeights = data; 
+    }
+    else {
         throw ModelException(MID_ITP, "Set2DData", "Parameter " + sk + " does not exist.");
     }
 }
@@ -83,20 +100,23 @@ void Interpolate::Set2DData(const char* key, const int n_rows, const int n_cols,
 void Interpolate::Set1DData(const char* key, const int n, float* data) {
     string sk(key);
     if (StringMatch(sk, Tag_DEM)) {
-        if (m_itpVertical) {
+        //if (m_itpVertical) {
             CheckInputSize(MID_ITP, key, n, m_nCells);
             m_dem = data;
-        }
-    } else if (StringMatch(sk, Tag_Weight)) {
-        CheckInputSize(MID_ITP, key, n, m_nCells);
-        m_itpWeights = data;
+        //}
+    // } else if (StringMatch(sk, Tag_Weight)) {
+    //     CheckInputSize(MID_ITP, key, n, m_nCells);
+    //     m_itpWeights = data;
     } else if (StringMatch(sk, Tag_Elevation_Precipitation) || StringMatch(sk, Tag_Elevation_Meteorology)
         || StringMatch(sk, Tag_Elevation_Temperature) || StringMatch(sk, Tag_Elevation_PET)) {
-        if (m_itpVertical) {
+        //if (m_itpVertical) {
             CheckInputSize(MID_ITP, key, n, m_nStatioins);
             m_hStations = data;
-        }
-    } else {
+        //}
+    } else if (StringMatch(sk, VAR_DATATYPES)) {
+        m_datatypes = data;
+        SetClimateDataType(m_datatypes[0]);
+    }else {
         string prefix = sk.substr(0, 1);
         if (StringMatch(prefix, DataType_Prefix_TS)) {
             CheckInputSize(MID_ITP, key, n, m_nStatioins);

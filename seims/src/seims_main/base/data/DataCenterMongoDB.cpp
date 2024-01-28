@@ -305,6 +305,8 @@ void DataCenterMongoDB::ReadClimateSiteList() {
     bson_t* query = bson_new();
     // subbasin id
     BSON_APPEND_INT32(query, Tag_SubbasinId, subbasin_id_);
+    BSON_APPEND_UTF8(query, Tag_Mode, input_->getModelMode().c_str()); // mode
+    
     // mode
     //string modelMode = m_input->getModelMode();
     BSON_APPEND_UTF8(query, Tag_Mode, input_->getModelMode().c_str());
@@ -442,19 +444,30 @@ FloatRaster* DataCenterMongoDB::ReadRasterData(const string& remote_filename) {
     return raster_data;
 }
 
-void DataCenterMongoDB::ReadItpWeightData(const string& remote_filename, int& num, float*& data) {
+// void DataCenterMongoDB::ReadItpWeightData(const string& remote_filename, int& num, float*& data) {
+//     ItpWeightData* weight_data = new ItpWeightData(spatial_gridfs_, remote_filename);
+//     if (!weight_data->Initialized()) {
+//         delete weight_data;
+//         data = nullptr;
+//         return;
+//     }
+//     float* tmpdata = nullptr;
+//     weight_data->GetWeightData(&num, &tmpdata);
+//     Initialize1DArray(num, data, tmpdata);
+//     delete weight_data;
+// }
+void DataCenterMongoDB::ReadItpWeightData(const string& remote_filename, int& num, int& stations, float**& data) {
     ItpWeightData* weight_data = new ItpWeightData(spatial_gridfs_, remote_filename);
     if (!weight_data->Initialized()) {
         delete weight_data;
         data = nullptr;
         return;
     }
-    float* tmpdata = nullptr;
-    weight_data->GetWeightData(&num, &tmpdata);
-    Initialize1DArray(num, data, tmpdata);
+    float** tmpdata = nullptr;
+    weight_data->GetWeightData2D(&num, &stations, &tmpdata);
+    Initialize2DArray(num, stations, data, tmpdata);
     delete weight_data;
 }
-
 void DataCenterMongoDB::Read1DArrayData(const string& remote_filename, int& num, float*& data) {
     char* databuf = nullptr;
     size_t datalength;

@@ -46,6 +46,10 @@ public:
 
     void Get1DData(const char* key, int* n, float** data) OVERRIDE;
 
+    void Set2DData(const char* key, int n, int col, float** data) OVERRIDE;
+
+    void Get2DData(const char* key, int* n, int* col, float*** data) OVERRIDE;
+
 private:
     /// from parameter database
     /// coefficients in the Equation
@@ -69,5 +73,13 @@ private:
 
     /// output soil temperature
     float* m_soilTemp;
+
+    //ljj++
+    /// max number of soil layers
+    int m_maxSoilLyrs;
+
+    float**m_soildepth;
+
+    float** m_soilt;
 };
 #endif /* SEIMS_MODULE_STP_FP_H */

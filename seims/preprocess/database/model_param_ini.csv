@@ -225,3 +225,4 @@ Routing,ch_bed_d50,D50(median) particle size diameter of channel bed sediment,mi
 Groundwater,gwmin,Minimum groundwater storage,mm,GW_MOD,300,0,AC,50000,1
 Groundwater,alphabf,alpha factor for groundwater recession curve,1/days,GW_MOD,0.48,0,AC,1,0
 Groundwater,delay,time required for water leaving the bottom of the root zone to reach the shallow aquifer,days,GW_MOD,31,0,AC,300,1
+Groundwater,gw_spyld,specific yield for shallow aquifer,days,GW_MOD,-9999,1,RC,100,0

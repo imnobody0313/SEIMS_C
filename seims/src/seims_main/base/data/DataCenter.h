@@ -75,7 +75,8 @@ public:
      * \param[out] num Data length
      * \param[out] data returned data
      */
-    virtual void ReadItpWeightData(const string& remote_filename, int& num, float*& data) = 0;
+    //virtual void ReadItpWeightData(const string& remote_filename, int& num, float*& data) = 0;
+    virtual void ReadItpWeightData(const string& remote_filename, int& num, int& stations, float**& data) = 0;
     /*!
      * \brief Read 1D array data
      * \param[in] remote_filename Data file name

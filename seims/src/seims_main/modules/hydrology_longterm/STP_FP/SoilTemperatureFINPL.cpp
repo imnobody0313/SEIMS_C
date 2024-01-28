@@ -12,13 +12,19 @@ SoilTemperatureFINPL::SoilTemperatureFINPL() :
     m_soilTempRelFactor10(nullptr),
     m_landUse(nullptr), m_meanTemp(nullptr), m_meanTempPre1(nullptr),
     m_meanTempPre2(nullptr),
-    m_soilTemp(nullptr) {
+    m_soilTemp(nullptr),
+    //ljj++
+    m_maxSoilLyrs(-1),m_soildepth(nullptr),
+    m_soilt(nullptr)
+     {
 }
 
 SoilTemperatureFINPL::~SoilTemperatureFINPL() {
     if (m_soilTemp != nullptr) Release1DArray(m_soilTemp);
     if (m_meanTempPre1 != nullptr) Release1DArray(m_meanTempPre1);
     if (m_meanTempPre2 != nullptr) Release1DArray(m_meanTempPre2);
+    //ljj++
+    if (m_soilt != nullptr) Release2DArray(m_nCells, m_soilt);
 }
 
 int SoilTemperatureFINPL::Execute() {
@@ -54,6 +60,10 @@ int SoilTemperatureFINPL::Execute() {
             m_meanTempPre2[i] = m_meanTempPre1[i];
             m_meanTempPre1[i] = t;
         }
+    }
+    for (int i = 0; i < m_nCells; i++) {
+        m_soilt[i][0] = m_meanTemp[i];
+        m_soilt[i][1] = m_meanTemp[6];
     }
     if (errCount > 0) {
         throw ModelException(MID_STP_FP, "Execute", "The calculation of soil temperature failed!");
@@ -125,5 +135,26 @@ void SoilTemperatureFINPL::InitialOutputs() {
     }
     if (nullptr == m_soilTemp) {
         Initialize1DArray(m_nCells, m_soilTemp, 0.f);
+    }
+    //ljj++
+    if (nullptr == m_soilt) {
+        Initialize2DArray(m_nCells, m_maxSoilLyrs, m_soilt, 0.f);
+    }
+}
+
+//ljj++
+void SoilTemperatureFINPL::Set2DData(const char* key, int n, int col, float** data) {
+	CheckInputSize2D(MID_STP_FP, key, n, col, m_nCells, m_maxSoilLyrs);
+	string sk(key);
+	if (StringMatch(sk, VAR_SOILDEPTH)) m_soildepth = data;
+}
+
+void SoilTemperatureFINPL::Get2DData(const char* key, int* nrows, int* ncols, float*** data) {
+	InitialOutputs();
+	string sk(key);
+	if (StringMatch(sk, VAR_SOILT)) {
+        *data = m_soilt;
+        *nrows = m_nCells;
+        *ncols = m_maxSoilLyrs;
     }
 }

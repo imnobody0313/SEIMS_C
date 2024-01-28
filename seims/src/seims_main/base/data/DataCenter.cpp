@@ -202,10 +202,11 @@ void DataCenter::LoadAdjust1DArrayData(const string& para_name, const string& re
     int n;
     float* data = nullptr;
     string upper_name = GetUpper(para_name);
-    if (StringMatch(upper_name, Tag_Weight)) {
-        /// 1. IF Weight data. `data` will be nullptr if load Weight data failed.
-        ReadItpWeightData(remote_filename, n, data);
-    } else if (StringMatch(upper_name, Tag_FLOWOUT_INDEX_D8)) {
+    // if (StringMatch(upper_name, Tag_Weight)) {
+    //     /// 1. IF Weight data. `data` will be nullptr if load Weight data failed.
+    //     ReadItpWeightData(remote_filename, n, data);
+    // } else 
+    if (StringMatch(upper_name, Tag_FLOWOUT_INDEX_D8)) {
         /// 2. IF FLOWOUT_INDEX_D8
         Read1DArrayData(remote_filename, n, data);
         if (nullptr == data && mask_raster_->GetCellNumber() != n && !is_optional) {
@@ -257,7 +258,12 @@ void DataCenter::LoadAdjust2DArrayData(const string& para_name, const string& re
     } else if (StringMatch(upper_name, Tag_LapseRate)) {
         /// Match to the format of DT_Array2D, By LJ.
         SetLapseData(remote_filename, n_rows, n_cols, data);
-    } else {
+    } 
+    else if (StringMatch(upper_name, Tag_Weight[0])) 
+    {
+        ReadItpWeightData(remote_filename, n_rows, n_cols, data);
+    }
+    else {
         // Including: Tag_ROUTING_LAYERS, Tag_ROUTING_LAYERS_DINF,
         //            Tag_FLOWIN_INDEX_D8, Tag_FLOWIN_INDEX_DINF,
         //            Tag_FLOWIN_PERCENTAGE_DINF, Tag_FLOWOUT_INDEX_DINF
@@ -323,7 +329,8 @@ void DataCenter::SetData(SEIMSModuleSetting* setting, ParamInfo* param,
     } else {
         oss << name;
     }
-    if (StringMatch(name, Tag_Weight)) {
+    //if (StringMatch(name, Tag_Weight)) {
+    if (StringMatch(name, Tag_Weight[0])) {
         if (setting->dataTypeString() == DataType_Precipitation) {
             oss << "_P";
         } else {
@@ -518,6 +525,24 @@ void DataCenter::UpdateInput(vector<SimulationModule *>& modules, const time_t t
                         data[i_data] *= init_params_[VAR_K_PET]->GetAdjustedValue();
                     }
                 }
+                float* data2 = (float*)malloc(1 * sizeof(float));
+                for (int i_data = 0; i_data < 1; i_data++) {
+                    string temp = param->Name.c_str();
+                    int pos = temp.find("_");
+                    string tt = temp.substr(pos+1);
+                    if (StringMatch(tt, DataType_Precipitation)) data2[i_data] = 1.0f;
+                    if (StringMatch(tt, DataType_MeanTemperature)) data2[i_data] = 2.0f;
+                    if (StringMatch(tt, DataType_MinimumTemperature)) data2[i_data] = 3.0f;
+                    if (StringMatch(tt, DataType_MaximumTemperature)) data2[i_data] = 4.0f;
+                    if (StringMatch(tt, DataType_PotentialEvapotranspiration)) data2[i_data] = 5.0f;
+                    if (StringMatch(tt, DataType_SolarRadiation)) data2[i_data] = 6.0f;
+                    if (StringMatch(tt, DataType_WindSpeed)) data2[i_data] = 7.0f;
+                    if (StringMatch(tt, DataType_RelativeAirMoisture)) data2[i_data] = 8.0f;
+                    // if (StringMatch(tt, DataType_MaximumMonthlyTemperature)) data2[i_data] = 9.0f;
+                    // if (StringMatch(tt, DataType_MinimumMonthlyTemperature)) data2[i_data] = 10.0f;
+                }
+                p_module->Set1DData("datatypes", 1, data2);       
+               
                 p_module->Set1DData(DataType_Prefix_TS, datalen, data);
             }
         }

@@ -379,10 +379,12 @@ void ModuleFactory::ReadParameterSetting(string& moduleID, TiXmlDocument& doc, S
                     if (StringMatch(param->Name, Tag_DataType)) param->Value = setting->dataType();
 
                     //special process for interpolation modules
-                    if (StringMatch(param->Name, Tag_Weight)) {
+                    //if (StringMatch(param->Name, Tag_Weight)) {
+                    if (StringMatch(param->Name, Tag_Weight[0])) {    
                         if (setting->dataTypeString().length() == 0) {
                             throw ModelException("ModuleFactory", "ReadParameterSetting",
-                                                 "The parameter " + string(Tag_Weight) +
+                                                 //"The parameter " + string(Tag_Weight) +
+                                                 "The parameter " + string(Tag_Weight[0]) +
                                                  " should have corresponding data type in module " + moduleID);
                         }
                         if (StringMatch(setting->dataTypeString(), DataType_MeanTemperature) ||

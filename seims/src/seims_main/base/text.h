@@ -9,6 +9,10 @@
 #ifndef SEIMS_TEXT_H
 #define SEIMS_TEXT_H
 
+#ifndef CONST_CHARS_LIST
+#define CONST_CHARS_LIST static const char* const
+#endif
+
 #define MODEL_NAME                             "SEIMS"
 #define MODEL_VERSION                          "2019"
 #define SEIMS_EMAIL                            "zlj@lreis.ac.cn"
@@ -44,8 +48,10 @@
 #define Tag_Latitude_Meteorology               "Latitude_M"
 #define Tag_StationElevation                   "StationElevation"        // m_hStations
 #define Tag_VerticalInterpolation              "VERTICALINTERPOLATION"   // m_itpVertical
-#define Tag_Weight                             "WEIGHT"                  // m_itpWeights
+//#define Tag_Weight                             "WEIGHT"                  // m_itpWeights
 #define Tag_DataType                           "DATATYPE"                // m_dataType
+//#define Tag_Weight                             "WEIGHT"                  // m_itpWeights
+CONST_CHARS_LIST Tag_Weight[] = {"WEIGHT", "Weight used for interpolation"};
 ///////  define parameter calibration related string constants  ///////
 #define PARAM_CHANGE_VC                        "VC"  // replace by a value
 #define PARAM_CHANGE_RC                        "RC"  // multiply a ratio, which is diff from SWAT: * (1+ratio)
@@ -1978,6 +1984,8 @@
 #define VAR_BMC                             "BMC"
 #define VAR_HSC                             "HSC"
 #define VAR_HPC                             "HPC"
+#define VAR_SOILT                           "SOILT"
+#define VAR_DATATYPES                       "datatypes"
 
 #define DESC_GWH                                "groundwater height"
 #define DESC_GW_SH                              "shallow groundwater stroage"
