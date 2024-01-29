@@ -15,7 +15,7 @@ SSR_DA::SSR_DA() :
     /// outputs
     m_subSurfRf(nullptr), m_subSurfRfVol(nullptr), m_ifluQ2Rch(nullptr),
     //ljj++
-    m_area(nullptr),m_flowout_length(nullptr)
+    m_area(nullptr),m_flowout_length(nullptr),m_soilTempprofile(nullptr)
      {
 }
 
@@ -89,7 +89,10 @@ bool SSR_DA::FlowInSoil(const int id) {
         // Otherwise, calculate interflow:
         // for the upper two layers, soil may be frozen
         // also check if there are upstream inflow
-        if (j == 0 && m_soilTemp[id] <= m_soilFrozenTemp && qUp <= 0.f) {
+        // if (j == 0 && m_soilTemp[id] <= m_soilFrozenTemp && qUp <= 0.f) {
+        //     continue;
+        // }
+        if (m_soilTempprofile[id][j] <= m_soilFrozenTemp && qUp <= 0.f) {
             continue;
         }
 
@@ -270,7 +273,12 @@ void SSR_DA::Set2DData(const char* key, const int nrows, const int ncols, float*
     } else if (StringMatch(sk, Tag_FLOWIN_INDEX_D8)) {
         CheckInputSize(MID_SSR_DA, key, nrows, m_nCells);
         m_flowInIdxD8 = data;
-    } else {
+    } 
+    //ljj++
+    else if (StringMatch(sk, VAR_SOILT)) {
+        CheckInputSize(MID_SSR_DA, key, nrows, m_nCells);
+        m_soilTempprofile = data;
+    }else {
         throw ModelException(MID_SSR_DA, "Set2DData", "Parameter " + sk + " does not exist.");
     }
 }

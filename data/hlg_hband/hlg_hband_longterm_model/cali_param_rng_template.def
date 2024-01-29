@@ -13,13 +13,21 @@ lag_snow,-0.5,0.1
 ### Subsurface, SSR_DA
 Ki,-2.0,5.0
 ### Groundwater, GWA_RE
-df_coef,0,0.4
-Kg,-0.004,0.1
+df_coef,0,0.3
+Kg,-0.004,0.04
 Base_ex,-0.5,1
 gwmax,0,22500
 
-#gwmin,0,200
+gwmin,0,200
 #ch_bnk_k,0.0001,100
-#alphabf,-0.04,1
-#delay,-30,60
-#gw_spyld,0.1,20
+alphabf,-0.04,1
+delay,-30,60
+gw_spyld,0.1,20
+
+tsoil1,-8,80
+tsoil2,-1,20
+tsoil3,-1,20
+tsoil4,-1,5
+tsoil5,-1,5
+DDEPTH1,-1000,1000
+DDEPTH2,-800,500

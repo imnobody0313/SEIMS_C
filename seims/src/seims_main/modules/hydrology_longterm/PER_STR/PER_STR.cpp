@@ -8,7 +8,7 @@ PER_STR::PER_STR() :
     m_soilSat(nullptr), m_soilFC(nullptr),
     m_soilWtrSto(nullptr), m_soilWtrStoPrfl(nullptr), m_soilTemp(nullptr), m_infil(nullptr),
     m_surfRf(nullptr), m_potVol(nullptr), m_impoundTrig(nullptr),
-    m_soilPerco(nullptr) {
+    m_soilPerco(nullptr),m_soilTempprofile(nullptr) {
 }
 
 PER_STR::~PER_STR() {
@@ -37,7 +37,11 @@ int PER_STR::Execute() {
             //if (i == 100)
             //	cout<<"lyr: "<<j<<", soil storage: "<<m_soilStorage[i][j]<<", fc: "<<fcSoilWater<<", excess: "<<excessWater<<endl;
             // for the upper two layers, soil may be frozen
-            if (j == 0 && m_soilTemp[i] <= m_soilFrozenTemp) {
+            // if (j == 0 && m_soilTemp[i] <= m_soilFrozenTemp) {
+            //     continue;
+            // }
+            //ljj++
+            if (m_soilTempprofile[i][j] <= m_soilFrozenTemp) {
                 continue;
             }
             m_soilPerco[i][j] = 0.f;
@@ -142,6 +146,8 @@ void PER_STR::Set2DData(const char* key, const int nrows, const int ncols, float
     else if (StringMatch(sk, VAR_SOL_UL)) m_soilSat = data;
     else if (StringMatch(sk, VAR_SOL_AWC)) m_soilFC = data;
     else if (StringMatch(sk, VAR_SOL_ST)) m_soilWtrSto = data;
+    //ljj++
+    else if (StringMatch(sk, VAR_SOILT)) m_soilTempprofile = data;
     else {
         throw ModelException(MID_PER_STR, "Set2DData", "Parameter " + sk + " does not exist.");
     }

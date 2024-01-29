@@ -4,7 +4,7 @@ PROJECT(SEIMS_MODULE_${MODNAME})
 FILE(GLOB SRC_LIST *.cpp *.h)
 ADD_LIBRARY(${MODNAME} SHARED ${SRC_LIST})
 SET(LIBRARY_OUTPUT_PATH ${SEIMS_BINARY_OUTPUT_PATH})
-TARGET_LINK_LIBRARIES(${MODNAME} module_setting)
+TARGET_LINK_LIBRARIES(${MODNAME} module_setting common_algorithm)
 ### For Xcode generator, specific LLVM-Clang installed by brew, and add link library of OpenMP explicitly.
 IF(XCODE AND LLVM_FOUND)
     TARGET_LINK_LIBRARIES(${MODNAME} ${OpenMP_LIBRARY})

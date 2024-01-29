@@ -75,7 +75,6 @@ public:
      * \param[out] num Data length
      * \param[out] data returned data
      */
-    //virtual void ReadItpWeightData(const string& remote_filename, int& num, float*& data) = 0;
     virtual void ReadItpWeightData(const string& remote_filename, int& num, int& stations, float**& data) = 0;
     /*!
      * \brief Read 1D array data
@@ -250,7 +249,6 @@ public:
     * \brief Get subbasin number and outlet ID
     */
     virtual bool GetSubbasinNumberAndOutletID() = 0;
-
 protected:
     string model_name_;                    ///< Model name, e.g., model_dianbu30m_longterm
     const string model_path_;              ///< Model path
@@ -285,7 +283,7 @@ protected:
     map<string, float **> array2d_map_;    ///< 2D array data map, e.g. ROUTING_LAYERS
     map<string, int> array2d_rows_map_;    ///< Row number of 2D array data map
     map<string, int> array2d_cols_map_;    ///< Col number of 2D array data map
-                                           ///<   CAUTION that nCols may not same for all rows
+                                           ///<   CAUTION that nCols may not same for all rows               
 };
 
 #endif /* SEIMS_DATA_CENTER_H */

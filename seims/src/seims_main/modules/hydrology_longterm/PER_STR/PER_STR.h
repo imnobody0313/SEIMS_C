@@ -81,5 +81,8 @@ private:
     float* m_impoundTrig;
     /// Output: percolation
     float** m_soilPerco;
+
+    //ljj++
+    float** m_soilTempprofile;
 };
 #endif /* SEIMS_MODULE_PER_STR_H */

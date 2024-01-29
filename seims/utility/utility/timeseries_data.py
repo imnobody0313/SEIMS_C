@@ -63,8 +63,7 @@ def match_simulation_observation(sim_vars,  # type: List[AnyStr]
                 continue
             sim_obs_dict[param_name]['UTCDATETIME'].append(sim_date)
             sim_obs_dict[param_name]['Obs'].append(obs_values[obs_i])
-            sim_obs_dict[param_name]['Sim'].append(sim_values[sim_i])
-
+            sim_obs_dict[param_name]['Sim'].append(sim_values[obs_i])
     # for param, values in self.sim_obs_dict.items():
     #     print('Observation-Simulation of %s' % param)
     #     for d, o, s in zip(values[DataValueFields.utc], values['Obs'], values['Sim']):
@@ -117,6 +116,7 @@ def calculate_statistics(sim_obs_dict,  # type: Optional[Dict[AnyStr, Dict[AnySt
         obsl = values['Obs'][sidx:eidx]
         siml = values['Sim'][sidx:eidx]
 
+
         nse_value = MathClass.nashcoef(obsl, siml)
         r2_value = MathClass.rsquare(obsl, siml)
         rmse_value = MathClass.rmse(obsl, siml)
@@ -135,6 +135,32 @@ def calculate_statistics(sim_obs_dict,  # type: Optional[Dict[AnyStr, Dict[AnySt
         values['lnNSE'] = lnnse_value
         values['NSE1'] = nse1_value
         values['NSE3'] = nse3_value
+
+        # sidxl = ["2011-12-01 00:00:00","2012-12-01 00:00:00","2013-12-01 00:00:00","2014-12-01 00:00:00"]
+        # eidxl = ["2012-03-31 23:59:59","2013-03-31 23:59:59","2014-03-31 23:59:59","2014-12-31 23:59:59"]
+        # if(param == "QG"):
+        #     simqg = []
+        #     qg = []
+        #     for index, i in enumerate(sidxl):
+        #         sidx = bisect.bisect_left(values['UTCDATETIME'], StringClass.get_datetime(sidxl[index]))
+        #         eidx = bisect.bisect_right(values['UTCDATETIME'], StringClass.get_datetime(eidxl[index]))
+        #         simqg.extend(values['Sim'][sidx:eidx])
+        #         sidx = bisect.bisect_left(values['UTCDATETIME'], StringClass.get_datetime("2011-01-01 00:00:00"))
+        #         eidx = bisect.bisect_right(values['UTCDATETIME'], StringClass.get_datetime("2014-12-31 00:00:00"))
+        #         qg.extend(values['Sim'][sidx:eidx])
+        # if(param == "Q"):
+        #     simq = []
+        #     q = []
+        #     qg = []
+        #     simqg = []
+        #     for index, i in enumerate(sidxl):
+        #         sidx = bisect.bisect_left(values['UTCDATETIME'], StringClass.get_datetime(sidxl[index]))
+        #         eidx = bisect.bisect_right(values['UTCDATETIME'], StringClass.get_datetime(eidxl[index]))
+        #         simq.extend(values['Sim'][sidx:eidx])
+
+        #         sidx = bisect.bisect_left(values['UTCDATETIME'], StringClass.get_datetime("2011-01-01 00:00:00"))
+        #         eidx = bisect.bisect_right(values['UTCDATETIME'], StringClass.get_datetime("2014-12-31 00:00:00"))
+        #         q.extend(values['Sim'][sidx:eidx])    
 
         # print('Statistics for %s, NSE: %.3f, R2: %.3f, RMSE: %.3f, PBIAS: %.3f, RSR: %.3f,'
         #       ' lnNSE: %.3f, NSE1: %.3f, NSE3: %.3f' %

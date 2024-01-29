@@ -54,6 +54,7 @@ extern "C" SEIMS_MODULE_API const char* MetadataInformation() {
     //ljj++
     mdi.AddParameter(VAR_AHRU, UNIT_AREA_M2, DESC_AHRU, Source_ParameterDB, DT_Raster1D);
     mdi.AddParameter(VAR_FLOWOUT_LEN, UNIT_LEN_M, DESC_FLOWOUT_LEN, Source_ParameterDB, DT_Raster1D);
+    mdi.AddInput(VAR_SOILT, UNIT_TEMP_DEG, DESC_SOTE, Source_Module, DT_Array2D);
 
     string res = mdi.GetXMLDocument();
 

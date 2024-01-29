@@ -50,7 +50,7 @@ from pygeoc.utils import UtilClass, FileClass, StringClass, sysstr, is_string, g
 from preprocess.text import DBTableNames
 from preprocess.db_mongodb import MongoClient, ConnectMongoDB
 from preprocess.db_read_model import ReadModelData
-from utility import read_simulation_from_txt, parse_datetime_from_ini
+from utility import read_simulation_from_txt, parse_datetime_from_ini,read_simulation_from_txt_new
 from utility import match_simulation_observation, calculate_statistics
 
 
@@ -385,6 +385,24 @@ class MainSEIMS(object):
         self.obs_vars, self.obs_value = read_model.Observation(self.outlet_id, vars_list,
                                                                self.start_time, self.end_time)
         return self.obs_vars, self.obs_value
+    #ljj++
+    def ReadOutletObservations_new(self,vars_list):
+        # type: (List[AnyStr]) -> (List[AnyStr], Dict[datetime, List[float]])
+        """
+
+        Examples:
+            model.SetMongoClient()
+            model.ReadOutletObservations()
+            model.UnsetMongoClient()
+        """
+        self.ConnectMongoDB()
+        self.ReadMongoDBData()
+        read_model = ReadModelData(self.mongoclient, self.db_name)
+        #ljj++
+        self.obs_vars,self.obs_value = read_model.Observation_new(0, vars_list,
+                                               self.start_time, self.end_time)
+
+        return self.obs_vars, self.obs_value
 
     def SetOutletObservations(self, vars_list, vars_value):
         # type: (List[AnyStr], Dict[datetime, List[float]]) -> None
@@ -412,6 +430,29 @@ class MainSEIMS(object):
             return False
         self.sim_obs_dict = match_simulation_observation(self.sim_vars, self.sim_value,
                                                          self.obs_vars, self.obs_value)
+        return True
+    #ljj++
+    def ReadTimeseriesSimulations_new(self, stime=None, etime=None):
+        # type: (Optional[datetime], Optional[datetime]) -> bool
+        """Read time series simulation results from OUTPUT directory.
+        If no start time or end time are specified, the time ranges from `FILE_IN` will be used.
+        """
+        if not self.obs_vars:
+            return False
+        startt, endt = self.SimulatedPeriod
+        if stime is None:
+            stime = startt
+        if etime is None:
+            etime = endt
+        self.sim_vars, self.sim_value = read_simulation_from_txt_new(self.OutputDirectory,
+                                                       self.obs_vars,
+                                                       0,
+                                                       stime, etime) 
+
+        if len(self.sim_vars) < 1:  # No match simulation results
+            return False
+        self.sim_obs_dict = match_simulation_observation(self.sim_vars, self.sim_value,
+                                                         self.obs_vars, self.obs_value)                                                     
         return True
 
     def ExtractSimData(self, stime=None, etime=None):

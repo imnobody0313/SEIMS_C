@@ -44,6 +44,9 @@ extern "C" SEIMS_MODULE_API const char* MetadataInformation() {
     // set the output variables
     mdi.AddOutput(VAR_PERCO, UNIT_DEPTH_MM, DESC_PERCO, DT_Raster2D);
 
+    //ljj++
+    mdi.AddInput(VAR_SOILT, UNIT_TEMP_DEG, DESC_SOTE, Source_Module, DT_Array2D);
+
     string res = mdi.GetXMLDocument();
 
     char* tmp = new char[res.size() + 1];

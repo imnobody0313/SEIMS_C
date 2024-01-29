@@ -32,7 +32,8 @@ Nutrient_Transformation::Nutrient_Transformation() :
     m_soilNH4(nullptr), m_soilWP(nullptr), m_wshd_dnit(-1.f), m_wshd_hmn(-1.f), m_wshd_hmp(-1.f),
     m_wshd_rmn(-1.f), m_wshd_rmp(-1.f), m_wshd_rwn(-1.f), m_wshd_nitn(-1.f), m_wshd_voln(-1.f),
     m_wshd_pal(-1.f), m_wshd_pas(-1.f),
-    m_conv_wt(nullptr),m_soil_carbon(nullptr) {
+    m_conv_wt(nullptr),m_soil_carbon(nullptr),
+    m_soilTempprofile(nullptr) {
 }
 
 Nutrient_Transformation::~Nutrient_Transformation() {
@@ -209,7 +210,10 @@ void Nutrient_Transformation::Set2DData(const char* key, const int nrows, const 
         m_soilPor = data;
     } else if (StringMatch(sk, VAR_SAND)) {
         m_soilSand = data;
-    } else {
+    } 
+    else if (StringMatch(sk, VAR_SOILT)) {
+        m_soilTempprofile = data;
+    }else {
         throw ModelException(MID_NUTR_TF, "Set2DData", "Parameter " + sk + " does not exist.");
     }
 }
@@ -486,7 +490,8 @@ void Nutrient_Transformation::MineralizationStaticCarbonMethod(const int i) {
         int kk = k == 0 ? 1 : k;
         float sut = 0.f;
         // mineralization can occur only if temp above 0 deg
-        if (m_soilTemp[i] > 0) {
+        //if (m_soilTemp[i] > 0) {
+        if (m_soilTempprofile[i][kk] > 0) {
             // compute soil water factor (sut)
             if (m_soilWtrSto[i][kk] < 0) {
                 m_soilWtrSto[i][kk] = 0.0000001f;
@@ -499,7 +504,8 @@ void Nutrient_Transformation::MineralizationStaticCarbonMethod(const int i) {
             float xx = 0.f;
             //soil temperature factor (cdg)
             float cdg = 0.f;
-            xx = m_soilTemp[i];
+            //xx = m_soilTemp[i];
+            xx = m_soilTempprofile[i][kk];
             cdg = 0.9f * xx / (xx + exp(9.93f - 0.312f * xx)) + 0.1f;
             cdg = Max(0.1f, cdg);
 
@@ -660,7 +666,8 @@ void Nutrient_Transformation::Volatilization(const int i) {
         //nitrification/volatilization temperature factor (nvtf)
         float nvtf = 0.f;
         //Calculate nvtf, equation 3:1.3.1 in SWAT Theory 2009, p192
-        nvtf = 0.41f * (m_soilTemp[i] - 5.f) * 0.1f;
+        //nvtf = 0.41f * (m_soilTemp[i] - 5.f) * 0.1f;
+        nvtf = 0.41f * (m_soilTempprofile[i][k] - 5.f) * 0.1f;
         if (m_soilNH4[i][k] > 0.f && nvtf >= 0.001f) {
             float sw25 = 0.f;
             float swwp = 0.f;
@@ -949,7 +956,8 @@ void Nutrient_Transformation::MineralizationCenturyModel(const int i) {
         int kk = k == 0 ? 1 : k;
         // mineralization can occur only if temp above 0 deg
         //check sol_st soil water content in each soil ayer mm H2O
-        if (m_soilTemp[i] > 0.f && m_soilWtrSto[i][k] > 0.f) {
+        //if (m_soilTemp[i] > 0.f && m_soilWtrSto[i][k] > 0.f) {
+        if (m_soilTempprofile[i][k] > 0.f && m_soilWtrSto[i][k] > 0.f) {
             //from Armen
             //compute soil water factor - sut
             // float fc = m_sol_awc[i][k] + m_sol_wpmm[i][k];            // units mm
@@ -990,7 +998,8 @@ void Nutrient_Transformation::MineralizationCenturyModel(const int i) {
              * i.e., Function fcgd(xx)
              */
             // cdg = pow(m_soilTemp[i] + 5.f, 8.f/3.f) * (50.f - m_soilTemp[i]) / (pow(40.f, 8.f/3.f) * 15.f);
-            cdg = pow(m_soilTemp[i] + 5.f, _8div3) * (50.f - m_soilTemp[i]) * 3.562449888909787e-06f;
+            //cdg = pow(m_soilTemp[i] + 5.f, _8div3) * (50.f - m_soilTemp[i]) * 3.562449888909787e-06f;
+            cdg = pow(m_soilTempprofile[i][kk] + 5.f, _8div3) * (50.f - m_soilTempprofile[i][kk]) * 3.562449888909787e-06f;
             if (cdg < 0.f) cdg = 0.f;
 
             //compute oxygen (OX)

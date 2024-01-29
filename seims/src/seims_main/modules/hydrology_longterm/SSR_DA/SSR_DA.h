@@ -144,6 +144,7 @@ private:
     //ljj++
     float* m_area;
     float* m_flowout_length;
+    float** m_soilTempprofile;
 };
 
 #endif /* SEIMS_MODULE_SSR_DA_H */

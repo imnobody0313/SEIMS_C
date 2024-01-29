@@ -10,16 +10,18 @@ using namespace utils_array;
 using namespace utils_string;
 
 ItpWeightData::ItpWeightData(MongoGridFs* gfs, const string& filename) :
-filename_(filename), itp_weight_data_(nullptr), n_rows_(-1), n_cols_(-1), initialized_(false) {
+    filename_(filename), itp_weight_data_(nullptr), itp_weight_data2d_(nullptr),
+    n_rows_(-1), n_cols_(-1), initialized_(false) {
     initialized_ = ReadFromMongoDB(gfs, filename_);
 }
 
 ItpWeightData::~ItpWeightData() {
     if (nullptr != itp_weight_data_) { Release1DArray(itp_weight_data_); }
+    if (nullptr != itp_weight_data2d_) { Release2DArray(n_cols_,itp_weight_data2d_); }
 }
 
 void ItpWeightData::GetWeightData(int* n, float** data) {
-    *n = n_rows_;
+    *n = n_rows_ * n_cols_;
     *data = itp_weight_data_;
 }
 
@@ -39,6 +41,7 @@ void ItpWeightData::GetWeightData2D(int* n, int* n_stations, float*** data) {
 
     *data = itp_weight_data2d_;
 }
+
 void ItpWeightData::Dump(std::ostream* fs) {
     if (fs == nullptr) return;
     int index = 0;
@@ -69,20 +72,23 @@ bool ItpWeightData::ReadFromMongoDB(MongoGridFs* gfs, const string& filename) {
         string type = filename.substr(index + 1);
         if (StringMatch(type, DataType_PotentialEvapotranspiration) || StringMatch(type, DataType_SolarRadiation)
             || StringMatch(type, DataType_RelativeAirMoisture) || StringMatch(type, DataType_MeanTemperature)
-            || StringMatch(type, DataType_MaximumTemperature) || StringMatch(type, DataType_MinimumTemperature)) {
+            //|| StringMatch(type, DataType_MaximumTemperature) || StringMatch(type, DataType_MinimumTemperature)) {
+            || StringMatch(type, DataType_MaximumMonthlyTemperature) || StringMatch(type, DataType_MinimumMonthlyTemperature)) {
             wfilename = filename.substr(0, index + 1) + DataType_Meteorology;
         }
     }
-    char* databuf = nullptr;
-    size_t datalength;
-    gfs->GetStreamData(wfilename, databuf, datalength);
-    if (nullptr == databuf) return false;
-
-    itp_weight_data_ = reinterpret_cast<float *>(databuf); // deprecate C-style: (float *) databuf
     /// Get metadata
     bson_t* md = gfs->GetFileMetadata(wfilename);
     /// Get value of given keys
     GetNumericFromBson(md, MONG_GRIDFS_WEIGHT_CELLS, n_rows_);
     GetNumericFromBson(md, MONG_GRIDFS_WEIGHT_SITES, n_cols_);
+    char* databuf = nullptr;
+    size_t datalength;
+    gfs->GetStreamData(wfilename, databuf, datalength);
+    if (nullptr == databuf) { return false; }
+    float* tmp_float_weight = reinterpret_cast<float *>(databuf); // deprecate C-style: (float *) databuf
+    Initialize1DArray(n_rows_ * n_cols_, itp_weight_data_, tmp_float_weight);
+    delete[] tmp_float_weight;
+    databuf = nullptr;
     return true;
 }

@@ -128,6 +128,7 @@ extern "C" SEIMS_MODULE_API const char* MetadataInformation() {
     mdi.AddOutput(VAR_CONV_WT, UNIT_NON_DIM, DESC_CONV_WT, DT_Raster2D);
 
     //ljj++
+    mdi.AddInput(VAR_SOILT, UNIT_TEMP_DEG, DESC_SOTE, Source_Module, DT_Array2D);
     mdi.AddOutput(VAR_LMC, UNIT_NON_DIM, DESC_SOL_LMC, DT_Array2D);
     mdi.AddOutput(VAR_LSC, UNIT_NON_DIM, DESC_SOL_LSC, DT_Array2D);
     mdi.AddOutput(VAR_WOC, UNIT_NON_DIM, DESC_SOL_WOC, DT_Array2D);

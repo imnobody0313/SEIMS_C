@@ -196,6 +196,13 @@ mongoc_cursor_t* MongoCollection::ExecuteQuery(const bson_t* b) {
     return cursor;
 }
 
+mongoc_cursor_t* MongoCollection::ExecuteQueryOpt(const bson_t* filter, const bson_t* opt) {
+
+	mongoc_cursor_t* cursor = mongoc_collection_find_with_opts(collection_, filter, opt, NULL);
+	return cursor;
+}
+
+
 int MongoCollection::QueryRecordsCount() {
     const bson_t* q_count = bson_new();
     bson_error_t* err = NULL;

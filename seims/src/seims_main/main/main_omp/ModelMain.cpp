@@ -276,6 +276,8 @@ void ModelMain::AppendOutputData(const time_t time) {
                         StringMatch(param->BasicName, VAR_HPC) || 
                         StringMatch(param->BasicName, VAR_HSC) || 
                         StringMatch(param->BasicName, VAR_SOILT) || 
+                        StringMatch(param->BasicName, VAR_SOLICE) || 
+                        StringMatch(param->BasicName, VAR_SOLWC) || 
                         StringMatch(param->BasicName, VAR_SOWB)    // soil water balance
                     ) {
                         // TODO: more conditions will be added in the future.

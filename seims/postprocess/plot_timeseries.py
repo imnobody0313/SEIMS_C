@@ -107,7 +107,7 @@ class TimeSeriesPlots(object):
         self.pcp_date_value = self.readData.Precipitation(self.subbsnID, start, end)
         # read simulated data and update the available variables
         self.plot_vars, self.sim_data_dict = read_simulation_from_txt(self.ws, self.plot_vars,
-                                                                      self.outletid,
+                                                                      self.subbsnID,
                                                                       start, end)
         self.sim_data_value = list()  # type: List[List[Union[datetime, float]]]
         for d, vs in self.sim_data_dict.items():

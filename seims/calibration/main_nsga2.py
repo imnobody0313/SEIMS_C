@@ -49,7 +49,7 @@ from calibration.userdef import write_param_values_to_mongodb, output_population
 accepted_objnames = ['NSE', 'RSR', 'PBIAS', 'R-square', 'RMSE', 'lnNSE', 'NSE1', 'NSE3']
 
 # step can be one of 'Q', 'SED', 'QSED', 'NUTRIENT', or 'CUSTOMIZE'.
-step = 'Q'
+step = 'TEST'
 filter_ind = False  # Filter for valid population for the next generation
 # Definitions of Multiobjectives:
 multiobj = dict()
@@ -69,6 +69,18 @@ elif step == 'NUTRIENT':
     multiobj.setdefault('CH_TP', [['NSE', 1., -100]])
     multiobj.setdefault('Q', [['NSE', 1., -100]])
     multiobj.setdefault('SED', [['NSE', 1., -100]])
+#ljj++
+elif step == 'TEST':
+    #negative is minimal 
+    #the number can be any float
+    # multiobj.setdefault('Q_1444', [['NSE', 1., -100, '>0'], ['PBIAS', -1., 500.]])
+    # multiobj.setdefault('Q_1289', [['NSE', 1., -100, '>0'], ['PBIAS', -1., 500.]])
+    # multiobj.setdefault('TOTDOCcon_1289', [['NSE1', 1., -100, '>0'],['R-square', 1., -100, '>0']])
+    # multiobj.setdefault('TOTDOCcon_1444', [['R-square', 1., -100, '>0']])
+    multiobj.setdefault('Q_11', [['NSE', 1., -100, '>0'], ['PBIAS', -1., 500.]])
+    multiobj.setdefault('SOTE20_7', [['NSE', 1., -100, '>0'], ['PBIAS', -1., 500.]])
+    multiobj.setdefault('SOTE100_7', [['NSE', 1., -100, '>0'], ['PBIAS', -1., 500.]])
+#######
 else:
     # Customize your own multiobjective here, such as:
     multiobj.setdefault('Q', [['NSE', 3., 0., '>0.'],
@@ -160,7 +172,8 @@ def main(cfg):
     model_obj = MainSEIMS(args_dict=model_cfg_dict)
 
     model_obj.SetMongoClient()
-    obs_vars, obs_data_dict = model_obj.ReadOutletObservations(object_vars)
+    #obs_vars, obs_data_dict = model_obj.ReadOutletObservations(object_vars)  #读取每个变量的观测值
+    obs_vars, obs_data_dict = model_obj.ReadOutletObservations_new(object_vars)  #ljj++
     model_obj.UnsetMongoClient()
 
     # Initialize population

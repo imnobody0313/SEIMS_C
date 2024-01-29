@@ -538,8 +538,8 @@ void DataCenter::UpdateInput(vector<SimulationModule *>& modules, const time_t t
                     if (StringMatch(tt, DataType_SolarRadiation)) data2[i_data] = 6.0f;
                     if (StringMatch(tt, DataType_WindSpeed)) data2[i_data] = 7.0f;
                     if (StringMatch(tt, DataType_RelativeAirMoisture)) data2[i_data] = 8.0f;
-                    // if (StringMatch(tt, DataType_MaximumMonthlyTemperature)) data2[i_data] = 9.0f;
-                    // if (StringMatch(tt, DataType_MinimumMonthlyTemperature)) data2[i_data] = 10.0f;
+                    if (StringMatch(tt, DataType_MaximumMonthlyTemperature)) data2[i_data] = 9.0f;
+                    if (StringMatch(tt, DataType_MinimumMonthlyTemperature)) data2[i_data] = 10.0f;
                 }
                 p_module->Set1DData("datatypes", 1, data2);       
                

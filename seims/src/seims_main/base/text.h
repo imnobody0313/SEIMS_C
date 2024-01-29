@@ -36,7 +36,8 @@
 #define DataType_Meteorology                   "M"             // Suffix of meteorology data
 #define DataType_Prefix_TS                     "T"             // m_stationData, Prefix of time series data
 #define DataType_Prefix_DIS                    "D"             // Prefix of distributed data
-
+#define DataType_MaximumMonthlyTemperature            "MAXMONT"          //9
+#define DataType_MinimumMonthlyTemperature            "MINMONT"          //10
 /// Tags of climate related data.
 ///     MacroName                              StringNameInDatabase      // VariableNameInModules
 #define Tag_DEM                                "DEM"                     // m_dem
@@ -1964,19 +1965,19 @@ CONST_CHARS_LIST Tag_Weight[] = {"WEIGHT", "Weight used for interpolation"};
 
 
 //ljj++
-#define VAR_GWH                                 "GW_HEIGHT"
-#define VAR_GW_SH                                "GW_SH"
-#define VAR_GWMIN                               "GWMIN" 
-#define VAR_CHSEEPAGE                           "CHSEEPAGE" 
-#define VAR_CHK                                 "CHK"
-#define VAR_ALPHABF                             "ALPHABF"
-#define VAR_DELAY                               "DELAY"
-#define VAR_QGS                                  "QGS" /// m_qgsRchOut, 
-#define VAR_AHRU                                 "CELLAREA" /// m_qgsRchOut, 
-#define VAR_FLOWOUT_LEN                                 "flowout_length" /// m_qgsRchOut, 
-#define REACH_PERMAFORST                                "is_permafrost" /// m_qgsRchOut, 
-#define REACH_SPYLD                            "GW_SPYLD"
-#define VAR_BM_DIEOFF                           "BM_DIEOFF"
+#define VAR_GWH                             "GW_HEIGHT"
+#define VAR_GW_SH                           "GW_SH"
+#define VAR_GWMIN                           "GWMIN" 
+#define VAR_CHSEEPAGE                       "CHSEEPAGE" 
+#define VAR_CHK                             "CHK"
+#define VAR_ALPHABF                         "ALPHABF"
+#define VAR_DELAY                           "DELAY"
+#define VAR_QGS                             "QGS" /// m_qgsRchOut, 
+#define VAR_AHRU                            "CELLAREA" /// m_qgsRchOut, 
+#define VAR_FLOWOUT_LEN                     "flowout_length" /// m_qgsRchOut, 
+#define REACH_PERMAFORST                    "is_permafrost" /// m_qgsRchOut, 
+#define REACH_SPYLD                         "GW_SPYLD"
+#define VAR_BM_DIEOFF                       "BM_DIEOFF"
 #define VAR_BIOMS                           "BIOMS"
 #define VAR_LMC                             "LMC"
 #define VAR_LSC                             "LSC"
@@ -1985,20 +1986,42 @@ CONST_CHARS_LIST Tag_Weight[] = {"WEIGHT", "Weight used for interpolation"};
 #define VAR_HSC                             "HSC"
 #define VAR_HPC                             "HPC"
 #define VAR_SOILT                           "SOILT"
+#define VAR_SOLICE                          "SOLICE"
+#define VAR_SOLWC                           "SOLWC"
 #define VAR_DATATYPES                       "datatypes"
+#define VAR_TSOIL1                          "tsoil1"
+#define VAR_TSOIL2                          "tsoil2"
+#define VAR_TSOIL3                          "tsoil3"
+#define VAR_TSOIL4                          "tsoil4"
+#define VAR_TSOIL5                          "tsoil5"
+#define VAR_SOLAVBD                         "sol_avbd"
+#define VAR_DDEPTH1                         "DDEPTH1"
+#define VAR_DDEPTH2                         "DDEPTH2"
+#define VAR_SOTE1                           "SOTE1"
+#define VAR_SOTE20                          "SOTE20"
+#define VAR_SOTE50                          "SOTE50"
+#define VAR_SOTE100                         "SOTE100"
+#define VAR_SOTE200                         "SOTE200"
 
-#define DESC_GWH                                "groundwater height"
-#define DESC_GW_SH                              "shallow groundwater stroage"
-#define DESC_GWMIN                              "Minumum groundwater storage"
-#define DESC_CHSEEPAGE                          "channel to groundwater"
-#define DESC_ALPHABF                             "alpha factor for groundwater recession curve"
-#define DESC_DELAY                               "time required for water leaving the bottom of the root zone to reach the shallow aquifer"
-#define DESC_SPYLD                               "specific yield for shallow aquifer"
-#define DESC_QGS                               "Showllow Groundwater discharge at each reach outlet and at each time stepr"
-#define DESC_AHRU                               "total area of HRU"
-#define DESC_FLOWOUT_LEN                               "flowout length"
-#define DESC_BM_DIEOFF                               "fraction above ground biomass that dies off at dormancy"
-#define DESC_BIOMS                               "land cover/crop biomass (dry weight)"
+#define DESC_GWH                             "groundwater height"
+#define DESC_GW_SH                           "shallow groundwater stroage"
+#define DESC_GWMIN                           "Minumum groundwater storage"
+#define DESC_CHSEEPAGE                       "channel to groundwater"
+#define DESC_ALPHABF                         "alpha factor for groundwater recession curve"
+#define DESC_DELAY                           "time required for water leaving the bottom of the root zone to reach the shallow aquifer"
+#define DESC_SPYLD                           "specific yield for shallow aquifer"
+#define DESC_QGS                             "Showllow Groundwater discharge at each reach outlet and at each time stepr"
+#define DESC_AHRU                            "total area of HRU"
+#define DESC_FLOWOUT_LEN                     "flowout length"
+#define DESC_BM_DIEOFF                       "fraction above ground biomass that dies off at dormancy"
+#define DESC_BIOMS                           "land cover/crop biomass (dry weight)"
+#define DESC_TSOIL1                          "Effective air-to-ground conductance ratio"
+#define DESC_TSOIL2                          "Thermal conductivity of soil"
+#define DESC_TSOIL3                          "Thermal conductivity of soil"
+#define DESC_TSOIL4                          "snow heat conduc"
+#define DESC_TSOIL5                          "soil heat capacity"
+#define DESC_SOLICE                          "Ice depth in soil layer"
+#define DESC_SOLWC                           "Water depth in soil layer"
 //////////////////////////////////////////////////////////////////////////
 /// Define Raster/ related constant strings used in SEIMS and preprocess//
 /// By LiangJun Zhu, May. 5, 2016  ///////////////////////////////////////

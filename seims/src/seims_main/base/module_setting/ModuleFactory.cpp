@@ -389,7 +389,9 @@ void ModuleFactory::ReadParameterSetting(string& moduleID, TiXmlDocument& doc, S
                         }
                         if (StringMatch(setting->dataTypeString(), DataType_MeanTemperature) ||
                             StringMatch(setting->dataTypeString(), DataType_MinimumTemperature) ||
-                            StringMatch(setting->dataTypeString(), DataType_MaximumTemperature)) {
+                            StringMatch(setting->dataTypeString(), DataType_MaximumTemperature)||
+                            StringMatch(setting->dataTypeString(), DataType_MaximumMonthlyTemperature) ||
+                            StringMatch(setting->dataTypeString(), DataType_MinimumMonthlyTemperature)){
                             //The weight coefficient file is same for TMEAN, TMIN and TMAX,
                             //  so just need to read one file named "Weight_M"
                             param->Name += "_M";
@@ -563,10 +565,11 @@ bool ModuleFactory::LoadSettingsFromFile(const char* filename, vector<vector<str
     if (!LoadPlainTextFile(filename, cfgStrs)) {
         return false;
     }
-    string T_variables[7] = {
+    string T_variables[9] = {
         DataType_Precipitation, DataType_MeanTemperature, DataType_MaximumTemperature,
         DataType_MinimumTemperature, DataType_SolarRadiation, DataType_WindSpeed,
-        DataType_RelativeAirMoisture
+        DataType_RelativeAirMoisture,
+        DataType_MaximumMonthlyTemperature,DataType_MinimumMonthlyTemperature
     };
     for (auto iter = cfgStrs.begin(); iter != cfgStrs.end(); ++iter) {
         // parse the line into separate item
@@ -584,8 +587,8 @@ bool ModuleFactory::LoadSettingsFromFile(const char* filename, vector<vector<str
         size_t sz = settings.size(); // get the current number of rows
         if (tokens[3].find(MID_ITP) != string::npos ||
             tokens[3].find(MID_TSD_RD) != string::npos) {
-            settings.resize(sz + 7);
-            for (size_t j = 0; j < 7; j++) {
+            settings.resize(sz + 9);
+            for (size_t j = 0; j < 9; j++) {
                 vector<string> tokensTemp(tokens);
                 if (tokens[3].find(MID_ITP) != string::npos) {
                     bool useVerticalItp = false;  // Default

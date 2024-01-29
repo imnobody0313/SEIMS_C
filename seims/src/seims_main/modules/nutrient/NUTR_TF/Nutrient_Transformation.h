@@ -281,5 +281,8 @@ private:
     float** m_conv_wt;
 
     float** m_soil_carbon;
+
+    //ljj++
+    float** m_soilTempprofile;
 };
 #endif /* SEIMS_MODULE_NUTR_TF_H */

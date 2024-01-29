@@ -69,7 +69,6 @@ public:
      * \param[out] stations \a int& number of stations
      * \param[out] data \a float*&, returned data
      */
-    //void ReadItpWeightData(const string& remote_filename, int& num, float*& data) OVERRIDE;
     void ReadItpWeightData(const string& remote_filename, int& num, int& stations, float**& data) OVERRIDE;
     /*!
      * \brief Read 1D array data from MongoDB and insert to m_1DArrayMap

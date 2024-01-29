@@ -7,11 +7,18 @@ const char* MAIN_DB_TABS_REQ[] = {
     DB_TAB_PARAMETERS, DB_TAB_REACH, DB_TAB_SPATIAL
 };
 
-const int METEO_VARS_NUM = 6;
+// const int METEO_VARS_NUM = 6;
+// const char* METEO_VARS[] = {
+//     DataType_MeanTemperature, DataType_MaximumTemperature,
+//     DataType_MinimumTemperature, DataType_SolarRadiation,
+//     DataType_WindSpeed, DataType_RelativeAirMoisture
+// };
+const int METEO_VARS_NUM = 8;
 const char* METEO_VARS[] = {
     DataType_MeanTemperature, DataType_MaximumTemperature,
     DataType_MinimumTemperature, DataType_SolarRadiation,
-    DataType_WindSpeed, DataType_RelativeAirMoisture
+    DataType_WindSpeed, DataType_RelativeAirMoisture,
+    DataType_MaximumMonthlyTemperature,DataType_MinimumMonthlyTemperature
 };
 
 const int SOILWATER_VARS_NUM = 5;
@@ -303,13 +310,8 @@ bool DataCenterMongoDB::GetSubbasinNumberAndOutletID() {
 
 void DataCenterMongoDB::ReadClimateSiteList() {
     bson_t* query = bson_new();
-    // subbasin id
-    BSON_APPEND_INT32(query, Tag_SubbasinId, subbasin_id_);
+    BSON_APPEND_INT32(query, Tag_SubbasinId, subbasin_id_); // subbasin id
     BSON_APPEND_UTF8(query, Tag_Mode, input_->getModelMode().c_str()); // mode
-    
-    // mode
-    //string modelMode = m_input->getModelMode();
-    BSON_APPEND_UTF8(query, Tag_Mode, input_->getModelMode().c_str());
 
     std::unique_ptr<MongoCollection>
             collection(new MongoCollection(mongo_client_->GetCollection(model_name_, DB_TAB_SITELIST)));
@@ -321,7 +323,8 @@ void DataCenterMongoDB::ReadClimateSiteList() {
         if (bson_iter_init(&iter, doc) && bson_iter_find(&iter, MONG_SITELIST_DB)) {
             clim_dbname_ = GetStringFromBsonIterator(&iter);
         } else {
-            throw ModelException("DataCenterMongoDB", "Constructor", "The DB field does not exist in SiteList table.");
+            throw ModelException("DataCenterMongoDB", "ReadClimateSiteList",
+                                 "The DB field does not exist in SiteList table.");
         }
         string site_list;
         if (bson_iter_init(&iter, doc) && bson_iter_find(&iter, SITELIST_TABLE_M)) {
@@ -453,7 +456,10 @@ FloatRaster* DataCenterMongoDB::ReadRasterData(const string& remote_filename) {
 //     }
 //     float* tmpdata = nullptr;
 //     weight_data->GetWeightData(&num, &tmpdata);
-//     Initialize1DArray(num, data, tmpdata);
+//     vector<string> vecSiteType = SplitString(remote_filename, '_');
+//     int num_site = m_numSites[vecSiteType.back()];
+//     Initialize1DArray(num* num_site, data, tmpdata);
+//    // Initialize1DArray(num, data, tmpdata);
 //     delete weight_data;
 // }
 void DataCenterMongoDB::ReadItpWeightData(const string& remote_filename, int& num, int& stations, float**& data) {
@@ -468,6 +474,8 @@ void DataCenterMongoDB::ReadItpWeightData(const string& remote_filename, int& nu
     Initialize2DArray(num, stations, data, tmpdata);
     delete weight_data;
 }
+
+
 void DataCenterMongoDB::Read1DArrayData(const string& remote_filename, int& num, float*& data) {
     char* databuf = nullptr;
     size_t datalength;

@@ -174,7 +174,8 @@ public:
      * \brief Execute query
      */
     mongoc_cursor_t* ExecuteQuery(const bson_t* b);
-
+    
+    mongoc_cursor_t* ExecuteQueryOpt(const bson_t* filter, const bson_t* opt);
     /*!
     * \brief Query the records number
     */

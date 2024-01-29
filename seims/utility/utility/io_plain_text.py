@@ -108,6 +108,7 @@ def read_simulation_from_txt(ws,  # type: AnyStr
     print('Read simulation from %s to %s done.' % (stime.strftime('%c'),
                                                    etime.strftime('%c')))
     return plot_vars_existed, sim_data_dict
+
 #ljj
 def read_simulation_from_txt_new(ws,  # type: AnyStr
                              plot_vars,  # type: List[AnyStr]

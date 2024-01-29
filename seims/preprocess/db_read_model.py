@@ -58,6 +58,7 @@ class ReadModelData(object):
         # type: (...) -> AnyStr
         climtbl = self.maindb[DBTableNames.main_sitelist]
         allitems = climtbl.find()
+        #print(self.maindb)
         if not allitems.count():
             raise RuntimeError('%s Collection is not existed or empty!' %
                                DBTableNames.main_sitelist)
@@ -245,6 +246,7 @@ class ReadModelData(object):
                 name = name.split('Conc')[0]
             return name
 
+        print(self.HydroClimateDBName)
         siteTbl = self.climatedb[DBTableNames.sites]
         obsTbl = self.climatedb[DBTableNames.observes]
         for i, param_name in enumerate(vars):
@@ -255,6 +257,7 @@ class ReadModelData(object):
             if site_items is None:
                 continue
             site_id = site_items.get(StationFields.id)
+            site_elve = site_items.get(StationFields.elev)
             for obs in obsTbl.find({DataValueFields.utc: {"$gte": start_time, '$lte': end_time},
                                     DataValueFields.type: get_observed_name(param_name),
                                     DataValueFields.id: site_id}).sort([(DataValueFields.utc, 1)]):
@@ -263,12 +266,14 @@ class ReadModelData(object):
                     vars_existed.append(param_name)
                 curt = obs[DataValueFields.utc]
                 curv = obs[DataValueFields.value]
+                if(get_observed_name(param_name) == "LWL"): 
+                    curv = curv-site_elve
                 if curt not in data_dict:
                     data_dict[curt] = [None] * len(vars)
                 data_dict[curt][i] = curv
         if not vars_existed:
             return None, None
-
+ 
         # remove the redundant None in data_dict, in case of len(vars_existed) != len(vars)
         delidx = list()
         for i, vname in enumerate(vars):
@@ -278,7 +283,88 @@ class ReadModelData(object):
         for dt, adata in list(data_dict.items()):
             for i in delidx:
                 del adata[i]
+        print('Read observation data of %s from %s to %s done.' % (','.join(vars_existed),
+                                                                   start_time.strftime('%c'),
+                                                                   end_time.strftime('%c')))
+        return vars_existed, data_dict
 
+#ljj
+    def Observation_new(self, subbsn_id, vars, start_time, end_time):
+        # type: (int, List[AnyStr], datetime, datetime) -> (List[AnyStr], Dict[datetime, List[float]])
+        """Read observation data of given variables.
+
+        Changelog:
+          - 1. 2018-8-29 Use None when the observation of one variables is absent.
+
+        Returns:
+            1. Observed variable names, [var1, var2, ...]
+            2. Observed data dict of selected plotted variables, with UTCDATETIME.
+               {Datetime: [value_of_var1, value_of_var2, ...], ...}
+        """
+        vars_existed = list()
+        data_dict = OrderedDict()
+
+        coll_list = self.climatedb.collection_names()
+        if DBTableNames.observes not in coll_list:
+            return None, None
+        
+        isoutlet = 0
+
+        def is_outlets(name,isoutlet):      
+            subbsn_id = float(get_subbasinid(name))
+            if subbsn_id == self.OutletID:
+                isoutlet = 1
+            return isoutlet
+
+        def get_subbasinid(name):
+            """To avoid the prefix of subbasin number."""
+            if '_' in name:
+                name = name.split('_')[1]
+            return name
+
+        def get_observed_name_new(name):
+            """To avoid the prefix of subbasin number."""
+            if '_' in name:
+                name = name.split('_')[0]
+            return name
+
+        siteTbl = self.climatedb[DBTableNames.sites]
+        obsTbl = self.climatedb[DBTableNames.observes]
+        
+        for i, param_name in enumerate(vars):
+            site_items = siteTbl.find_one({StationFields.type: get_observed_name_new(param_name),
+                                           StationFields.outlet: is_outlets(param_name,isoutlet),
+                                           StationFields.subbsn: float(get_subbasinid(param_name))})
+            if site_items is None:
+                continue
+            site_id = site_items.get(StationFields.id)
+            site_elve = site_items.get(StationFields.elev)
+            for obs in obsTbl.find({DataValueFields.utc: {"$gte": start_time, '$lte': end_time},
+                                    #DataValueFields.type: get_observed_name(param_name),
+                                    DataValueFields.type: get_observed_name_new(param_name),
+                                    DataValueFields.id: site_id}).sort([(DataValueFields.utc, 1)]):
+                if param_name not in vars_existed:
+                    vars_existed.append(param_name)
+                curt = obs[DataValueFields.utc]
+                curv = obs[DataValueFields.value]
+                # if(get_observed_name_new(param_name) == "LWL"): 
+                #     curv = curv-site_elve
+                #     print(curv)
+                if curt not in data_dict:
+                    data_dict[curt] = [None] * len(vars)
+                data_dict[curt][i] = curv        
+        if not vars_existed:
+            return None, None
+ 
+        # remove the redundant None in data_dict, in case of len(vars_existed) != len(vars)
+        delidx = list()
+        for i, vname in enumerate(vars):
+            if vname not in vars_existed:
+                delidx.append(i)
+        delidx.reverse()
+        for dt, adata in list(data_dict.items()):
+            for i in delidx:
+                del adata[i]
         print('Read observation data of %s from %s to %s done.' % (','.join(vars_existed),
                                                                    start_time.strftime('%c'),
                                                                    end_time.strftime('%c')))

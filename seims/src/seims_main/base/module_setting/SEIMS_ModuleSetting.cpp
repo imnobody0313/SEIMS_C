@@ -55,6 +55,8 @@ float SEIMSModuleSetting::dataTypeString2Float(const string& data_type) {
     if (StringMatch(data_type, DataType_SolarRadiation)) return 6.0f;
     if (StringMatch(data_type, DataType_WindSpeed)) return 7.0f;
     if (StringMatch(data_type, DataType_RelativeAirMoisture)) return 8.0f;
+    if (StringMatch(data_type, DataType_MaximumMonthlyTemperature)) return 9.0f;
+    if (StringMatch(data_type, DataType_MinimumMonthlyTemperature)) return 10.0f;
     return -1.0f;
 }
 
@@ -68,6 +70,8 @@ string SEIMSModuleSetting::dataType2String(const float data_type) {
         case 6: return DataType_SolarRadiation;
         case 7: return DataType_WindSpeed;
         case 8: return DataType_RelativeAirMoisture;
+        case 9: return DataType_MaximumMonthlyTemperature;
+        case 10: return DataType_MinimumMonthlyTemperature;
         default: return "";
     }
 }

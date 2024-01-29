@@ -14,7 +14,7 @@ Interpolate::Interpolate() : m_dataType(0), m_nStatioins(-1),
 void Interpolate::SetClimateDataType(const float value) {
     if (FloatEqual(value, 1.0f)) {
         m_dataType = 0; /// Precipitation
-    } else if (FloatEqual(value, 2.0f) || FloatEqual(value, 3.0f) || FloatEqual(value, 4.0f)) {
+    } else if (FloatEqual(value, 2.0f) || FloatEqual(value, 3.0f) || FloatEqual(value, 4.0f)|| FloatEqual(value, 9.0f)|| FloatEqual(value, 10.0f)) {
         m_dataType = 1; /// Temperature
     } else if (FloatEqual(value, 5.0f)) {
         m_dataType = 2; /// PET

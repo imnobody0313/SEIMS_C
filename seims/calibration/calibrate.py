@@ -11,6 +11,8 @@
 from __future__ import absolute_import, unicode_literals
 
 import time
+import bisect
+from pygeoc.utils import UtilClass, FileClass, StringClass
 from collections import OrderedDict
 import os
 import sys
@@ -55,13 +57,14 @@ class ObsSimData(object):
         for name in effnames:
             tmpvar = '%s-%s' % (varname, name)
             if tmpvar not in self.objnames:
-                values.append(-9999.)
+                #values.append(-9999.)
+                tmpvars.append(tmpvar)
             else:
                 if name.upper() == 'PBIAS':
                     tmpvars.append('%s-abs(PBIAS)' % varname)
                 else:
                     tmpvars.append(tmpvar)
-                values.append(self.objvalues[self.objnames.index(tmpvar)])
+                values.append(self.objvalues[self.objnames.index(tmpvar)]) #evaluate index, i.e., NSE
         return values, tmpvars
 
     def output_header(self, varname, effnames, prefix=''):
@@ -210,7 +213,8 @@ def calibration_objectives(cali_obj, ind):
     time.sleep(0.1)  # Wait a moment in case of unpredictable file system error
 
     # read simulation data of the entire simulation period (include calibration and validation)
-    if model_obj.ReadTimeseriesSimulations():
+    #if model_obj.ReadTimeseriesSimulations():
+    if model_obj.ReadTimeseriesSimulations_new():   #ljj++
         ind.sim.vars = model_obj.sim_vars[:]
         ind.sim.data = deepcopy(model_obj.sim_value)
     else:
@@ -229,7 +233,6 @@ def calibration_objectives(cali_obj, ind):
                                                             cali_obj.cfg.cali_etime)
     if ind.cali.objnames and ind.cali.objvalues:
         ind.cali.valid = True
-
     # Calculate NSE, R2, RMSE, PBIAS, and RSR, etc. of validation period
     if cali_obj.cfg.calc_validation:
         ind.vali.vars, ind.vali.data = model_obj.ExtractSimData(cali_obj.cfg.vali_stime,
@@ -250,6 +253,7 @@ def calibration_objectives(cali_obj, ind):
     # delete model output directory for saving storage
     model_obj.clean(calibration_id=ind.id)
     model_obj.UnsetMongoClient()
+    
     return ind
 
 
