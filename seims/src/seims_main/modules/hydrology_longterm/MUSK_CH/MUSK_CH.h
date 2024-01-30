@@ -65,12 +65,17 @@ public:
     void GetValue(const char* key, float* value) OVERRIDE;
 
     void Get1DData(const char* key, int* n, float** data) OVERRIDE;
-
+    
+    //ljj++
+    void SetSubbasins(clsSubbasins* subbasins) OVERRIDE;
 private:
 
     void PointSourceLoading();
 
     bool ChannelFlow(int i);
+    
+    //ljj++
+    bool LakeBudget(int i);
 
 private:
     int m_dt;            ///< time step (sec)
@@ -162,19 +167,43 @@ private:
     float* m_chCrossArea; ///< cross-sectional area (m^2), rcharea in SWAT
 
     //ljj++
+    int m_nCells;
+
     //! maximum ground water storage
     float m_GWMAX;
     float m_Kg;
     float m_Base_ex;
+    float m_evlake; //lake evaporation coefficient
+    float m_lakeseep; //m/day; hydraulic conductivity of the lake bottom
+    float m_petFactor;
+    float m_minvol;
 
     float* m_ispermafrost;
+    float* m_islake;
+    float* m_lakearea;
+    float* curBasinArea;
+    float* m_area;
+    float* m_lakevol;
+    float* m_lakedpini;
+    float* m_lakealpha;
 
     float* gw_height;
+    float* m_netPcp;
+    float* m_prec;
 
     float* m_gw_sh;
+    
+    float* m_qin1;
+    float* m_qout1;
 
     float* m_rch_ht;   //river height
     float* m_qgsRchOut; ///<shallow groundwater part of channel outflow
+    float* m_lakedp;
+
+    // subbasin IDs
+    vector<int> m_subbasinIDs;
+    // All subbasins information
+    clsSubbasins* m_subbasinsInfo;
 };
 
 #endif /* SEIMS_MODULE_MUSK_CH_H */

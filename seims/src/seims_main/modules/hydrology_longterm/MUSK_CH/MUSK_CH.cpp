@@ -25,7 +25,11 @@ MUSK_CH::MUSK_CH() :
     m_chWtrDepth(nullptr), m_chWtrWth(nullptr), m_chBtmWth(nullptr), m_chCrossArea(nullptr),
     //ljj++
     m_GWMAX(NODATA_VALUE),m_Kg(NODATA_VALUE), m_Base_ex(NODATA_VALUE),m_ispermafrost(nullptr),
-    gw_height(nullptr), m_rch_ht(nullptr), m_gw_sh(nullptr),m_qgsRchOut(nullptr)
+    gw_height(nullptr), m_rch_ht(nullptr), m_gw_sh(nullptr),m_qgsRchOut(nullptr),
+    m_nCells(-1),m_subbasinsInfo(nullptr),m_prec(nullptr),curBasinArea(nullptr),m_area(nullptr),m_netPcp(nullptr),
+    m_islake(nullptr),m_lakearea(nullptr),m_evlake(NODATA_VALUE),m_lakeseep(NODATA_VALUE),m_petFactor(NODATA_VALUE),
+    m_minvol(NODATA_VALUE),m_lakedpini(nullptr),m_lakedp(nullptr),m_lakevol(nullptr),
+    m_qin1(nullptr),m_qout1(nullptr),m_lakealpha(nullptr)
 {
 }
 
@@ -56,6 +60,10 @@ MUSK_CH::~MUSK_CH() {
     //ljj++
     if (nullptr != m_rch_ht) Release1DArray(m_rch_ht);
     if (nullptr != m_qgsRchOut) Release1DArray(m_qgsRchOut);
+    if (nullptr != curBasinArea) Release1DArray(curBasinArea);
+    if (nullptr != m_lakedp) Release1DArray(m_lakedp);
+    if (nullptr != m_qin1) Release1DArray(m_qin1);
+    if (nullptr != m_qout1) Release1DArray(m_qout1);
 }
 
 bool MUSK_CH::CheckInputData() {
@@ -120,6 +128,11 @@ void MUSK_CH::InitialOutputs() {
     //ljj++
     m_rch_ht = new(nothrow) float[m_nreach + 1];
     m_qgsRchOut = new(nothrow) float[m_nreach + 1];
+    curBasinArea = new(nothrow) float[m_nreach + 1];
+    m_prec = new(nothrow) float[m_nreach + 1];
+    m_lakedp = new(nothrow) float[m_nreach + 1];
+    m_qin1 = new(nothrow) float[m_nreach + 1];
+    m_qout1 = new(nothrow) float[m_nreach + 1];
     for (int i = 1; i <= m_nreach; i++) {
         m_qRchOut[i] = m_olQ2Rch[i];
         m_qsRchOut[i] = m_olQ2Rch[i];
@@ -148,6 +161,12 @@ void MUSK_CH::InitialOutputs() {
         m_rteWtrOut[i] = 0.f;
         //ljj++
         m_rch_ht[i] = m_chWtrDepth[i];
+        m_lakedp[i] = m_lakedpini[i]; //初值改了
+        curBasinArea[i] = 0.f;
+        m_prec[i] = 0.f;
+        m_qin1[i]=0.f;
+        m_qout1[i]=0.f;
+        if(m_islake[i]==1) m_chSto[i] = m_lakedpini[i]*m_lakearea[i];
     }
     /// initialize point source loadings
     if (nullptr == m_ptSub) {
@@ -194,6 +213,24 @@ int MUSK_CH::Execute() {
     InitialOutputs();
     /// load point source water volume from m_ptSrcFactory
     PointSourceLoading();
+    //ljj++
+    for (auto id = m_subbasinIDs.begin(); id != m_subbasinIDs.end(); ++id) {
+        Subbasin* sub = m_subbasinsInfo->GetSubbasinByID(*id);
+        int curCellsNum = sub->GetCellCount();
+        int* curCells = sub->GetCells();
+        m_prec[*id] = 0.f;
+        
+        float total_area=0.f;
+        if(m_islake[*id] == 1){
+            for (int i = 0; i < curCellsNum; i++) {
+                int index = curCells[i];
+                total_area += m_area[index];
+                m_prec[*id]+= m_netPcp[index]/1000* m_area[index]; //m3
+                curBasinArea[*id] += m_area[index];
+            }
+            m_prec[*id] = m_prec[*id] / total_area * m_lakearea[*id]/ m_dt;  //m3/s
+        }
+    }
     for (auto it = m_rteLyrs.begin(); it != m_rteLyrs.end(); ++it) {
         // There are not any flow relationship within each routing layer.
         // So parallelization can be done here.
@@ -206,8 +243,15 @@ int MUSK_CH::Execute() {
             if (m_inputSubbsnID == 0 || m_inputSubbsnID == reachIndex) {
                 // for OpenMP version, all reaches will be executed,
                 // for MPI version, only the current reach will be executed.
-                if (!ChannelFlow(reachIndex)) {
-                    errCount++;
+                if(m_islake[reachIndex] == 0){ 
+                    if (!ChannelFlow(reachIndex)) {
+                        errCount++;
+                    }
+                }
+                else{
+                    if (!LakeBudget(reachIndex)) {
+                      errCount++;
+                    }
                 }
             }
         }
@@ -234,6 +278,10 @@ void MUSK_CH::SetValue(const char* key, const float value) {
     else if (StringMatch(sk, VAR_GWMAX)) m_GWMAX = value;
     else if (StringMatch(sk, VAR_KG)) m_Kg = value;
     else if (StringMatch(sk, VAR_Base_ex)) m_Base_ex = value;
+    else if (StringMatch(sk, VAR_LAKE_EVP)) m_evlake = value;
+    else if (StringMatch(sk, VAR_LAKE_SEEP)) m_lakeseep = value;
+    else if (StringMatch(sk, VAR_K_PET)) m_petFactor = value;
+    else if (StringMatch(sk, VAR_LAKE_MNVOL))  m_minvol = value;
     else {
         throw ModelException(MID_MUSK_CH, "SetValue", "Parameter " + sk + " does not exist.");
     }
@@ -285,7 +333,14 @@ void MUSK_CH::Set1DData(const char* key, const int n, float* data) {
     else if (StringMatch(sk, VAR_GW_SH)) {
         CheckInputSize(MID_MUSK_CH, key, n - 1, m_nreach);
         m_gw_sh = data;
-    } 
+    } else if (StringMatch(sk, VAR_PCP)) {
+        CheckInputSize(MID_MUSK_CH, key, n, m_nCells);
+        m_netPcp = data;
+    }
+    else if (StringMatch(sk, VAR_AHRU)) {
+        CheckInputSize(MID_MUSK_CH, key, n, m_nCells);
+        m_area = data;
+    }
     else {
         throw ModelException(MID_MUSK_CH, "Set1DData", "Parameter " + sk + " does not exist.");
     }
@@ -394,6 +449,12 @@ void MUSK_CH::SetReaches(clsReaches* reaches) {
     if (nullptr == m_Kchb) reaches->GetReachesSingleProperty(REACH_BEDK, &m_Kchb);
     if (nullptr == m_reachDownStream) reaches->GetReachesSingleProperty(REACH_DOWNSTREAM, &m_reachDownStream);
     if (nullptr == m_ispermafrost) reaches->GetReachesSingleProperty(REACH_PERMAFORST, &m_ispermafrost);
+    //ljj++
+    if (nullptr == m_islake) reaches->GetReachesSingleProperty(REACH_ISLAKE, &m_islake);
+    if (nullptr == m_lakearea) reaches->GetReachesSingleProperty(REACH_LAKEAREA, &m_lakearea);
+    if (nullptr == m_lakevol) reaches->GetReachesSingleProperty(REACH_LAKEVOL, &m_lakevol);
+    if (nullptr == m_lakedpini) reaches->GetReachesSingleProperty(REACH_LAKEDPINI, &m_lakedpini);
+    if (nullptr == m_lakealpha) reaches->GetReachesSingleProperty(REACH_LAKEALPHA, &m_lakealpha);
 
     m_reachUpStream = reaches->GetUpStreamIDs();
     m_rteLyrs = reaches->GetReachLayers();
@@ -781,4 +842,156 @@ bool MUSK_CH::ChannelFlow(const int i) {
     cout << " surfq: " << m_qsCh[i] << ", ifluq: " << m_qiCh[i] << ", groudq: " << m_qgCh[i] << endl;
 #endif
     return true;
+}
+//ljj++
+bool MUSK_CH::LakeBudget(const int i) {
+    m_chWtrDepth[i] = 0.f;
+    //! 1. add all the inflow water
+    float qIn = 0.f; /// Water entering reach on current day from both current subbasin and upstreams
+    // 1.1. water from this subbasin
+    qIn += m_olQ2Rch[i]; /// surface flow
+    float qiSub = 0.f;   /// interflow flow
+    if (nullptr != m_ifluQ2Rch && m_ifluQ2Rch[i] >= 0.f) {
+        qiSub = m_ifluQ2Rch[i];
+        qIn += qiSub;
+    }
+    float qgSub = 0.f; /// groundwater flow
+    if (nullptr != m_gndQ2Rch && m_gndQ2Rch[i] >= 0.f) {
+        qgSub = m_gndQ2Rch[i];
+        qIn += qgSub;
+    }
+    float qgsSub = 0.f;
+    float dh = gw_height[i];   //lake 
+    float rto = m_gw_sh[i]/gw_height[i];
+    if (abs(dh) <= 1e-6) dh = 0.f;
+    float Q = m_Kg * pow(abs(dh), m_Base_ex) * rto; // m3
+    Q = Max(Q,1.e-6f);
+    qgsSub += Q/m_dt;
+    qIn += qgsSub;
+    m_gw_sh[i] -= Q; // m3
+
+    // 1.2. water from upstream reaches
+    float qsUp = 0.f;
+    float qiUp = 0.f;
+    float qgUp = 0.f;
+    float qgsUp = 0.f;
+    for (auto upRchID = m_reachUpStream.at(i).begin(); upRchID != m_reachUpStream.at(i).end(); ++upRchID) {
+        if (m_qsRchOut[*upRchID] != m_qsRchOut[*upRchID]) {
+            cout << "DayOfYear: " << m_dayOfYear << ", rchID: " << i << ", upRchID: " << *upRchID <<
+                    ", surface part illegal!" << endl;
+            return false;
+        }
+        if (m_qiRchOut[*upRchID] != m_qiRchOut[*upRchID]) {
+            cout << "DayOfYear: " << m_dayOfYear << ", rchID: " << i << ", upRchID: " << *upRchID <<
+                    ", subsurface part illegal!" << endl;
+            return false;
+        }
+        if (m_qgRchOut[*upRchID] != m_qgRchOut[*upRchID]) {
+            cout << "DayOfYear: " << m_dayOfYear << ", rchID: " << i << ", upRchID: " << *upRchID <<
+                    ", groundwater part illegal!" << endl;
+            return false;
+        }
+        if (m_qgRchOut[*upRchID] != m_qgRchOut[*upRchID]) {
+            cout << "DayOfYear: " << m_dayOfYear << ", rchID: " << i << ", upRchID: " << *upRchID <<
+                    ", groundwater part illegal!" << endl;
+            return false;
+        }
+        if (m_qsRchOut[*upRchID] > 0.f) qsUp += m_qsRchOut[*upRchID];
+        if (m_qiRchOut[*upRchID] > 0.f) qiUp += m_qiRchOut[*upRchID];
+        if (m_qgRchOut[*upRchID] > 0.f) qgUp += m_qgRchOut[*upRchID];
+        if (m_qgsRchOut[*upRchID] > 0.f) qgsUp += m_qgsRchOut[*upRchID];
+    }
+    qIn += qsUp + qiUp + qgUp;   
+
+    float pre_Sto = m_chSto[i];
+    //add precipitation
+    m_chSto[i] += m_prec[i]* m_dt;  
+    float wtrin = qIn * m_dt;  //m3  
+    float rtwtr = 0.f;    //flow out
+
+    //!!! important: for lake unit, chSto == lakeSto
+    //m_chSto[i] += wtrin;
+    
+    //! 2. minus all the outflow water
+    // linear reservior
+    rtwtr = 0.f;  //m3/s
+    float h0 = 0.f;
+    h0 = m_minvol;
+	float thwl = m_lakedpini[i] * h0; 
+    float max_outflow = Max(0.f, (m_lakedp[i] - thwl) * m_lakearea[i]);
+	// lake evaporation
+	float rtevp = 0.f; 
+	rtevp = m_evlake * m_petSubbsn[i]/m_petFactor * 0.001f * m_lakearea[i]; //m3
+	rtevp = Min(rtevp, m_chSto[i]);
+    m_chSto[i] -= rtevp;
+	// lake groundwater
+	float LakeOutGw = m_chSto[i] * m_lakeseep;
+    LakeOutGw = Min(LakeOutGw, m_chSto[i]);
+    if (nullptr != m_gwSto) {
+        m_gwSto[i] += LakeOutGw / m_chArea[i] * 1000.f; // updated groundwater storage
+        m_chSto[i] -= LakeOutGw;
+    }
+	
+	// add qIn
+	m_chSto[i] += qIn * m_dt;
+
+    float SI = m_chSto[i] / m_dt + (qIn + m_qin1[i])/2 - m_qout1[i]/2;
+
+    // Lake parameter A (suggested  value equal to outflow width in [m])
+    // float lakefactor = m_lakearea[i] / m_dt / sqrt(alpha[i]);
+    float lakefactor = m_lakearea[i] / m_dt / sqrt(m_chWth[i]*m_lakealpha[i]);
+    if (m_lakedp[i] > thwl && m_chSto[i]>0.f){
+        rtwtr = pow(sqrt((lakefactor*lakefactor) + 2*SI)-lakefactor,2);
+        if ((m_qout1[i]+rtwtr)*0.5 * m_dt > max_outflow){
+            rtwtr = 2*(max_outflow / m_dt) -m_qout1[i];
+            rtwtr = Max(rtwtr,0.f);
+        }
+        m_chSto[i] -= (m_qout1[i]+rtwtr)*0.5 * m_dt;
+    }
+    else{
+        rtwtr = 0.f;
+    }
+
+	// update lake water level
+    if(m_chSto[i]>=m_lakevol[i]) {
+        rtwtr +=  (m_chSto[i]- m_lakevol[i])/m_dt;
+        //m_qRchOut[i]+= (m_chSto[i]- m_lakevol[i])/m_dt;  
+        m_chSto[i]  = m_lakevol[i];
+    }
+    m_qRchOut[i] = rtwtr*0.5;
+    m_lakedp[i] = m_chSto[i] / m_lakearea[i];
+    m_rteWtrOut[i] = m_qRchOut[i] * m_dt;   // m^3
+
+    m_qin1[i] = qIn;
+    m_qout1[i] = rtwtr*0.5;
+    m_chWtrDepth[i] = m_lakedp[i];
+
+    float qInSum = m_olQ2Rch[i] + qiSub + qgSub + qsUp + qiUp + qgUp;
+    if (qInSum < UTIL_ZERO) {
+        // In case of divided by zero.
+        // m_qsRchOut[i] = 0.f;
+        // m_qiRchOut[i] = 0.f;
+        // m_qgRchOut[i] = 0.f;
+        // m_qgsRchOut[i] = 0.f;
+        // m_qRchOut[i] = 0.f;
+    } else {
+        // In my opinion, these lines should use `qIn` instead of `qInSum`. By lj.
+        // m_qsRchOut[i] = m_qRchOut[i] * (m_olQ2Rch[i] + qsUp) / qIn;
+        // m_qiRchOut[i] = m_qRchOut[i] * (qiSub + qiUp) / qIn;
+        // m_qgRchOut[i] = m_qRchOut[i] * (qgSub + qgUp) / qIn;
+        m_qsRchOut[i] = m_qRchOut[i];
+        m_qiRchOut[i] = 0.f;
+        m_qgRchOut[i] = 0.f;
+        m_qgsRchOut[i] = 0.f;
+    }
+    return true;
+}
+
+
+void MUSK_CH::SetSubbasins(clsSubbasins* subbsns) {
+    if (m_subbasinsInfo == nullptr) {
+        m_subbasinsInfo = subbsns;
+        // m_nSubbasins = m_subbasinsInfo->GetSubbasinNumber(); // Set in SetValue()! lj
+        m_subbasinIDs = m_subbasinsInfo->GetSubbasinIDs();
+    }
 }

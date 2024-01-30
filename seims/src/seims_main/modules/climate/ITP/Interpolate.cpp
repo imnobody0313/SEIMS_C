@@ -52,6 +52,7 @@ int Interpolate::Execute() {
             float delta = m_dem[i] - m_hStations[j];
             float adjust = m_itpWeights[i][j] * m_lapse * delta;
             value += adjust;
+            if(m_dataType == 0) value = Max(value,0.f);
             if (m_itpVertical) {
                 float delta = m_dem[i] - m_hStations[j];
                 float factor = m_lapseRate[m_month - 1][m_dataType];

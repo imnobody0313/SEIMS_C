@@ -1975,8 +1975,6 @@ CONST_CHARS_LIST Tag_Weight[] = {"WEIGHT", "Weight used for interpolation"};
 #define VAR_QGS                             "QGS" /// m_qgsRchOut, 
 #define VAR_AHRU                            "CELLAREA" /// m_qgsRchOut, 
 #define VAR_FLOWOUT_LEN                     "flowout_length" /// m_qgsRchOut, 
-#define REACH_PERMAFORST                    "is_permafrost" /// m_qgsRchOut, 
-#define REACH_SPYLD                         "GW_SPYLD"
 #define VAR_BM_DIEOFF                       "BM_DIEOFF"
 #define VAR_BIOMS                           "BIOMS"
 #define VAR_LMC                             "LMC"
@@ -2002,6 +2000,17 @@ CONST_CHARS_LIST Tag_Weight[] = {"WEIGHT", "Weight used for interpolation"};
 #define VAR_SOTE50                          "SOTE50"
 #define VAR_SOTE100                         "SOTE100"
 #define VAR_SOTE200                         "SOTE200"
+#define VAR_LAKE_EVP                        "LAKE_EVP"
+#define VAR_LAKE_SEEP                       "LAKE_SEEP"
+#define VAR_LAKE_MNVOL                      "LAKE_MNVOL"
+
+#define REACH_PERMAFORST                    "is_permafrost"
+#define REACH_SPYLD                         "GW_SPYLD"
+#define REACH_ISLAKE                        "Is_Lake"
+#define REACH_LAKEAREA                      "Lake_Area"
+#define REACH_LAKEVOL                       "Lake_Vol" 
+#define REACH_LAKEDPINI                     "Lake_Depini"
+#define REACH_LAKEALPHA                     "Lake_Alpha"
 
 #define DESC_GWH                             "groundwater height"
 #define DESC_GW_SH                           "shallow groundwater stroage"
@@ -2022,6 +2031,9 @@ CONST_CHARS_LIST Tag_Weight[] = {"WEIGHT", "Weight used for interpolation"};
 #define DESC_TSOIL5                          "soil heat capacity"
 #define DESC_SOLICE                          "Ice depth in soil layer"
 #define DESC_SOLWC                           "Water depth in soil layer"
+#define DESC_LAKE_EVP                        "lake evaporation coefficient"
+#define DESC_LAKE_SEEP                       "hydraulic conductivity of the lake bottom"
+#define DESC_LAKE_MNVOL                      "min volume of water to flow out for a lake"
 //////////////////////////////////////////////////////////////////////////
 /// Define Raster/ related constant strings used in SEIMS and preprocess//
 /// By LiangJun Zhu, May. 5, 2016  ///////////////////////////////////////

@@ -233,3 +233,6 @@ SoilTemperature,tsoi2,Thermal conductivity of soil, ,STP_FP,1,0,AC,20,0
 SoilTemperature,tsoi3,Thermal conductivity of soil, ,STP_FP,1,0,AC,20,0
 SoilTemperature,tsoi4,snow heat conduc, ,STP_FP,1,0,AC,10,0
 SoilTemperature,tsoi5,dsoil heat capacity, ,STP_FP,1,0,AC,10,0
+LAKE,LAKE_EVP,lake evaporation coefficient,%,ChannelRouting,0.6,0,AC,1,0
+LAKE,LAKE_SEEP,shydraulic conductivity of the lake bottom,%,ChannelRouting,0.005,0,AC,1,0
+LAKE,LAKE_MNVOL,min volume of water to flow out for a lake,%,ChannelRouting,0.7,0,AC,1,0
