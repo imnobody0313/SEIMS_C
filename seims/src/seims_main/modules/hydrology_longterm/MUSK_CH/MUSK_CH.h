@@ -77,6 +77,8 @@ private:
     //ljj++
     bool LakeBudget(int i);
 
+    bool ResBudget(int i);
+
 private:
     int m_dt;            ///< time step (sec)
     int m_inputSubbsnID; ///< current subbasin ID, 0 for the entire watershed
@@ -186,6 +188,12 @@ private:
     float* m_lakevol;
     float* m_lakedpini;
     float* m_lakealpha;
+    float* m_isres;
+    float* m_natural_flow; //naturalized daily streamflow
+    float* m_ResLc;
+    float* m_ResLn;
+    float* m_ResLf;
+    float* m_ResAdjust;
 
     float* gw_height;
     float* m_netPcp;

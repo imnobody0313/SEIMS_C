@@ -2011,6 +2011,12 @@ CONST_CHARS_LIST Tag_Weight[] = {"WEIGHT", "Weight used for interpolation"};
 #define REACH_LAKEVOL                       "Lake_Vol" 
 #define REACH_LAKEDPINI                     "Lake_Depini"
 #define REACH_LAKEALPHA                     "Lake_Alpha"
+#define REACH_ISRES                         "Is_Res"
+#define REACH_NATURAL_FLOW                  "Nature_Flow"
+#define REACH_RES_LC                        "RES_LC"
+#define REACH_RES_LN                        "RES_LN"
+#define REACH_RES_LF                        "RES_LF"
+#define REACH_RES_ADJUST                    "RES_ADJUST"
 
 #define DESC_GWH                             "groundwater height"
 #define DESC_GW_SH                           "shallow groundwater stroage"

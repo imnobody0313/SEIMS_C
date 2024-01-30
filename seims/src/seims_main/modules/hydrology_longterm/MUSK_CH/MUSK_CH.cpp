@@ -29,7 +29,8 @@ MUSK_CH::MUSK_CH() :
     m_nCells(-1),m_subbasinsInfo(nullptr),m_prec(nullptr),curBasinArea(nullptr),m_area(nullptr),m_netPcp(nullptr),
     m_islake(nullptr),m_lakearea(nullptr),m_evlake(NODATA_VALUE),m_lakeseep(NODATA_VALUE),m_petFactor(NODATA_VALUE),
     m_minvol(NODATA_VALUE),m_lakedpini(nullptr),m_lakedp(nullptr),m_lakevol(nullptr),
-    m_qin1(nullptr),m_qout1(nullptr),m_lakealpha(nullptr)
+    m_qin1(nullptr),m_qout1(nullptr),m_lakealpha(nullptr),m_natural_flow(nullptr),
+    m_isres(nullptr),m_ResLc(nullptr),m_ResLn(nullptr),m_ResLf(nullptr),m_ResAdjust(nullptr)
 {
 }
 
@@ -167,6 +168,7 @@ void MUSK_CH::InitialOutputs() {
         m_qin1[i]=0.f;
         m_qout1[i]=0.f;
         if(m_islake[i]==1) m_chSto[i] = m_lakedpini[i]*m_lakearea[i];
+        if(m_isres[i]==1) m_chSto[i] = m_lakevol[i];
     }
     /// initialize point source loadings
     if (nullptr == m_ptSub) {
@@ -221,7 +223,7 @@ int MUSK_CH::Execute() {
         m_prec[*id] = 0.f;
         
         float total_area=0.f;
-        if(m_islake[*id] == 1){
+        if(m_islake[*id] == 1 || m_isres[*id] == 1){
             for (int i = 0; i < curCellsNum; i++) {
                 int index = curCells[i];
                 total_area += m_area[index];
@@ -243,13 +245,18 @@ int MUSK_CH::Execute() {
             if (m_inputSubbsnID == 0 || m_inputSubbsnID == reachIndex) {
                 // for OpenMP version, all reaches will be executed,
                 // for MPI version, only the current reach will be executed.
-                if(m_islake[reachIndex] == 0){ 
-                    if (!ChannelFlow(reachIndex)) {
+                if(m_islake[reachIndex] == 1){ 
+                    if (!LakeBudget(reachIndex)) {
                         errCount++;
                     }
                 }
+                else if (m_isres[reachIndex] == 1){
+                    if (!ResBudget(reachIndex)) {
+                      errCount++;
+                    }
+                }
                 else{
-                    if (!LakeBudget(reachIndex)) {
+                    if (!ChannelFlow(reachIndex)) {
                       errCount++;
                     }
                 }
@@ -455,6 +462,12 @@ void MUSK_CH::SetReaches(clsReaches* reaches) {
     if (nullptr == m_lakevol) reaches->GetReachesSingleProperty(REACH_LAKEVOL, &m_lakevol);
     if (nullptr == m_lakedpini) reaches->GetReachesSingleProperty(REACH_LAKEDPINI, &m_lakedpini);
     if (nullptr == m_lakealpha) reaches->GetReachesSingleProperty(REACH_LAKEALPHA, &m_lakealpha);
+    if (nullptr == m_isres) reaches->GetReachesSingleProperty(REACH_ISRES, &m_isres);
+    if (nullptr == m_natural_flow) reaches->GetReachesSingleProperty(REACH_NATURAL_FLOW, &m_natural_flow);
+    if (nullptr == m_ResLc) reaches->GetReachesSingleProperty(REACH_RES_LC, &m_ResLc);
+    if (nullptr == m_ResLn) reaches->GetReachesSingleProperty(REACH_RES_LN, &m_ResLn);
+    if (nullptr == m_ResLf) reaches->GetReachesSingleProperty(REACH_RES_LF, &m_ResLf);
+    if (nullptr == m_ResAdjust) reaches->GetReachesSingleProperty(REACH_RES_ADJUST, &m_ResAdjust);
 
     m_reachUpStream = reaches->GetUpStreamIDs();
     m_rteLyrs = reaches->GetReachLayers();
@@ -901,7 +914,7 @@ bool MUSK_CH::LakeBudget(const int i) {
         if (m_qgRchOut[*upRchID] > 0.f) qgUp += m_qgRchOut[*upRchID];
         if (m_qgsRchOut[*upRchID] > 0.f) qgsUp += m_qgsRchOut[*upRchID];
     }
-    qIn += qsUp + qiUp + qgUp;   
+    qIn += qsUp + qiUp + qgUp + qgsUp;   
 
     float pre_Sto = m_chSto[i];
     //add precipitation
@@ -987,6 +1000,166 @@ bool MUSK_CH::LakeBudget(const int i) {
     return true;
 }
 
+bool MUSK_CH::ResBudget(const int i) {
+    //! 1. add all the inflow water
+    float qIn = 0.f; /// Water entering reach on current day from both current subbasin and upstreams
+    // 1.1. water from this subbasin
+    qIn += m_olQ2Rch[i]; /// surface flow
+    float qiSub = 0.f;   /// interflow flow
+    if (nullptr != m_ifluQ2Rch && m_ifluQ2Rch[i] >= 0.f) {
+        qiSub = m_ifluQ2Rch[i];
+        qIn += qiSub;
+    }
+    float qgSub = 0.f; /// groundwater flow
+    if (nullptr != m_gndQ2Rch && m_gndQ2Rch[i] >= 0.f) {
+        qgSub = m_gndQ2Rch[i];
+        qIn += qgSub;
+    }
+    float qgsSub = 0.f;
+    float dh = gw_height[i];   //lake 
+    float rto = m_gw_sh[i]/gw_height[i];
+    if (abs(dh) <= 1e-6) dh = 0.f;
+    float Q = m_Kg * pow(abs(dh), m_Base_ex) * rto; // m3
+    Q = Max(Q,1.e-6f);
+    qgsSub += Q/m_dt;
+    qIn += qgsSub;
+    m_gw_sh[i] -= Q; // m3
+    // 1.2. water from upstream reaches
+    float qsUp = 0.f;
+    float qiUp = 0.f;
+    float qgUp = 0.f;
+    float qgsUp = 0.f;
+    for (auto upRchID = m_reachUpStream.at(i).begin(); upRchID != m_reachUpStream.at(i).end(); ++upRchID) {
+        if (m_qsRchOut[*upRchID] != m_qsRchOut[*upRchID]) {
+            cout << "DayOfYear: " << m_dayOfYear << ", rchID: " << i << ", upRchID: " << *upRchID <<
+                    ", surface part illegal!" << endl;
+            return false;
+        }
+        if (m_qiRchOut[*upRchID] != m_qiRchOut[*upRchID]) {
+            cout << "DayOfYear: " << m_dayOfYear << ", rchID: " << i << ", upRchID: " << *upRchID <<
+                    ", subsurface part illegal!" << endl;
+            return false;
+        }
+        if (m_qgRchOut[*upRchID] != m_qgRchOut[*upRchID]) {
+            cout << "DayOfYear: " << m_dayOfYear << ", rchID: " << i << ", upRchID: " << *upRchID <<
+                    ", groundwater part illegal!" << endl;
+            return false;
+        }
+        if (m_qsRchOut[*upRchID] > 0.f) qsUp += m_qsRchOut[*upRchID];
+        if (m_qiRchOut[*upRchID] > 0.f) qiUp += m_qiRchOut[*upRchID];
+        if (m_qgRchOut[*upRchID] > 0.f) qgUp += m_qgRchOut[*upRchID];
+        if (m_qgsRchOut[*upRchID] > 0.f) qgsUp += m_qgsRchOut[*upRchID];
+    }
+    qIn += qsUp + qiUp + qgUp + qgsUp;     
+
+    float pre_Sto = m_chSto[i];
+
+    //add precipitation
+    m_chSto[i] += m_prec[i]*m_dt;  
+
+    float wtrin = qIn * m_dt;  //m3  
+    float rtwtr = 0.f;    //flow out
+
+	// evaporation
+	float rtevp = 0.f; 
+	rtevp = m_evlake * m_petSubbsn[i]/m_petFactor * 0.001f * m_lakearea[i]; //m3
+	rtevp = Min(rtevp, m_chSto[i]);
+    m_chSto[i] -= rtevp;
+
+	// add qIn
+	m_chSto[i] += qIn * m_dt;
+
+    //initial 
+    float TotalReservoirStorageM3CC = m_lakevol[i];
+    float ConservativeStorageLimitCC = m_ResLc[i]; //minimum storage, 0.1 as defult
+    float NormalStorageLimitCC = m_ResLn[i]; //normal storage, 0.3 as defult
+    float FloodStorageLimitCC = m_ResLf[i]; //maximum storage, 0.97 as defult
+    float adjust_Normal_FloodCC = m_ResAdjust[i]; //adjust parameter, 0.01~0.99, 0.7 as defult
+    float Normal_FloodStorageLimitCC = NormalStorageLimitCC + adjust_Normal_FloodCC * (FloodStorageLimitCC - NormalStorageLimitCC);
+
+    float InvDtSecDay = m_dt;
+    float MinReservoirOutflowCC = 0.05* m_natural_flow[i];  //minimum outflow 
+    float NormalReservoirOutflowCC = 0.3* m_natural_flow[i]; //normal outflow 
+    float NonDamagingReservoirOutflowCC = 0.97* m_natural_flow[i]; //non-damaging outflow 
+    float ReservoirRnormqMultCC=1.f;  //!!todo
+    NormalReservoirOutflowCC = NormalReservoirOutflowCC * ReservoirRnormqMultCC;
+    if(NormalReservoirOutflowCC > MinReservoirOutflowCC){
+        NormalReservoirOutflowCC = NormalReservoirOutflowCC;
+    }else{
+        NormalReservoirOutflowCC = MinReservoirOutflowCC+0.01;
+    }
+    if(NormalReservoirOutflowCC < NonDamagingReservoirOutflowCC){
+        NormalReservoirOutflowCC = NormalReservoirOutflowCC;
+    }else{
+        NormalReservoirOutflowCC = NonDamagingReservoirOutflowCC-0.01;
+    }
+
+    //New reservoir fill (fraction)
+    float ReservoirFillCC = m_chSto[i] / TotalReservoirStorageM3CC;
+    
+    //below 2Lc
+    float ReservoirOutflow1 = Min(MinReservoirOutflowCC, m_chSto[i] / InvDtSecDay);
+
+    //2Lc<F<=Ln
+    float DeltaO = NormalReservoirOutflowCC - MinReservoirOutflowCC;
+    float DeltaLN = NormalStorageLimitCC - 2 * ConservativeStorageLimitCC;
+    float ReservoirOutflow2 = MinReservoirOutflowCC + DeltaO * (ReservoirFillCC - 2 * ConservativeStorageLimitCC) / DeltaLN;
+    
+    //Ln<F<Lf
+    float DeltaNFL = FloodStorageLimitCC - Normal_FloodStorageLimitCC;
+    float ReservoirOutflow3a = NormalReservoirOutflowCC;
+    float ReservoirOutflow3b = NormalReservoirOutflowCC + ((ReservoirFillCC - Normal_FloodStorageLimitCC) / DeltaNFL) 
+                                * (NonDamagingReservoirOutflowCC - NormalReservoirOutflowCC);
+
+    //F>Lf
+    float temp = Min(NonDamagingReservoirOutflowCC, Max(qIn * 1.2, NormalReservoirOutflowCC));
+    float ReservoirOutflow4 = Min(Max((ReservoirFillCC - FloodStorageLimitCC-0.01) *
+                                TotalReservoirStorageM3CC / InvDtSecDay,NonDamagingReservoirOutflowCC), temp);
+    
+    //Reservoir outflow [m3/s] 
+    rtwtr = 0.f;
+    rtwtr = ReservoirOutflow1;
+    if(ReservoirFillCC > 2 * ConservativeStorageLimitCC) rtwtr = ReservoirOutflow2;
+    if(ReservoirFillCC > NormalStorageLimitCC) rtwtr = ReservoirOutflow3a;
+    if(ReservoirFillCC > Normal_FloodStorageLimitCC) rtwtr = ReservoirOutflow3b;
+    if(ReservoirFillCC > FloodStorageLimitCC) rtwtr = ReservoirOutflow4;
+
+
+    temp = Min(rtwtr,Max(qIn, NormalReservoirOutflowCC));
+
+    if((rtwtr > 1.2 * qIn) & (rtwtr > NormalReservoirOutflowCC) & (ReservoirFillCC < FloodStorageLimitCC)){
+        rtwtr = temp;
+    }
+    m_qRchOut[i] = rtwtr;
+    m_rteWtrOut[i] = m_qRchOut[i] * m_dt;   // m^3
+    m_rteWtrOut[i] = Min(m_rteWtrOut[i], m_chSto[i]);
+    m_rteWtrOut[i] = Max(m_rteWtrOut[i], m_chSto[i] - TotalReservoirStorageM3CC);
+    m_qRchOut[i] = m_rteWtrOut[i] / m_dt;   //m3 s-1
+    m_chSto[i] = m_chSto[i] - m_rteWtrOut[i];
+    ReservoirFillCC = m_chSto[i] /TotalReservoirStorageM3CC;
+    if(ReservoirFillCC<=0.f) ReservoirFillCC = 0.f;
+    m_chWtrDepth[i] = ReservoirFillCC;
+
+    float qInSum = m_olQ2Rch[i] + qiSub + qgSub + qsUp + qiUp + qgUp;
+    if (qInSum < UTIL_ZERO) {
+        // In case of divided by zero.
+        // m_qsRchOut[i] = 0.f;
+        // m_qiRchOut[i] = 0.f;
+        // m_qgRchOut[i] = 0.f;
+        // m_qRchOut[i] = 0.f;
+    } else {
+        // In my opinion, these lines should use `qIn` instead of `qInSum`. By lj.
+        // m_qsRchOut[i] = m_qRchOut[i] * (m_olQ2Rch[i] + qsUp) / qIn;
+        // m_qiRchOut[i] = m_qRchOut[i] * (qiSub + qiUp) / qIn;
+        // m_qgRchOut[i] = m_qRchOut[i] * (qgSub + qgUp) / qIn;
+        m_qsRchOut[i] = m_qRchOut[i];
+        //if(m_temp[i] <0) m_qsRchOut[i] +=m_prec[i] +qsUp+ qiUp + qgUp+ m_olQ2Rch[i]+m_ifluQ2Rch[i]+m_gndQ2Rch[i];
+        m_qiRchOut[i] = 0.f;
+        m_qgRchOut[i] = 0.f;
+    }
+
+    return true;
+}
 
 void MUSK_CH::SetSubbasins(clsSubbasins* subbsns) {
     if (m_subbasinsInfo == nullptr) {
