@@ -52,9 +52,12 @@ extern "C" SEIMS_MODULE_API const char* MetadataInformation() {
     mdi.AddOutput(VAR_SBIF, UNIT_FLOW_CMS, DESC_SBIF, DT_Array1D);
 
     //ljj++
+    mdi.AddParameter("Clay", "%", "Percent of clay content", Source_ParameterDB, DT_Raster2D);
+    mdi.AddParameter(VAR_POROST, UNIT_VOL_FRA_M3M3, DESC_POROST, Source_ParameterDB, DT_Raster2D);
     mdi.AddParameter(VAR_AHRU, UNIT_AREA_M2, DESC_AHRU, Source_ParameterDB, DT_Raster1D);
     mdi.AddParameter(VAR_FLOWOUT_LEN, UNIT_LEN_M, DESC_FLOWOUT_LEN, Source_ParameterDB, DT_Raster1D);
     mdi.AddInput(VAR_SOILT, UNIT_TEMP_DEG, DESC_SOTE, Source_Module, DT_Array2D);
+    mdi.AddInput(VAR_SOLICE, UNIT_DEPTH_MM, DESC_SOL_ST, Source_Module_Optional, DT_Array2D);
 
     string res = mdi.GetXMLDocument();
 

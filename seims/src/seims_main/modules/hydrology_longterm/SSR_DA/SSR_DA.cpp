@@ -15,7 +15,8 @@ SSR_DA::SSR_DA() :
     /// outputs
     m_subSurfRf(nullptr), m_subSurfRfVol(nullptr), m_ifluQ2Rch(nullptr),
     //ljj++
-    m_area(nullptr),m_flowout_length(nullptr),m_soilTempprofile(nullptr)
+    m_area(nullptr),m_flowout_length(nullptr),m_soilTempprofile(nullptr),
+    m_soilIceSto(nullptr),m_clay(nullptr),m_soilPor(nullptr)
      {
 }
 
@@ -26,6 +27,7 @@ SSR_DA::~SSR_DA() {
 }
 
 bool SSR_DA::FlowInSoil(const int id) {
+    int frez =1;
     float s0 = Max(m_slope[id], 0.01f);
     // float flowWidth = m_CellWth;
     float flowWidth = m_flowout_length[id]; //ljj
@@ -92,21 +94,42 @@ bool SSR_DA::FlowInSoil(const int id) {
         // if (j == 0 && m_soilTemp[id] <= m_soilFrozenTemp && qUp <= 0.f) {
         //     continue;
         // }
-        if (m_soilTempprofile[id][j] <= m_soilFrozenTemp && qUp <= 0.f) {
+        if (frez = 0 && m_soilTempprofile[id][j] <= m_soilFrozenTemp && qUp <= 0.f) {
             continue;
         }
 
         float k = 0.f, maxSoilWater = 0.f, soilWater = 0.f, fcSoilWater = 0.f;
         soilWater = m_soilWtrSto[id][j];
         maxSoilWater = m_soilSat[id][j];
+        
+        //ljj++
+        if(frez==1) maxSoilWater -= m_soilIceSto[id][j];//ljj++ frozen
+        maxSoilWater  = Max(0.f,maxSoilWater);
+
+        float FACTR = Max(0.01, (m_soilWtrSto[id][j]+m_soilIceSto[id][j])/(m_soilPor[id][j]*m_soilThk[id][j])) ;
+        FACTR = Min(FACTR,1.f);
+        float BEXP = 2.91+0.159*m_clay[id][j];
+        float EXPON = 2.0*BEXP + 3.0 ;
+        //WCND  = myDKSAT * FACTR ** EXPON
+        float alpha = 3;
+        float f_frozen=exp(-alpha*(1-Min(m_soilIceSto[id][j]/(m_soilPor[id][j]*m_soilThk[id][j]),1)));
+        f_frozen = Max(0.f,f_frozen);
+        f_frozen = f_frozen - exp(-alpha); 
+        float WCND =  (1-f_frozen)*m_ks[id][j] * Min(1.0,pow(FACTR, EXPON));
+        //if(id==11) cout<<m_soilIceSto[id][j]/(m_soilPor[id][j]*m_soilThk[id][j])<<"      "<<FACTR<<"      "<<f_frozen<<"     "<<WCND<<"     "<<m_ks[id][j]<<endl;
+        WCND = Min(WCND,m_ks[id][j]);
+        //
+        
         fcSoilWater = m_soilFC[id][j];
         //the moisture content can exceed the porosity in the way the algorithm is implemented
         if (m_soilWtrSto[id][j] > maxSoilWater) {
             k = m_ks[id][j];
+            if(frez==1) k = WCND ;  //ljj
         } else {
             /// Using Clapp and Hornberger (1978) equation to calculate unsaturated hydraulic conductivity.
             float dcIndex = 2.f * m_poreIdx[id][j] + 3.f; // pore disconnectedness index
             k = m_ks[id][j] * pow(m_soilWtrSto[id][j] / maxSoilWater, dcIndex);
+            if(frez==1) k = WCND ;  //ljj
             if (k <= UTIL_ZERO) k = 0.f;
             //cout << id << "\t" << j << "\t" << k << endl;
         }
@@ -276,9 +299,22 @@ void SSR_DA::Set2DData(const char* key, const int nrows, const int ncols, float*
     } 
     //ljj++
     else if (StringMatch(sk, VAR_SOILT)) {
-        CheckInputSize(MID_SSR_DA, key, nrows, m_nCells);
+        CheckInputSize2D(MID_SSR_DA, key, nrows, ncols, m_nCells, m_maxSoilLyrs);
         m_soilTempprofile = data;
-    }else {
+    }
+    else if (StringMatch(sk, VAR_SOLICE)) {
+        CheckInputSize2D(MID_SSR_DA, key, nrows, ncols, m_nCells, m_maxSoilLyrs);
+        m_soilIceSto = data;
+    }
+    else if (StringMatch(sk, "clay")) {
+        CheckInputSize2D(MID_SSR_DA, key, nrows, ncols, m_nCells, m_maxSoilLyrs);
+        m_clay = data;
+    }
+    else if (StringMatch(sk, VAR_POROST)) {
+        CheckInputSize2D(MID_SSR_DA, key, nrows, ncols, m_nCells, m_maxSoilLyrs);
+        m_soilPor = data;
+    }
+    else {
         throw ModelException(MID_SSR_DA, "Set2DData", "Parameter " + sk + " does not exist.");
     }
 }

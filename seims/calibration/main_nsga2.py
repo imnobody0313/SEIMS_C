@@ -77,9 +77,9 @@ elif step == 'TEST':
     # multiobj.setdefault('Q_1289', [['NSE', 1., -100, '>0'], ['PBIAS', -1., 500.]])
     # multiobj.setdefault('TOTDOCcon_1289', [['NSE1', 1., -100, '>0'],['R-square', 1., -100, '>0']])
     # multiobj.setdefault('TOTDOCcon_1444', [['R-square', 1., -100, '>0']])
-    multiobj.setdefault('Q_11', [['NSE', 1., -100, '>0'], ['PBIAS', -1., 500.]])
-    multiobj.setdefault('SOTE20_7', [['NSE', 1., -100, '>0'], ['PBIAS', -1., 500.]])
-    multiobj.setdefault('SOTE100_7', [['NSE', 1., -100, '>0'], ['PBIAS', -1., 500.]])
+    multiobj.setdefault('Q_11', [['NSE', 1., -100, '>0'], ['R-square', 1., -100, '>0']])
+    multiobj.setdefault('SOTE20_7', [['NSE', 1., -100, '>0'], ['PBIAS', -1., 100.]])
+    multiobj.setdefault('SOTE100_7', [['NSE', 1., -100, '>0'], ['PBIAS', -1., 100.]])
 #######
 else:
     # Customize your own multiobjective here, such as:

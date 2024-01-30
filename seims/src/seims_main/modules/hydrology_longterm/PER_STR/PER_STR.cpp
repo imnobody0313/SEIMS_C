@@ -8,7 +8,8 @@ PER_STR::PER_STR() :
     m_soilSat(nullptr), m_soilFC(nullptr),
     m_soilWtrSto(nullptr), m_soilWtrStoPrfl(nullptr), m_soilTemp(nullptr), m_infil(nullptr),
     m_surfRf(nullptr), m_potVol(nullptr), m_impoundTrig(nullptr),
-    m_soilPerco(nullptr),m_soilTempprofile(nullptr) {
+    m_soilPerco(nullptr),m_soilTempprofile(nullptr),
+    m_soilIceSto(nullptr),m_clay(nullptr),m_soilPor(nullptr) {
 }
 
 PER_STR::~PER_STR() {
@@ -21,6 +22,7 @@ void PER_STR::InitialOutputs() {
 }
 
 int PER_STR::Execute() {
+    int frez =1;
     CheckInputData();
     InitialOutputs();
 #pragma omp parallel for
@@ -41,15 +43,36 @@ int PER_STR::Execute() {
             //     continue;
             // }
             //ljj++
-            if (m_soilTempprofile[i][j] <= m_soilFrozenTemp) {
+            if (frez = 0 && m_soilTempprofile[i][j] <= m_soilFrozenTemp) {
                 continue;
             }
+                    
+            //ljj++
+            if(frez==1) maxSoilWater -= m_soilIceSto[i][j];//ljj++ frozen
+            maxSoilWater  = Max(0.f,maxSoilWater);
+
+            float FACTR = Max(0.01, (m_soilWtrSto[i][j]+m_soilIceSto[i][j])/(m_soilPor[i][j]*m_soilThk[i][j])) ;
+            FACTR = Min(FACTR,1.f);
+            float BEXP = 2.91+0.159*m_clay[i][j];
+            float EXPON = 2.0*BEXP + 3.0 ;
+            //WCND  = myDKSAT * FACTR ** EXPON
+            float alpha = 3;
+            float f_frozen=exp(-alpha*(1-Min(m_soilIceSto[i][j]/(m_soilPor[i][j]*m_soilThk[i][j]),1)));
+            f_frozen = Max(0.f,f_frozen);
+            f_frozen = f_frozen - exp(-alpha); 
+            float WCND =  (1-f_frozen)*m_ks[i][j] * Min(1.0,pow(FACTR, EXPON));
+            //if(i==11) cout<<m_soilIceSto[i][j]/(m_soilPor[i][j]*m_soilThk[i][j])<<"      "<<FACTR<<"      "<<f_frozen<<"     "<<WCND<<"     "<<m_ks[i][j]<<endl;
+            WCND = Min(WCND,m_ks[i][j]);
+            //
+            
             m_soilPerco[i][j] = 0.f;
             // No movement if soil moisture is below field capacity
             if (excessWater > 1.e-5f) {
                 float maxPerc = maxSoilWater - fcSoilWater;
+                if(frez==1) maxPerc = maxSoilWater - fcSoilWater - m_soilIceSto[i][j];  //ljj++
                 if (maxPerc < 0.f) maxPerc = 0.1f;
                 float tt = 3600.f * maxPerc / m_ks[i][j];                  // secs
+                if(frez==1) tt = 3600.f * maxPerc / WCND ;  //ljj++
                 m_soilPerco[i][j] = excessWater * (1.f - exp(-m_dt / tt)); // secs
 
                 if (m_soilPerco[i][j] > maxPerc) {
@@ -148,6 +171,18 @@ void PER_STR::Set2DData(const char* key, const int nrows, const int ncols, float
     else if (StringMatch(sk, VAR_SOL_ST)) m_soilWtrSto = data;
     //ljj++
     else if (StringMatch(sk, VAR_SOILT)) m_soilTempprofile = data;
+    else if (StringMatch(sk, VAR_SOLICE)) {
+        CheckInputSize2D(MID_SSR_DA, key, nrows, ncols, m_nCells, m_maxSoilLyrs);
+        m_soilIceSto = data;
+    }
+    else if (StringMatch(sk, "clay")) {
+        CheckInputSize2D(MID_SSR_DA, key, nrows, ncols, m_nCells, m_maxSoilLyrs);
+        m_clay = data;
+    }
+    else if (StringMatch(sk, VAR_POROST)) {
+        CheckInputSize2D(MID_SSR_DA, key, nrows, ncols, m_nCells, m_maxSoilLyrs);
+        m_soilPor = data;
+    }
     else {
         throw ModelException(MID_PER_STR, "Set2DData", "Parameter " + sk + " does not exist.");
     }

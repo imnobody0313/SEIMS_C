@@ -117,5 +117,12 @@ private:
     float** m_soilWtrSto;
     /// soil water storage in soil profile (mm)
     float* m_soilWtrStoPrfl;
+
+    //ljj++
+    float** m_soilIceSto;
+    float** m_soilPor;
+    float** m_soilThk;
+    
+    float* m_soilIceStoPrfl;
 };
 #endif /* SEIMS_MODULE_SUR_MR_H */

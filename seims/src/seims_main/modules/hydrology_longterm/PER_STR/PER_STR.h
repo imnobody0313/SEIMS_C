@@ -84,5 +84,8 @@ private:
 
     //ljj++
     float** m_soilTempprofile;
+    float** m_soilIceSto;
+    float** m_clay;
+    float** m_soilPor;
 };
 #endif /* SEIMS_MODULE_PER_STR_H */

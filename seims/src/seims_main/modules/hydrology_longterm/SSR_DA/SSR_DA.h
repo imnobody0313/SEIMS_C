@@ -145,6 +145,9 @@ private:
     float* m_area;
     float* m_flowout_length;
     float** m_soilTempprofile;
+    float** m_soilIceSto;
+    float** m_clay;
+    float** m_soilPor;
 };
 
 #endif /* SEIMS_MODULE_SSR_DA_H */

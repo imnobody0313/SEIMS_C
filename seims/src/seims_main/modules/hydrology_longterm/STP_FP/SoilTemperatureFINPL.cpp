@@ -34,6 +34,7 @@ SoilTemperatureFINPL::SoilTemperatureFINPL() :
     m_csol(nullptr),m_asol(nullptr),m_dsol(nullptr),m_dsols(nullptr),m_dice(nullptr),
     m_asno(nullptr),m_bsno(nullptr),m_csno(nullptr),m_dsno(nullptr),m_psno(nullptr),m_qsno(nullptr),
     m_soltmp1(nullptr),m_snotmp1(nullptr),m_presnotmp(nullptr), m_soilt(nullptr),
+    m_smp(nullptr),m_supercool(nullptr),m_sand(nullptr),m_clay(nullptr),
     m_SOTE1(nullptr),m_SOTE20(nullptr),m_SOTE50(nullptr),m_SOTE100(nullptr),m_SOTE200(nullptr)
     {
 }
@@ -103,6 +104,8 @@ SoilTemperatureFINPL::~SoilTemperatureFINPL() {
     if (m_soltmp1 != nullptr) Release2DArray(m_nCells, m_soltmp1);
     if (m_soilt != nullptr) Release2DArray(m_nCells, m_soilt);
     if (m_solthic != nullptr) Release2DArray(m_nCells, m_solthic);
+    if (m_smp != nullptr) Release2DArray(m_nCells, m_smp);
+    if (m_supercool != nullptr) Release2DArray(m_nCells, m_supercool);
 }
 
 int SoilTemperatureFINPL::Execute() {
@@ -142,37 +145,36 @@ int SoilTemperatureFINPL::Execute() {
     for (int i = 0; i < m_nCells; i++) {
         SoilTempTSWAT(i);   //TSWAT
         m_soilTemp[i] = m_soilt[i][0];
-        
-        //output
-        int outputID = 7;  //subbasinID for calibration
-        int HRUID = 90;
+    }
+    //output
+    int outputID = 7;  //subbasinID for calibration
+    int HRUID = 90;
 
-        int nlyr=5; //!!????ljj
-        //assume the depth below the deepest soil layer is devided into 5 layer
-        int nly1=0;
-        nly1 = m_nSoilLyrs[i]+ nlyr;
-        for (int k = 0; k < nlyr; k++) {
-            if (m_solnd[i][k+1]>10. && m_solnd[i][k]<=10.) {
-                m_SOTE1[outputID] = m_soltmp1[i][k] * ( (m_solnd[i][k+1]-10) / (m_solnd[i][k+1]-m_solnd[i][k]) ) 
-                            + m_soltmp1[i][k+1] * ((10- m_solnd[i][k]) / (m_solnd[i][k+1]-m_solnd[i][k]) );
-            } 
-            if (m_solnd[i][k+1]>200. && m_solnd[i][k]<=200.) {
-                m_SOTE20[outputID] = m_soltmp1[i][k] * ( (m_solnd[i][k+1]-200) / (m_solnd[i][k+1]-m_solnd[i][k]) ) 
-                            + m_soltmp1[i][k+1] * ((200- m_solnd[i][k]) / (m_solnd[i][k+1]-m_solnd[i][k]) );
-            } 
-            if (m_solnd[i][k+1]>500. && m_solnd[i][k]<=500.) {
-                m_SOTE50[outputID] = m_soltmp1[i][k] * ( (m_solnd[i][k+1]-500) / (m_solnd[i][k+1]-m_solnd[i][k]) ) 
-                            + m_soltmp1[i][k+1] * ((500- m_solnd[i][k]) / (m_solnd[i][k+1]-m_solnd[i][k]) );
-            } 
-            if (m_solnd[i][k+1]>1000. && m_solnd[i][k]<=1000.) {
-                m_SOTE100[outputID] = m_soltmp1[i][k] * ( (m_solnd[i][k+1]-1000) / (m_solnd[i][k+1]-m_solnd[i][k]) ) 
-                            + m_soltmp1[i][k+1] * ((1000- m_solnd[i][k]) / (m_solnd[i][k+1]-m_solnd[i][k]) );
-            }
-            if (m_solnd[i][k+1]>2000. && m_solnd[i][k]<=2000.) {
-                m_SOTE100[outputID] = m_soltmp1[i][k] * ( (m_solnd[i][k+1]-2000) / (m_solnd[i][k+1]-m_solnd[i][k]) ) 
-                            + m_soltmp1[i][k+1] * ((2000- m_solnd[i][k]) / (m_solnd[i][k+1]-m_solnd[i][k]) );
-            }  
+    int nlyr=5; //!!????ljj
+    //assume the depth below the deepest soil layer is devided into 5 layer
+    int nly1=0;
+    nly1 = m_nSoilLyrs[HRUID]+ nlyr;
+    for (int k = 0; k < nlyr; k++) {
+        if (m_solnd[HRUID][k+1]>10. && m_solnd[HRUID][k]<=10.) {
+            m_SOTE1[outputID] = m_soltmp1[HRUID][k] * ( (m_solnd[HRUID][k+1]-10) / (m_solnd[HRUID][k+1]-m_solnd[HRUID][k]) ) 
+                        + m_soltmp1[HRUID][k+1] * ((10- m_solnd[HRUID][k]) / (m_solnd[HRUID][k+1]-m_solnd[HRUID][k]) );
+        } 
+        if (m_solnd[HRUID][k+1]>200. && m_solnd[HRUID][k]<=200.) {
+            m_SOTE20[outputID] = m_soltmp1[HRUID][k] * ( (m_solnd[HRUID][k+1]-200) / (m_solnd[HRUID][k+1]-m_solnd[HRUID][k]) ) 
+                        + m_soltmp1[HRUID][k+1] * ((200- m_solnd[HRUID][k]) / (m_solnd[HRUID][k+1]-m_solnd[HRUID][k]) );
+        } 
+        if (m_solnd[HRUID][k+1]>500. && m_solnd[HRUID][k]<=500.) {
+            m_SOTE50[outputID] = m_soltmp1[HRUID][k] * ( (m_solnd[HRUID][k+1]-500) / (m_solnd[HRUID][k+1]-m_solnd[HRUID][k]) ) 
+                        + m_soltmp1[HRUID][k+1] * ((500- m_solnd[HRUID][k]) / (m_solnd[HRUID][k+1]-m_solnd[HRUID][k]) );
+        } 
+        if (m_solnd[HRUID][k+1]>1000. && m_solnd[HRUID][k]<=1000.) {
+            m_SOTE100[outputID] = m_soltmp1[HRUID][k] * ( (m_solnd[HRUID][k+1]-1000) / (m_solnd[HRUID][k+1]-m_solnd[HRUID][k]) ) 
+                        + m_soltmp1[HRUID][k+1] * ((1000- m_solnd[HRUID][k]) / (m_solnd[HRUID][k+1]-m_solnd[HRUID][k]) );
         }
+        if (m_solnd[HRUID][k+1]>2000. && m_solnd[HRUID][k]<=2000.) {
+            m_SOTE100[outputID] = m_soltmp1[HRUID][k] * ( (m_solnd[HRUID][k+1]-2000) / (m_solnd[HRUID][k+1]-m_solnd[HRUID][k]) ) 
+                        + m_soltmp1[HRUID][k+1] * ((2000- m_solnd[HRUID][k]) / (m_solnd[HRUID][k+1]-m_solnd[HRUID][k]) );
+        }  
     }
     if (errCount > 0) {
         throw ModelException(MID_STP_FP, "Execute", "The calculation of soil temperature failed!");
@@ -306,19 +308,20 @@ void SoilTemperatureFINPL::InitialOutputs() {
         Initialize1DArray(m_nCells, m_kscoe, 0.f);
         Initialize1DArray(m_nCells, m_ccoe, 0.f);
         Initialize1DArray(m_nCells, m_basedep, 0.f);
-        Initialize2DArray(m_nCells, m_maxSoilLyrs, m_kcoe, 0.f);
+        
+        Initialize2DArray(m_nCells, m_maxSoilLyrs, m_solpormm, 0.f);
+        Initialize2DArray(m_nCells, m_maxSoilLyrs, m_solwc, 0.f);
+        Initialize2DArray(m_nCells, m_maxSoilLyrs, m_solwcv, 0.f);
+        Initialize2DArray(m_nCells, m_maxSoilLyrs, m_solice, 0.f);
+        Initialize2DArray(m_nCells, m_maxSoilLyrs, m_solicev, 0.f);
+        Initialize2DArray(m_nCells, m_maxSoilLyrs, m_solorg, 0.f);
+        Initialize2DArray(m_nCells, m_maxSoilLyrs, m_solorgv, 0.f);
+        Initialize2DArray(m_nCells, m_maxSoilLyrs, m_solminv, 0.f);
+        Initialize2DArray(m_nCells, m_maxSoilLyrs, m_solair, 0.f);
         
         int newlayer = m_maxSoilLyrs+10; //ljj++
+        Initialize2DArray(m_nCells, newlayer, m_kcoe, 0.f);
         Initialize2DArray(m_nCells, newlayer, m_solnd, 0.f);
-        Initialize2DArray(m_nCells, newlayer, m_solpormm, 0.f);
-        Initialize2DArray(m_nCells, newlayer, m_solwc, 0.f);
-        Initialize2DArray(m_nCells, newlayer, m_solwcv, 0.f);
-        Initialize2DArray(m_nCells, newlayer, m_solice, 0.f);
-        Initialize2DArray(m_nCells, newlayer, m_solicev, 0.f);
-        Initialize2DArray(m_nCells, newlayer, m_solorg, 0.f);
-        Initialize2DArray(m_nCells, newlayer, m_solorgv, 0.f);
-        Initialize2DArray(m_nCells, newlayer, m_solminv, 0.f);
-        Initialize2DArray(m_nCells, newlayer, m_solair, 0.f);
         Initialize2DArray(m_nCells, newlayer, m_casol, 1.f);
         Initialize2DArray(m_nCells, newlayer, m_solsatu, 0.f);
         Initialize2DArray(m_nCells, newlayer, m_solkd, 0.f);
@@ -393,6 +396,8 @@ void SoilTemperatureFINPL::InitialOutputs() {
     if (nullptr == m_qsol ) Initialize1DArray(newlayer, m_qsol, 0.f);
     if (nullptr == m_dice) Initialize2DArray(m_nCells, newlayer, m_dice, 0.f);
     if (nullptr == m_dsols) Initialize2DArray(m_nCells, newlayer, m_dsols, 0.f);
+    if (nullptr == m_smp) Initialize2DArray(m_nCells, newlayer, m_smp, 0.f);
+    if (nullptr == m_supercool) Initialize2DArray(m_nCells, newlayer, m_supercool, 0.f);
 
     if (nullptr == m_soilt) {
         int newlayer = m_maxSoilLyrs+6; //ljj++
@@ -415,6 +420,8 @@ void SoilTemperatureFINPL::Set2DData(const char* key, int n, int col, float** da
 	else if (StringMatch(sk, VAR_SOL_WPMM)) m_soilWP = data;
     else if (StringMatch(sk, VAR_SOL_BD)) m_soilBD = data;
     else if (StringMatch(sk, VAR_SOL_RSD)) m_soilRsd = data;
+    else if (StringMatch(sk, "clay")) m_clay = data;
+    else if (StringMatch(sk, "sand"))  m_sand = data;
 }
 
 void SoilTemperatureFINPL::Get2DData(const char* key, int* nrows, int* ncols, float*** data) {
@@ -429,12 +436,12 @@ void SoilTemperatureFINPL::Get2DData(const char* key, int* nrows, int* ncols, fl
     if (StringMatch(sk, VAR_SOLICE)) {
         *data = m_solice;
         *nrows = m_nCells;
-        *ncols = newlayer;
+        *ncols = m_maxSoilLyrs;
     }
     if (StringMatch(sk, VAR_SOLWC)) {
         *data = m_solwc;
         *nrows = m_nCells;
-        *ncols = newlayer;
+        *ncols = m_maxSoilLyrs;
     }
 }
 
@@ -447,6 +454,7 @@ void SoilTemperatureFINPL::SoilTempTSWAT(const int i) {
         } else{
             m_solwc[i][k] = m_soilWtrSto[i][k];
         }
+        
         //limit the wc+ice !> pormm
         float rto = m_solwc[i][k]/(m_solwc[i][k]+m_solice[i][k]);
         if((m_solwc[i][k]+m_solice[i][k]) >  m_solpormm[i][k]) {
@@ -459,6 +467,7 @@ void SoilTemperatureFINPL::SoilTempTSWAT(const int i) {
         m_solminv[i][k] = m_soilBD[i][k] / 2.65 - m_solorgv[i][k];
         m_solicev[i][k] = m_solice[i][k] / m_solthic[i][k];
         m_solair[i][k]  = m_solpormm[i][k]- m_solwc[i][k]-m_solice[i][k];
+        
     }   
     //subroutine snom1
     //Snow depth
@@ -682,6 +691,7 @@ void SoilTemperatureFINPL::SoilTempTSWAT(const int i) {
 	    m_csol[0]=m_kint[0]/(m_solthic[i][0]/10/2);
     }
     int solft=1; //solft=0 no freeze and thaw; solft=1 with freeze and thaw
+    int supercool = 1; //ljj++
     if(solft==0) {
        for (int k = 0; k < nly1; k++) {
           m_asol[k]=m_bsol[k]+m_csol[k]+m_casol[i][k]*(m_solthic[i][k]/10)/1 ;
@@ -690,6 +700,7 @@ void SoilTemperatureFINPL::SoilTempTSWAT(const int i) {
 	}
     if(solft==1) { 
         for (int k = 0; k <nly1; k++) {
+            m_supercool[i][k]= 0.f;
             m_asol[k]=m_bsol[k]+m_csol[k]+m_casol[i][k]*(m_solthic[i][k]/10)/1 ;
             //call soltfretha(k)!! latent heat source  
             if (k<=m_nSoilLyrs[i]-1) {
@@ -699,19 +710,46 @@ void SoilTemperatureFINPL::SoilTempTSWAT(const int i) {
 	                a=m_casol[i][k]*(m_solthic[i][k]/10)*m_soltmp1[i][k] ;
                     b=334*m_solwc[i][k]/10;                             
 	                m_dsols[i][k]=a+b;
+                    //ljj++ supercooled soil water
+                    // SMP = HFUS*(TFRZ-STC(J))/(GRAV*STC(J))             
+                    // SUPERCOOL(J) = SMCMAX(J)*(SMP/PSISAT(J))**(-1./BEXP(J))
+                    // SUPERCOOL(J) = SUPERCOOL(J)*DZSNSO(J)*1000. 
+                    float HFUS = 0.3336e6;
+                    float GRAV = 9.80616;
+                    m_smp[i][k]= HFUS*(m_tfrozen-m_soltmp1[i][k])/(GRAV*(m_soltmp1[i][k]+273.15));   //m
+                    //m_smp[i][k] = Max(0.f,m_smp[i][k]);
+                    //BEXP(I)   = 2.91+0.159*myClay(I)
+                    float BEXP = 2.91+0.159*m_clay[i][k];
+                    //SMCMAX is porosity of liquid water
+                    //PSISAT is saturated soil matric potential 0.01*10**( 1.88-0.0131*mySand(I) )
+                    float PSISAT = 0.01*pow(10,( 1.88-0.0131*m_sand[i][k] ));
+                    m_supercool[i][k]= m_soilPor[i][k]*(pow((m_smp[i][k]/PSISAT),(-1./BEXP))); 
+                    // DZSNSO  !snow/soil layer thickness [m]
+                    if(k>0){
+                        m_supercool[i][k]= m_supercool[i][k] *(m_soildepth[i][k] - m_soildepth[i][k-1]);  //mm
+                    }else{
+                        m_supercool[i][k]= m_supercool[i][k] *m_soildepth[i][k];  //mm
+                    }
+                    m_supercool[i][k] = Min(m_supercool[i][k],(m_solice[i][k]));
+                    m_supercool[i][k] = Max(m_supercool[i][k]*0.1, 0.f);
+                    
+                    //
                     if (m_dsols[i][k]>=0) {
                         m_dice[i][k] = -a/334*10;
+                        if(supercool==1 && m_solwc[i][k] - m_dice[i][k] <m_supercool[i][k]) m_dice[i][k] = m_solwc[i][k]-m_supercool[i][k]; 
                         m_dice[i][k] = Min(m_dice[i][k], m_solwc[i][k]);
                         m_solwc[i][k] =m_solwc[i][k] - m_dice[i][k];
                         m_solice[i][k]=m_solice[i][k]+ m_dice[i][k];
 		                m_dsol[k]=0; 
+                        if(supercool==1 && m_solwc[i][k] - m_dice[i][k] <m_supercool[i][k]) m_dsol[k]= (a+334*m_solwc[i][k]/10)/1;  // m_dsol[k]= (a+b)/1;
                     }else{
                         m_dsol[k]= (a+b)/1;    
                         m_dice[i][k]=m_solwc[i][k];
                         m_dice[i][k] = Min(m_dice[i][k], m_solwc[i][k]);
+                        if(supercool==1 && m_solwc[i][k] - m_dice[i][k] <m_supercool[i][k]) m_dice[i][k] = m_solwc[i][k]-m_supercool[i][k];
                         m_solice[i][k]=m_solice[i][k]+ m_dice[i][k]; 
-                        //m_solwc[i][k]=0;    
-                        m_solwc[i][k]=m_solwc[i][k] - m_dice[i][k];             
+                        m_solwc[i][k]=m_solwc[i][k] - m_dice[i][k];         
+                        if(supercool==1 && m_solwc[i][k] - m_dice[i][k] <m_supercool[i][k]) m_dsol[k]= (a+334*m_solwc[i][k]/10)/1;
                     }
                 }else{ //-------------------------thawing--------------------------------
                     a=0;

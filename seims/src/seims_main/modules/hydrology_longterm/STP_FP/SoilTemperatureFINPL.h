@@ -101,6 +101,8 @@ private:
     float** m_solpormm;
     float** m_soilBD;
     float** m_soilRsd;
+    float** m_clay;
+    float** m_sand;
 
     float** m_solwc;
     float** m_solice;
@@ -171,6 +173,8 @@ private:
     float** m_ksol;
     float** m_dice;
     float** m_dsols;
+    float** m_smp;
+    float** m_supercool;
 
     float** m_solnd;
 

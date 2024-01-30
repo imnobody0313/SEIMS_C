@@ -58,6 +58,8 @@ extern "C" SEIMS_MODULE_API const char* MetadataInformation() {
     mdi.AddParameter(VAR_SOL_WPMM, UNIT_DEPTH_MM, DESC_SOL_WPMM, Source_ParameterDB, DT_Raster2D);
     mdi.AddParameter(VAR_SOL_BD, UNIT_DENSITY, DESC_SOL_BD, Source_ParameterDB, DT_Raster2D);
     mdi.AddParameter(VAR_SOLAVBD, UNIT_DENSITY, DESC_SOL_BD, Source_ParameterDB, DT_Raster1D);
+    mdi.AddParameter("Clay", "%", "Percent of clay content", Source_ParameterDB, DT_Raster2D);
+    mdi.AddParameter("Sand", "%", "Percent of sand content", Source_ParameterDB, DT_Raster2D);
 
     mdi.AddParameter(VAR_TSOIL1, UNIT_NON_DIM, DESC_TSOIL1, Source_ParameterDB, DT_Single);
     mdi.AddParameter(VAR_TSOIL2, UNIT_NON_DIM, DESC_TSOIL2, Source_ParameterDB, DT_Single);
