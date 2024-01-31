@@ -11,7 +11,7 @@ using namespace utils_array;
 using namespace utils_string;
 using namespace utils_math;
 
-const int REACH_PARAM_NUM = 61; /// Numerical parameters, except GROUP related
+const int REACH_PARAM_NUM = 62; /// Numerical parameters, except GROUP related
 const char* REACH_PARAM_NAME[] = {
     REACH_SUBBASIN, REACH_NUMCELLS,                           // 0-1
     REACH_DOWNSTREAM, REACH_UPDOWN_ORDER, REACH_DOWNUP_ORDER, // 2-4
@@ -30,7 +30,8 @@ const char* REACH_PARAM_NAME[] = {
     //ljj++
     REACH_PERMAFORST,REACH_SPYLD,
     REACH_ISLAKE,REACH_LAKEAREA,REACH_LAKEVOL,REACH_LAKEDPINI,REACH_LAKEALPHA,
-    REACH_ISRES,REACH_NATURAL_FLOW,REACH_RES_LC,REACH_RES_LN,REACH_RES_LF,REACH_RES_ADJUST
+    REACH_ISRES,REACH_NATURAL_FLOW,REACH_RES_LC,REACH_RES_LN,REACH_RES_LF,REACH_RES_ADJUST,
+    REACH_NSED
 };
 const int REACH_GROUP_METHOD_NUM = 2; /// Group methods
 const char* REACH_GROUP_NAME[] = {REACH_KMETIS, REACH_PMETIS};

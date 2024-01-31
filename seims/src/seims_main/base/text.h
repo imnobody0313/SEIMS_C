@@ -2017,6 +2017,7 @@ CONST_CHARS_LIST Tag_Weight[] = {"WEIGHT", "Weight used for interpolation"};
 #define REACH_RES_LN                        "RES_LN"
 #define REACH_RES_LF                        "RES_LF"
 #define REACH_RES_ADJUST                    "RES_ADJUST"
+#define REACH_NSED                          "RES_NSED"
 
 #define DESC_GWH                             "groundwater height"
 #define DESC_GW_SH                           "shallow groundwater stroage"

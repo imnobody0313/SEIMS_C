@@ -73,6 +73,9 @@ private:
     void SedChannelRouting(int i);
 
     void ChannelDowncuttingWidening(int i);
+
+    //ljj++
+    void SedResRouting(int i);
 private:
     int m_dt;            ///< time step (sec)
     int m_inputSubbsnID; ///< current subbasin ID, 0 for the entire watershed
@@ -187,5 +190,15 @@ private:
     float* m_sagSto;    ///< Small aggregate storage in reach (kg), sagst * 1000 in SWAT
     float* m_lagSto;    ///< Large aggregate storage in reach (kg), lagst * 1000 in SWAT
     float* m_gravelSto; ///< Gravel storage in reach (kg), sanst * 1000 in SWAT
+
+    //ljj++
+    float* m_islake;
+    float* m_lakearea;
+    float* m_lakevol;
+    float* m_res_d50;
+    float* m_isres;
+    float* m_ResLc;
+    float* m_ResLf;
+    float* m_resnsed;
 };
 #endif /* SEIMS_MODULE_SEDR_SBAGNOLD_H */

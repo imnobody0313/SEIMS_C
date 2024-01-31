@@ -25,6 +25,7 @@ RES_LC = [0.10,0,0,0,0,0,0,0,0,0,0,0]
 RES_LN = [0.30,0,0,0,0,0,0,0,0,0,0,0]
 RES_LF = [0.97,0,0,0,0,0,0,0,0,0,0,0]
 RES_ADJUST = [0.7,0,0,0,0,0,0,0,0,0,0,0]
+RES_NSED = [12,0,0,0,0,0,0,0,0,0,0,0]
 
 for i in range(1,13):
 	db["REACHES"].update({'SUBBASINID': i}, {'$set': {"is_permafrost": is_permafrost[i-1]}},False,True)
@@ -41,3 +42,4 @@ for i in range(1,13):
 	db["REACHES"].find_one_and_update({'SUBBASINID': i},{'$set': {'RES_LN': RES_LN[i-1]}})
 	db["REACHES"].find_one_and_update({'SUBBASINID': i},{'$set': {'RES_LF': RES_LF[i-1]}})
 	db["REACHES"].find_one_and_update({'SUBBASINID': i},{'$set': {'RES_ADJUST': RES_ADJUST[i-1]}})
+	db["REACHES"].find_one_and_update({'SUBBASINID': i},{'$set': {'RES_NSED': RES_NSED[i-1]}})
