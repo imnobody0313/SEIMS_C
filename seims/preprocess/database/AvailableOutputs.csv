@@ -173,3 +173,10 @@ Nutrient,SOILT,soil temperture profile,kg/ha,NONE,1970-01-01 00:00:00,1970-01-01
 Nutrient,SOLICE,Ice depth in soil layer,kg/ha,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,OUTLET,SOLICE.txt,1
 Nutrient,SOLWC,Water depth in soil layer,kg/ha,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,OUTLET,SOLWC.txt,1
 Sediment,SedStorageCH,Sediment storage,mg/L,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,1,DAY,OUTLET,SedStorageCH.txt,1
+CarbonTransport,LPOCtoCH,LPOC amount transported by sediment in subbasin,kg,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,1,DAY,OUTLET,LPOCtoCH.txt,1
+CarbonTransport,RPOCtoCH,RPOC amount transported by sediment in subbasin,kg,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,1,DAY,OUTLET,LPOCtoCH.txt,1
+CarbonTransport,surf_DICtoCH,DIC amount transported by surf runoff in subbasin,kg,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,1,DAY,OUTLET,surf_DICtoCH.txt,1
+CarbonTransport,lat_DICtoCH,DIC amount transported by lateral runoff in subbasin,kg,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,1,DAY,OUTLET,lat_DICtoCH.txt,1
+CarbonTransport,LDOCtoCH,LDOC amount transported by sediment in subbasin,kg,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,1,DAY,OUTLET,LDOCtoCH.txt,1
+CarbonTransport,surf_RDOCtoCH,RDOC amount transported by surf runoff in subbasin,kg,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,1,DAY,OUTLET,surf_RDOCtoCH.txt,1
+CarbonTransport,lat_RDOCtoCH,RDOC amount transported by lateral runoff in subbasin,kg,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,1,DAY,OUTLET,lat_RDOCtoCH.txt,1

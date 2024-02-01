@@ -209,5 +209,43 @@ private:
     float* m_soilIfluCbnPrfl;  ///< lateral flow Carbon loss in soil profile
     float* m_soilPercoCbnPrfl; ///< percolation Carbon loss in soil profile
     float* m_sedLossCbn;       ///< amount of C lost with sediment pools
+
+    //ljj++
+    int m_nRteLyrs;
+
+    float* m_area;
+    float* m_rchID;
+    float* m_flowOutIdxD8;
+    float** m_rteLyrs;
+    float** m_sol_RSPC;
+	float** m_soilWP; ///water content of soil at -1.5 MPa (wilting point)
+	float** m_soilWtrSto;	///amount of water stored in the soil layer on current day(mm H2O)
+	float** m_soilPor;	/// porosity mm/mm
+    float** m_soilDepth;
+    
+    
+    float* m_soileroRPOC;
+    float* m_soileroLPOC;
+    float* m_LPOCtoCH;
+    float* m_RPOCtoCH;
+
+    float* m_soilSurfInOrgnCbn;
+    float* m_surfDICtoCH;
+    float* m_IfluDICtoCH;
+    float** m_soilWtrDIC; 
+    float** m_soilIfluInOrgnCbn;
+	float** m_soilPercoInOrgnCbn;
+
+    float* m_LDOCToCH;
+    float* m_surfRDOCtoCH;
+    float* m_IfluRDOCtoCH;
+    float* m_soilPercoCbnLowest;
+    float* m_soilSurfCbn;
+	
+
+    float m_enr_POC;
+    float m_kd_oc;
+    float m_perco_doc;
+    
 };
 #endif /* SEIMS_MODULE_NUTRSED_H */

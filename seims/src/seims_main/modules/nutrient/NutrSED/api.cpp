@@ -89,6 +89,30 @@ extern "C" SEIMS_MODULE_API const char* MetadataInformation() {
     mdi.AddOutput(VAR_PERCO_C, UNIT_CONT_KGHA, DESC_PERCO_C, DT_Raster1D);
     mdi.AddOutput(VAR_SEDLOSS_C, UNIT_CONT_KGHA, DESC_SEDLOSS_C, DT_Raster1D);
 
+    //ljj++
+    mdi.AddParameter(VAR_ENRPOC, UNIT_NON_DIM, DESC_ENRPOC, Source_ParameterDB, DT_Single);
+    mdi.AddParameter(VAR_KDOC, UNIT_NON_DIM, DESC_KDOC, Source_ParameterDB, DT_Single);
+	mdi.AddParameter(VAR_PERCO_DOC, UNIT_NON_DIM, DESC_PERCO_DOC, Source_ParameterDB, DT_Single);
+    mdi.AddParameter(VAR_AHRU, UNIT_AREA_M2, DESC_AHRU, Source_ParameterDB, DT_Raster1D);
+    mdi.AddParameter(VAR_STREAM_LINK, UNIT_NON_DIM, DESC_STREAM_LINK, Source_ParameterDB, DT_Raster1D);
+    mdi.AddParameter(VAR_SOL_WPMM, UNIT_DEPTH_MM, DESC_SOL_WPMM, Source_ParameterDB, DT_Raster2D);
+    mdi.AddParameter(VAR_POROST, UNIT_VOL_FRA_M3M3, DESC_POROST, Source_ParameterDB, DT_Raster2D);
+    mdi.AddParameter(VAR_SOILDEPTH, UNIT_DEPTH_MM, DESC_SOILDEPTH, Source_ParameterDB, DT_Raster2D);
+    mdi.AddParameter(Tag_ROUTING_LAYERS, UNIT_NON_DIM, DESC_ROUTING_LAYERS, Source_ParameterDB, DT_Array2D);
+	mdi.AddParameter(Tag_FLOWOUT_INDEX_D8, UNIT_NON_DIM, DESC_FLOWOUT_INDEX_D8, Source_ParameterDB, DT_Array1D);
+
+    mdi.AddOutput(VAR_LPOCtoCH, UNIT_KG, DESC_LPOCtoCH, DT_Array1D);
+	mdi.AddOutput(VAR_RPOCtoCH, UNIT_KG, DESC_RPOCtoCH, DT_Array1D);
+    mdi.AddOutput(VAR_surfDICtoCH, UNIT_KG, DESC_surfDICtoCH, DT_Array1D);
+	mdi.AddOutput(VAR_latDICtoCH, UNIT_KG, DESC_latDICtoCH, DT_Array1D);
+    mdi.AddOutput(VAR_LDOCtoCH, UNIT_KG, DESC_LDOCtoCH, DT_Array1D);
+    mdi.AddOutput(VAR_surfRDOCtoCH, UNIT_KG, DESC_surfRDOCtoCH, DT_Array1D);
+	mdi.AddOutput(VAR_latRDOCtoCH, UNIT_KG, DESC_latRDOCtoCH, DT_Array1D);
+    mdi.AddOutput(VAR_PERC_LOWEST_DOC, UNIT_KG, DESC_PERC_LOWEST_DOC, DT_Array1D);
+
+    mdi.AddInput(VAR_SOL_RSPC, UNIT_CONT_KGHA, DESC_SOL_RSPC, Source_Module_Optional, DT_Raster2D);
+	mdi.AddInput(VAR_SOL_ST, UNIT_DEPTH_MM, DESC_SOL_ST, Source_Module, DT_Raster2D);
+
     string res = mdi.GetXMLDocument();
     char* tmp = new char[res.size() + 1];
     strprintf(tmp, res.size() + 1, "%s", res.c_str());
