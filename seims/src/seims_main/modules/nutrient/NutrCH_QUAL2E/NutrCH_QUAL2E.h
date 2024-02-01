@@ -317,6 +317,47 @@ private:
     float* m_chSr;
     /// valid cell numbers of each channel
     int* m_chCellCount;
+
+    //ljj+
+    float* m_seepage;
+    float* m_gws_RDOCconc;
+    float* m_gws_RDOCsto;
+
+    float* m_surfRDOCToCH;
+    float* m_latRDOCToCH;
+    float* m_gwdRDOCToCH;
+    float* m_latDICToCH;
+    float* m_surfDICToCH;
+    float* m_LPOCToCH;
+    float* m_RPOCToCH;
+    float* m_LDOCToCH;
+    
+    float* m_chDIC;
+    float* m_chLPOC;
+    float* m_chRPOC;
+    float* m_chLDOC;
+    float* m_chRDOC;
+    float* m_chsurfRDOC;
+    float* m_chlatRDOC;
+    float* m_chgwdRDOC;
+
+    float* m_chOutDIC;
+    float* m_chOutLDOC;
+    float* m_chOutRDOC;
+    float* m_chOutLPOC;
+    float* m_chOutRPOC;
+    float* m_chOutTotDOC;
+    float* m_chOutsurfRDOC;
+    float* m_chOutlatRDOC;
+    float* m_chOutgwdRDOC;
+    float* m_chOutgwsRDOC;
+   
+    float* m_chOutDICConc;
+    float* m_chOutLDOCConc;
+    float* m_chOutRDOCConc;
+    float* m_chOutLPOCConc;
+    float* m_chOutRPOCConc;
+    float* m_chOutTotDOCConc;
 };
 
 #endif /* SEIMS_MODULE_NUTRCH_QUAL2E_H */

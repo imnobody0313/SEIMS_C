@@ -116,6 +116,47 @@ extern "C" SEIMS_MODULE_API const char* MetadataInformation() {
     mdi.AddInOutput(VAR_CHSTR_TN, UNIT_KG, DESC_CHSTR_TN, DT_Array1D, TF_SingleValue);
     mdi.AddInOutput(VAR_CHSTR_TP, UNIT_KG, DESC_CHSTR_TP, DT_Array1D, TF_SingleValue);
 
+    //ljj++
+    mdi.AddInput(VAR_CHSEEPAGE, UNIT_VOL_M3, DESC_SEEPAGE, Source_Module, DT_Array1D);
+    mdi.AddInput(VAR_GWS_RDOCconc, UNIT_VOL_M3, DESC_GWS_RDOCconc, Source_Module, DT_Array1D);
+    mdi.AddInput(VAR_GWS_RDOCsto, UNIT_VOL_M3, DESC_GWS_RDOCsto, Source_Module, DT_Array1D);
+
+	mdi.AddInput(VAR_surfDICtoCH, UNIT_KG, DESC_surfDICtoCH, Source_Module, DT_Array1D);
+	mdi.AddInput(VAR_latDICtoCH, UNIT_KG, DESC_latDICtoCH, Source_Module, DT_Array1D);
+	mdi.AddInput(VAR_LDOCtoCH, UNIT_KG, DESC_LDOCtoCH, Source_Module, DT_Array1D);
+	mdi.AddInput(VAR_surfRDOCtoCH, UNIT_KG, DESC_surfRDOCtoCH, Source_Module, DT_Array1D);
+	mdi.AddInput(VAR_latRDOCtoCH, UNIT_KG, DESC_latRDOCtoCH, Source_Module, DT_Array1D);
+	mdi.AddInput(VAR_GWD_RDOCtoCH, UNIT_KG, DESC_GWD_RDOCtoCH, Source_Module, DT_Array1D);
+	mdi.AddInput(VAR_LPOCtoCH, UNIT_KG, DESC_LPOCtoCH, Source_Module, DT_Array1D);
+	mdi.AddInput(VAR_RPOCtoCH, UNIT_KG, DESC_RPOCtoCH, Source_Module, DT_Array1D);
+
+	mdi.AddInOutput(VAR_CH_DIC, UNIT_KG, DESC_CH_DIC, DT_Array1D, TF_SingleValue);
+	mdi.AddInOutput(VAR_CH_LDOC, UNIT_KG, DESC_CH_LDOC, DT_Array1D, TF_SingleValue);
+	mdi.AddInOutput(VAR_CH_RDOC, UNIT_KG, DESC_CH_RDOC, DT_Array1D, TF_SingleValue);
+	mdi.AddInOutput(VAR_CH_LPOC, UNIT_KG, DESC_CH_LPOC, DT_Array1D, TF_SingleValue);
+	mdi.AddInOutput(VAR_CH_RPOC, UNIT_KG, DESC_CH_RPOC, DT_Array1D, TF_SingleValue);
+    mdi.AddInOutput(VAR_CH_TOTDOC, UNIT_KG, DESC_CH_TOTDOC, DT_Array1D, TF_SingleValue);
+    mdi.AddInOutput(VAR_CH_SURFRDOC, UNIT_KG, DESC_CH_SURFRDOC, DT_Array1D, TF_SingleValue);
+    mdi.AddInOutput(VAR_CH_LATRDOC, UNIT_KG, DESC_CH_LATRDOC, DT_Array1D, TF_SingleValue);
+    mdi.AddInOutput(VAR_CH_GWDRDOC, UNIT_KG, DESC_CH_GWDRDOC, DT_Array1D, TF_SingleValue);
+    mdi.AddInOutput(VAR_CH_GWSRDOC, UNIT_KG, DESC_CH_GWSRDOC, DT_Array1D, TF_SingleValue);
+
+	mdi.AddOutput(VAR_CH_DICConc, UNIT_CONCENTRATION, DESC_CH_DICConc, DT_Array1D, TF_SingleValue);
+	mdi.AddOutput(VAR_CH_LPOCConc, UNIT_CONCENTRATION, DESC_CH_LPOCConc, DT_Array1D, TF_SingleValue);
+	mdi.AddOutput(VAR_CH_RPOCConc, UNIT_CONCENTRATION, DESC_CH_RPOCConc, DT_Array1D, TF_SingleValue);
+	mdi.AddOutput(VAR_CH_LDOCConc, UNIT_CONCENTRATION, DESC_CH_LDOCConc, DT_Array1D, TF_SingleValue);
+	mdi.AddOutput(VAR_CH_RDOCConc, UNIT_CONCENTRATION, DESC_CH_RDOCConc, DT_Array1D, TF_SingleValue);
+    mdi.AddOutput(VAR_CH_TOTDOCConc, UNIT_CONCENTRATION, DESC_CH_TOTDOCConc, DT_Array1D, TF_SingleValue);
+
+	mdi.AddInOutput(VAR_CHSTR_DIC, UNIT_KG, DESC_CHSTR_DIC, DT_Array1D, TF_SingleValue);
+	mdi.AddInOutput(VAR_CHSTR_LDOC, UNIT_KG, DESC_CHSTR_LDOC, DT_Array1D, TF_SingleValue);
+	mdi.AddInOutput(VAR_CHSTR_RDOC, UNIT_KG, DESC_CHSTR_RDOC, DT_Array1D, TF_SingleValue);
+	mdi.AddInOutput(VAR_CHSTR_LPOC, UNIT_KG, DESC_CHSTR_LPOC, DT_Array1D, TF_SingleValue);
+	mdi.AddInOutput(VAR_CHSTR_RPOC, UNIT_KG, DESC_CHSTR_RPOC, DT_Array1D, TF_SingleValue);
+    mdi.AddInOutput(VAR_CHSTR_SURFRDOC, UNIT_KG, DESC_CHSTR_SURFRDOC, DT_Array1D, TF_SingleValue);
+    mdi.AddInOutput(VAR_CHSTR_LATRDOC, UNIT_KG, DESC_CHSTR_LATRDOC, DT_Array1D, TF_SingleValue);
+    mdi.AddInOutput(VAR_CHSTR_GWDRDOC, UNIT_KG, DESC_CHSTR_GWDRDOC, DT_Array1D, TF_SingleValue);
+
     string res = mdi.GetXMLDocument();
     char* tmp = new char[res.size() + 1];
     strprintf(tmp, res.size() + 1, "%s", res.c_str());

@@ -38,7 +38,20 @@ NutrCH_QUAL2E::NutrCH_QUAL2E() :
     m_chOutSolPConc(nullptr), m_chOutCOD(nullptr), m_chOutCODConc(nullptr), m_chOutDOx(nullptr),
     m_chOutDOxConc(nullptr), m_chOutTN(nullptr), m_chOutTNConc(nullptr),
     m_chOutTP(nullptr), m_chOutTPConc(nullptr),
-    m_chDaylen(nullptr), m_chSr(nullptr), m_chCellCount(nullptr) {
+    m_chDaylen(nullptr), m_chSr(nullptr), m_chCellCount(nullptr),
+    //ljj++
+    m_seepage(nullptr),m_gws_RDOCconc(nullptr),m_gws_RDOCsto(nullptr),
+	m_surfRDOCToCH(nullptr),m_latRDOCToCH(nullptr),m_gwdRDOCToCH(nullptr),m_latDICToCH(nullptr),m_surfDICToCH(nullptr),
+    m_LPOCToCH(nullptr),m_RPOCToCH(nullptr),m_LDOCToCH(nullptr),
+    m_chOutLDOC(nullptr), m_chOutLDOCConc(nullptr), m_chLDOC(nullptr), 
+	m_chOutDIC(nullptr), m_chOutDICConc(nullptr), m_chDIC(nullptr),
+	m_chOutLPOC(nullptr), m_chOutLPOCConc(nullptr), m_chLPOC(nullptr), 
+	m_chOutRPOC(nullptr), m_chOutRPOCConc(nullptr), m_chRPOC(nullptr), 
+	m_chOutRDOC(nullptr), m_chOutRDOCConc(nullptr), m_chRDOC(nullptr),
+    m_chsurfRDOC(nullptr), m_chlatRDOC(nullptr), m_chgwdRDOC(nullptr), 
+    m_chOutlatRDOC(nullptr), m_chOutsurfRDOC(nullptr), m_chOutgwdRDOC(nullptr),
+    m_chOutTotDOC(nullptr),m_chOutTotDOCConc(nullptr),m_chOutgwsRDOC(nullptr)
+ {
 }
 
 NutrCH_QUAL2E::~NutrCH_QUAL2E() {
@@ -87,6 +100,33 @@ NutrCH_QUAL2E::~NutrCH_QUAL2E() {
     if (nullptr != m_chDaylen) Release1DArray(m_chDaylen);
     if (nullptr != m_chSr) Release1DArray(m_chSr);
     if (nullptr != m_chTemp) Release1DArray(m_chTemp);
+	//ljj++
+    if (nullptr != m_chDIC) Release1DArray(m_chDIC);
+    if (nullptr != m_chRPOC) Release1DArray(m_chRPOC);
+    if (nullptr != m_chLPOC) Release1DArray(m_chLPOC);
+    if (nullptr != m_chRDOC) Release1DArray(m_chRDOC);
+    if (nullptr != m_chLDOC) Release1DArray(m_chLDOC);
+
+	if (nullptr != m_chOutDIC) Release1DArray(m_chOutDIC);
+	if (nullptr != m_chOutDICConc) Release1DArray(m_chOutDICConc);
+	if (nullptr != m_chOutLDOC) Release1DArray(m_chOutLDOC);
+	if (nullptr != m_chOutLDOCConc) Release1DArray(m_chOutLDOCConc);
+	if (nullptr != m_chOutLPOC) Release1DArray(m_chOutLPOC);
+	if (nullptr != m_chOutLPOCConc) Release1DArray(m_chOutLPOCConc);
+	if (nullptr != m_chOutRPOC) Release1DArray(m_chOutRPOC);
+	if (nullptr != m_chOutRPOCConc) Release1DArray(m_chOutRPOCConc);
+	if (nullptr != m_chOutRDOC) Release1DArray(m_chOutRDOC);
+	if (nullptr != m_chOutRDOCConc) Release1DArray(m_chOutRDOCConc);
+    if (nullptr != m_chOutTotDOC) Release1DArray(m_chOutTotDOC);
+    if (nullptr != m_chOutTotDOCConc) Release1DArray(m_chOutTotDOCConc);
+
+    if (nullptr != m_chOutsurfRDOC) Release1DArray(m_chOutsurfRDOC);
+    if (nullptr != m_chOutlatRDOC) Release1DArray(m_chOutlatRDOC);
+    if (nullptr != m_chOutgwdRDOC) Release1DArray(m_chOutgwdRDOC);
+    if (nullptr != m_chOutgwsRDOC) Release1DArray(m_chOutgwsRDOC);
+    if (nullptr != m_chsurfRDOC) Release1DArray(m_chsurfRDOC);
+    if (nullptr != m_chlatRDOC) Release1DArray(m_chlatRDOC);
+    if (nullptr != m_chgwdRDOC) Release1DArray(m_chgwdRDOC);
 }
 
 void NutrCH_QUAL2E::ParametersSubbasinForChannel() {
@@ -292,6 +332,31 @@ void NutrCH_QUAL2E::SetValueByIndex(const char* key, const int index, const floa
     else if (StringMatch(sk, VAR_CHSTR_NH4)) m_chNH4[index] = data;
     else if (StringMatch(sk, VAR_CHSTR_TN)) m_chTN[index] = data;
     else if (StringMatch(sk, VAR_CHSTR_TP)) m_chTP[index] = data;
+    //ljj++
+	else if (StringMatch(sk, VAR_CHSTR_DIC)) m_chDIC[index] = data;
+	else if (StringMatch(sk, VAR_CH_DICConc)) m_chOutDICConc[index] = data;
+	else if (StringMatch(sk, VAR_CH_DIC)) m_chOutDIC[index] = data;
+	else if (StringMatch(sk, VAR_CHSTR_LDOC)) m_chLDOC[index] = data;
+	else if (StringMatch(sk, VAR_CH_LDOCConc)) m_chOutLDOCConc[index] = data;
+	else if (StringMatch(sk, VAR_CH_LDOC)) m_chOutLDOC[index] = data;
+	else if (StringMatch(sk, VAR_CHSTR_LPOC)) m_chLPOC[index] = data;
+	else if (StringMatch(sk, VAR_CH_LPOCConc)) m_chOutLPOCConc[index] = data;
+	else if (StringMatch(sk, VAR_CH_LPOC)) m_chOutLPOC[index] = data;
+	else if (StringMatch(sk, VAR_CHSTR_RPOC)) m_chRPOC[index] = data;
+	else if (StringMatch(sk, VAR_CH_RPOCConc)) m_chOutRPOCConc[index] = data;
+	else if (StringMatch(sk, VAR_CH_RPOC)) m_chOutRPOC[index] = data;
+	else if (StringMatch(sk, VAR_CHSTR_RDOC)) m_chRDOC[index] = data;
+	else if (StringMatch(sk, VAR_CH_RDOCConc)) m_chOutRDOCConc[index] = data;
+	else if (StringMatch(sk, VAR_CH_RDOC)) m_chOutRDOC[index] = data;
+    else if (StringMatch(sk, VAR_CH_TOTDOC)) m_chOutTotDOC[index] = data;
+	else if (StringMatch(sk, VAR_CH_TOTDOCConc)) m_chOutTotDOCConc[index] = data;
+    else if (StringMatch(sk, VAR_CHSTR_SURFRDOC)) m_chsurfRDOC[index] = data;
+    else if (StringMatch(sk, VAR_CHSTR_LATRDOC)) m_chlatRDOC[index] = data;
+    else if (StringMatch(sk, VAR_CHSTR_GWDRDOC)) m_chgwdRDOC[index] = data;
+    else if (StringMatch(sk, VAR_CH_SURFRDOC)) m_chOutsurfRDOC[index] = data;
+    else if (StringMatch(sk, VAR_CH_LATRDOC)) m_chOutlatRDOC[index] = data;
+    else if (StringMatch(sk, VAR_CH_GWDRDOC)) m_chOutgwdRDOC[index] = data;
+    else if (StringMatch(sk, VAR_CH_GWSRDOC)) m_chOutgwsRDOC[index] = data;
     else {
         throw ModelException(MID_NUTRCH_QUAL2E, "SetValueByIndex", "Parameter " + sk + " does not exist.");
     }
@@ -336,6 +401,15 @@ void NutrCH_QUAL2E::Set1DData(const char* key, const int n, float* data) {
             m_chSolP[i] *= cvt_conc2amount;
             m_chDOx[i] *= cvt_conc2amount;
             m_chCOD[i] *= cvt_conc2amount;
+            //ljj++
+			m_chDIC[i] *= cvt_conc2amount;
+			m_chLDOC[i] *= cvt_conc2amount;
+			m_chLPOC[i] *= cvt_conc2amount;
+			m_chRPOC[i] *= cvt_conc2amount;
+			m_chRDOC[i] *= cvt_conc2amount;
+            m_chsurfRDOC[i] *= cvt_conc2amount;
+            m_chlatRDOC[i] *= cvt_conc2amount;
+            m_chgwdRDOC[i] *= cvt_conc2amount;
         }
     } else if (StringMatch(sk, VAR_RTE_WTRIN)) m_rteWtrIn = data;
     else if (StringMatch(sk, VAR_RTE_WTROUT)) m_rteWtrOut = data;
@@ -355,6 +429,18 @@ void NutrCH_QUAL2E::Set1DData(const char* key, const int n, float* data) {
     else if (StringMatch(sk, VAR_SEDMINPS_TOCH)) m_surfRfSedSorbMinPToCh = data;
     else if (StringMatch(sk, VAR_NO2_TOCH)) m_no2ToCh = data;
     else if (StringMatch(sk, VAR_RCH_DEG)) m_rchDeg = data;
+    //ljj++
+    else if (StringMatch(sk, VAR_CHSEEPAGE)) m_seepage = data;
+    else if (StringMatch(sk, VAR_GWS_RDOCconc)) m_gws_RDOCconc = data;
+    else if (StringMatch(sk, VAR_GWS_RDOCsto)) m_gws_RDOCsto = data;
+	else if (StringMatch(sk, VAR_surfDICtoCH)) m_surfDICToCH = data;
+	else if (StringMatch(sk, VAR_latDICtoCH)) m_latDICToCH = data;
+	else if (StringMatch(sk, VAR_LPOCtoCH)) m_LPOCToCH = data;
+	else if (StringMatch(sk, VAR_RPOCtoCH)) m_RPOCToCH = data;
+    else if (StringMatch(sk, VAR_LDOCtoCH)) m_LDOCToCH = data;
+	else if (StringMatch(sk, VAR_surfRDOCtoCH)) m_surfRDOCToCH = data;
+	else if (StringMatch(sk, VAR_latRDOCtoCH)) m_latRDOCToCH = data;
+	else if (StringMatch(sk, VAR_GWD_RDOCtoCH)) m_gwdRDOCToCH = data;
     else {
         throw ModelException(MID_NUTRCH_QUAL2E, "Set1DData", "Parameter " + sk + " does not exist.");
     }
@@ -390,6 +476,16 @@ void NutrCH_QUAL2E::SetReaches(clsReaches* reaches) {
     if (nullptr == m_chSolP) reaches->GetReachesSingleProperty(REACH_SOLP, &m_chSolP);
     if (nullptr == m_chDOx) reaches->GetReachesSingleProperty(REACH_DISOX, &m_chDOx);
     if (nullptr == m_chCOD) reaches->GetReachesSingleProperty(REACH_BOD, &m_chCOD);
+
+	//ljj++
+	if (nullptr == m_chDIC) reaches->GetReachesSingleProperty(REACH_DIC, &m_chDIC);
+	if (nullptr == m_chLDOC) reaches->GetReachesSingleProperty(REACH_LDOC, &m_chLDOC);
+	if (nullptr == m_chLPOC) reaches->GetReachesSingleProperty(REACH_LPOC, &m_chLPOC);
+	if (nullptr == m_chRPOC) reaches->GetReachesSingleProperty(REACH_RPOC, &m_chRPOC);
+	if (nullptr == m_chRDOC) reaches->GetReachesSingleProperty(REACH_RDOC, &m_chRDOC);
+    if (nullptr == m_chsurfRDOC) reaches->GetReachesSingleProperty(REACH_SURFRDOC, &m_chsurfRDOC);
+	if (nullptr == m_chlatRDOC) reaches->GetReachesSingleProperty(REACH_LATRDOC, &m_chlatRDOC);
+	if (nullptr == m_chgwdRDOC) reaches->GetReachesSingleProperty(REACH_GWDRDOC, &m_chgwdRDOC);
 
     if (nullptr == m_chChlora) Initialize1DArray(m_nReaches + 1, m_chChlora, 0.f);
     if (nullptr == m_chTP) Initialize1DArray(m_nReaches + 1, m_chTP, 0.f);
@@ -444,6 +540,23 @@ void NutrCH_QUAL2E::InitialOutputs() {
         Initialize1DArray(m_nReaches + 1, m_chOutCODConc, 0.f);
         Initialize1DArray(m_nReaches + 1, m_chOutTNConc, 0.f);
         Initialize1DArray(m_nReaches + 1, m_chOutTPConc, 0.f);
+		//ljj++
+		Initialize1DArray(m_nReaches + 1, m_chOutDIC, 0.f);
+		Initialize1DArray(m_nReaches + 1, m_chOutDICConc, 0.f);
+		Initialize1DArray(m_nReaches + 1, m_chOutLDOC, 0.f);
+		Initialize1DArray(m_nReaches + 1, m_chOutLDOCConc, 0.f);
+		Initialize1DArray(m_nReaches + 1, m_chOutLPOC, 0.f);
+		Initialize1DArray(m_nReaches + 1, m_chOutLPOCConc, 0.f);
+		Initialize1DArray(m_nReaches + 1, m_chOutRPOC, 0.f);
+		Initialize1DArray(m_nReaches + 1, m_chOutRPOCConc, 0.f);
+		Initialize1DArray(m_nReaches + 1, m_chOutRDOC, 0.f);
+		Initialize1DArray(m_nReaches + 1, m_chOutRDOCConc, 0.f);
+        Initialize1DArray(m_nReaches + 1, m_chOutTotDOC, 0.f);
+		Initialize1DArray(m_nReaches + 1, m_chOutTotDOCConc, 0.f);
+        Initialize1DArray(m_nReaches + 1, m_chOutsurfRDOC, 0.f);
+        Initialize1DArray(m_nReaches + 1, m_chOutlatRDOC, 0.f);
+        Initialize1DArray(m_nReaches + 1, m_chOutgwdRDOC, 0.f);
+        Initialize1DArray(m_nReaches + 1, m_chOutgwsRDOC, 0.f);
     }
 }
 
@@ -563,10 +676,47 @@ void NutrCH_QUAL2E::AddInputNutrient(const int i) {
         m_chDOx[i] += m_chOutDOx[upReachId];
         m_chChlora[i] += m_chOutChlora[upReachId];
         m_chAlgae[i] += m_chOutAlgae[upReachId];
+        //ljj++
+		m_chDIC[i] += m_chOutDIC[upReachId];        //kg
+		m_chLDOC[i] +=  m_chOutLDOC[upReachId];
+		m_chLPOC[i] += m_chOutLPOC[upReachId];
+		m_chRPOC[i] += m_chOutRPOC[upReachId];
+		m_chRDOC[i] +=  m_chOutRDOC[upReachId];
+        m_chsurfRDOC[i] += m_chOutsurfRDOC[upReachId];        //kg
+        m_chlatRDOC[i] += m_chOutlatRDOC[upReachId];        //kg
+        m_chgwdRDOC[i] += m_chOutgwdRDOC[upReachId];        //kg
     }
     /// absorbed organic N, P from overland sediment routing
     m_chOrgN[i] += m_surfRfSedOrgNToCh[i];
     m_chOrgP[i] += m_surfRfSedOrgPToCh[i];
+    //ljj++
+	m_chDIC[i] += m_surfDICToCH[i] + m_latDICToCH[i];
+	m_chLDOC[i] += m_LDOCToCH[i];
+	m_chLPOC[i] += m_LPOCToCH[i];
+	m_chRPOC[i] += m_RPOCToCH[i];
+	m_chRDOC[i] += m_surfRDOCToCH[i] + m_latRDOCToCH[i] + m_gwdRDOCToCH[i];
+    m_chsurfRDOC[i]+= m_surfRDOCToCH[i];
+    m_chlatRDOC[i] +=  m_latRDOCToCH[i];
+    m_chgwdRDOC[i] += m_gwdRDOCToCH[i];
+
+    float wtrTotal = m_chStorage[i] + m_rteWtrOut[i]; // m^3
+    float ch_DOCconc = (m_chRDOC[i] + m_chLDOC[i])*1000.f / wtrTotal;
+    m_chOutgwsRDOC[i] = 0.f;
+    if(wtrTotal<UTIL_ZERO) ch_DOCconc = 0.f; 
+    if(m_seepage[i]<0.f){
+        m_chOutgwsRDOC[i] = m_gws_RDOCconc[i] * m_seepage[i] * 1.e-3f;
+        m_chOutgwsRDOC[i] = Max(m_chOutgwsRDOC[i],m_gws_RDOCsto[i]*-1.f);
+        m_gws_RDOCsto[i] += m_chOutgwsRDOC[i];
+        m_chRDOC[i] -= m_chOutgwsRDOC[i]*m_chRDOC[i] / (m_chRDOC[i] + m_chLDOC[i]+UTIL_ZERO);
+        m_chLDOC[i] -= m_chOutgwsRDOC[i]*m_chLDOC[i] / (m_chRDOC[i] + m_chLDOC[i]+UTIL_ZERO);
+    }else{
+        m_chOutgwsRDOC[i] = ch_DOCconc * m_seepage[i] * 1.e-3f;
+        m_chOutgwsRDOC[i] = Min((m_chRDOC[i] + m_chLDOC[i]),m_chOutgwsRDOC[i]);
+        m_gws_RDOCsto[i] += m_chOutgwsRDOC[i];
+        m_chRDOC[i] -= m_chOutgwsRDOC[i]*m_chRDOC[i] / (m_chRDOC[i] + m_chLDOC[i]+UTIL_ZERO);
+        m_chLDOC[i] -= m_chOutgwsRDOC[i]*m_chLDOC[i] / (m_chRDOC[i] + m_chLDOC[i]+UTIL_ZERO);
+    }
+
     /// organic N, P contribution from channel erosion
     if (nullptr != m_rchDeg && m_chOrgPCo != NODATA_VALUE && m_chOrgNCo != NODATA_VALUE) {
         m_chOrgN[i] += m_rchDeg[i] * m_chOrgNCo * 0.001f;
@@ -616,6 +766,24 @@ void NutrCH_QUAL2E::RouteOut(const int i) {
     m_chOutTNConc[i] = 0.f;
     m_chOutTP[i] = 0.f;
     m_chOutTPConc[i] = 0.f;
+	//ljj++
+	m_chOutDIC[i] = 0.f;
+	m_chOutDICConc[i] = 0.f;
+	m_chOutLDOC[i] = 0.f;
+	m_chOutLDOCConc[i] = 0.f;
+	m_chOutLPOC[i] = 0.f;
+	m_chOutLPOCConc[i] = 0.f;
+	m_chOutRPOC[i] = 0.f;
+	m_chOutRPOCConc[i] = 0.f;
+	m_chOutRDOC[i] = 0.f;
+	m_chOutRDOCConc[i] = 0.f;
+    m_chOutTotDOC[i] = 0.f;
+	m_chOutTotDOCConc[i] = 0.f;
+
+    m_chOutsurfRDOC[i] = 0.f;
+    m_chOutlatRDOC[i] = 0.f;
+    m_chOutgwdRDOC[i] = 0.f;
+    
     //get out flow water fraction
     float wtrTotal = m_chStorage[i] + m_rteWtrOut[i]; // m^3
     if (wtrTotal <= UTIL_ZERO || m_rteWtrOut[i] <= UTIL_ZERO || m_chWtrDepth[i] <= UTIL_ZERO) {
@@ -640,6 +808,18 @@ void NutrCH_QUAL2E::RouteOut(const int i) {
     m_chOutTP[i] = m_chOutOrgP[i] + m_chOutSolP[i];
     //if(i == 12) cout << "m_chOutOrgP: " << m_chOutOrgP[i] << ", m_chOrgP: " << m_chOrgP[i] << ", outFrac: "<<outFraction<<endl;
     // kg ==> mg/L
+    
+    //ljj++
+	m_chOutDIC[i] = m_chDIC[i] * outFraction;    //kg
+	m_chOutLDOC[i] = m_chLDOC[i] * outFraction;
+	m_chOutLPOC[i] = m_chLPOC[i] * outFraction;
+	m_chOutRPOC[i] = m_chRPOC[i] * outFraction;
+	m_chOutRDOC[i] = m_chRDOC[i] *outFraction;
+    m_chOutTotDOC[i] = m_chOutLDOC[i] + m_chOutRDOC[i];
+    m_chOutsurfRDOC[i] = m_chsurfRDOC[i] *outFraction;
+    m_chOutlatRDOC[i] = m_chlatRDOC[i] *outFraction;
+    m_chOutgwdRDOC[i] = m_chgwdRDOC[i] *outFraction;
+
     float cvt = 1000.f / m_rteWtrOut[i];
     m_chOutOrgNConc[i] = m_chOutOrgN[i] * cvt;
     m_chOutNO3Conc[i] = m_chOutNO3[i] * cvt;
@@ -654,6 +834,15 @@ void NutrCH_QUAL2E::RouteOut(const int i) {
     /// total N and total P
     m_chOutTNConc[i] = m_chOutTN[i] * cvt;
     m_chOutTPConc[i] = m_chOutTP[i] * cvt;
+	//ljj++
+	m_chOutDICConc[i] = m_chOutDIC[i] * cvt;     //mg/L
+	m_chOutLDOCConc[i] = m_chOutLDOC[i] * cvt;
+	m_chOutLPOCConc[i] = m_chOutLPOC[i] * cvt;
+	m_chOutRPOCConc[i] = m_chOutRPOC[i] * cvt;
+	m_chOutRDOCConc[i] = m_chOutRDOC[i] * cvt;
+//if (i == 10 )cout << "m_chOutGwDOCConc: " << m_chOutGwDOCConc[i] << ", m_chOutGwOrgC: " << m_chOutGwOrgC[i] << ", cvt: " << cvt << endl;
+	m_chOutTotDOCConc[i] = m_chOutLDOCConc[i] + m_chOutRDOCConc[i];
+	m_chOutTotDOCConc[i] = Max(m_chOutTotDOCConc[i],0.f);
 
     m_chNO3[i] -= m_chOutNO3[i];
     m_chNO2[i] -= m_chOutNO2[i];
@@ -668,7 +857,15 @@ void NutrCH_QUAL2E::RouteOut(const int i) {
     // recalculate TN TP stored in reach
     m_chTN[i] = m_chOrgN[i] + m_chNH4[i] + m_chNO2[i] + m_chNO3[i];
     m_chTP[i] = m_chOrgP[i] + m_chSolP[i];
-
+    //ljj++
+	m_chDIC[i] -= m_chOutDIC[i];       //kg
+	m_chLDOC[i] -= m_chOutLDOC[i];
+	m_chLPOC[i] -= m_chOutLPOC[i];
+	m_chRPOC[i] -= m_chOutRPOC[i];
+	m_chRDOC[i] -= m_chOutRDOC[i];
+    m_chsurfRDOC[i] -= m_chOutsurfRDOC[i];
+    m_chlatRDOC[i] -= m_chOutlatRDOC[i];
+    m_chgwdRDOC[i] -= m_chOutgwdRDOC[i];
     /// in case of zero
     if (m_chNO3[i] < UTIL_ZERO) m_chNO3[i] = UTIL_ZERO;
     if (m_chNO2[i] < UTIL_ZERO) m_chNO2[i] = UTIL_ZERO;
@@ -680,6 +877,15 @@ void NutrCH_QUAL2E::RouteOut(const int i) {
     if (m_chDOx[i] < UTIL_ZERO) m_chDOx[i] = UTIL_ZERO;
     if (m_chAlgae[i] < UTIL_ZERO) m_chAlgae[i] = UTIL_ZERO;
     if (m_chChlora[i] < UTIL_ZERO) m_chChlora[i] = UTIL_ZERO;
+    //ljj++
+	if (m_chDIC[i] < 0.f) m_chDIC[i] = 0.f;
+	if (m_chLDOC[i] < 0.f) m_chLDOC[i] = 0.f;
+	if (m_chLPOC[i] < 0.f) m_chLPOC[i] = 0.f;
+	if (m_chRPOC[i] < 0.f) m_chRPOC[i] = 0.f;
+	if (m_chRDOC[i] < 0.f) m_chRDOC[i] = 0.f;
+    if (m_chsurfRDOC[i] < 0.f) m_chsurfRDOC[i] = 0.f;
+    if (m_chlatRDOC[i] < 0.f) m_chlatRDOC[i] = 0.f;
+    if (m_chgwdRDOC[i] < 0.f) m_chgwdRDOC[i] = 0.f;
 }
 
 void NutrCH_QUAL2E::NutrientTransform(const int i) {
@@ -725,6 +931,15 @@ void NutrCH_QUAL2E::NutrientTransform(const int i) {
         m_chDOx[i] = 0.f;
         m_chCOD[i] = 0.f;
         m_chSatDOx = 0.f;
+        //ljj+
+		m_chDIC[i] = 0.f;
+		m_chLDOC[i] = 0.f;
+		m_chLPOC[i] = 0.f;
+		m_chRPOC[i] = 0.f;
+		m_chRDOC[i] = 0.f;
+        m_chsurfRDOC[i] = 0.f;
+        m_chlatRDOC[i] = 0.f;
+        m_chgwdRDOC[i] = 0.f;
         return; // return and route out with 0.f
     }
     // initial algal biomass concentration in reach (algcon mg/L, i.e. g/m3)   kg ==> mg/L
@@ -1091,6 +1306,39 @@ void NutrCH_QUAL2E::GetValue(const char* key, float* value) {
     else if (StringMatch(sk, VAR_CHSTR_NH4)) *value = m_chNH4[m_inputSubbsnID];
     else if (StringMatch(sk, VAR_CHSTR_TN)) *value = m_chTN[m_inputSubbsnID];
     else if (StringMatch(sk, VAR_CHSTR_TP)) *value = m_chTP[m_inputSubbsnID];
+    	//ljj++
+	else if (StringMatch(sk, VAR_CH_DIC)) *value = m_chOutDIC[m_inputSubbsnID];
+	else if (StringMatch(sk, VAR_CH_DICConc)) *value = m_chOutDICConc[m_inputSubbsnID];
+	else if (StringMatch(sk, VAR_CHSTR_DIC)) *value = m_chDIC[m_inputSubbsnID];
+
+	else if (StringMatch(sk, VAR_CH_LDOC)) *value = m_chOutLDOC[m_inputSubbsnID];
+	else if (StringMatch(sk, VAR_CH_LDOCConc)) *value = m_chOutLDOCConc[m_inputSubbsnID];
+	else if (StringMatch(sk, VAR_CHSTR_LDOC)) *value = m_chLDOC[m_inputSubbsnID];
+
+	else if (StringMatch(sk, VAR_CH_LPOC)) *value = m_chOutLPOC[m_inputSubbsnID];
+	else if (StringMatch(sk, VAR_CH_LPOCConc)) *value = m_chOutLPOCConc[m_inputSubbsnID];
+	else if (StringMatch(sk, VAR_CHSTR_LPOC)) *value = m_chLPOC[m_inputSubbsnID];
+
+	else if (StringMatch(sk, VAR_CH_RPOC)) *value = m_chOutRPOC[m_inputSubbsnID];
+	else if (StringMatch(sk, VAR_CH_RPOCConc)) *value = m_chOutRPOCConc[m_inputSubbsnID];
+	else if (StringMatch(sk, VAR_CHSTR_RPOC)) *value = m_chRPOC[m_inputSubbsnID];
+
+	else if (StringMatch(sk, VAR_CH_RDOC)) *value = m_chOutRDOC[m_inputSubbsnID];
+	else if (StringMatch(sk, VAR_CH_RDOCConc)) *value = m_chOutRDOCConc[m_inputSubbsnID];
+	else if (StringMatch(sk, VAR_CHSTR_RDOC)) *value = m_chRDOC[m_inputSubbsnID];
+
+    else if (StringMatch(sk, VAR_CH_TOTDOC)) *value = m_chOutTotDOC[m_inputSubbsnID];
+	else if (StringMatch(sk, VAR_CH_TOTDOCConc)) *value = m_chOutTotDOCConc[m_inputSubbsnID];
+
+    else if (StringMatch(sk, VAR_CH_SURFRDOC)) *value = m_chOutsurfRDOC[m_inputSubbsnID];
+    else if (StringMatch(sk, VAR_CH_LATRDOC)) *value = m_chOutlatRDOC[m_inputSubbsnID];
+    else if (StringMatch(sk, VAR_CH_GWDRDOC)) *value = m_chOutgwdRDOC[m_inputSubbsnID];
+    else if (StringMatch(sk, VAR_CH_GWSRDOC)) *value = m_chOutgwsRDOC[m_inputSubbsnID];
+
+    else if (StringMatch(sk, VAR_CHSTR_SURFRDOC)) *value = m_chsurfRDOC[m_inputSubbsnID];
+    else if (StringMatch(sk, VAR_CHSTR_LATRDOC)) *value = m_chlatRDOC[m_inputSubbsnID];
+    else if (StringMatch(sk, VAR_CHSTR_GWDRDOC)) *value = m_chgwdRDOC[m_inputSubbsnID];
+    
     else {
         throw ModelException(MID_NUTRCH_QUAL2E, "GetValue", "Parameter " + sk + " does not exist.");
     }
@@ -1132,6 +1380,37 @@ void NutrCH_QUAL2E::Get1DData(const char* key, int* n, float** data) {
     else if (StringMatch(sk, VAR_CHSTR_NH4)) *data = m_chNH4;
     else if (StringMatch(sk, VAR_CHSTR_TN)) *data = m_chTN;
     else if (StringMatch(sk, VAR_CHSTR_TP)) *data = m_chTP;
+    	//ljj++
+	else if (StringMatch(sk, VAR_CHSTR_DIC)) *data = m_chDIC;
+	else if (StringMatch(sk, VAR_CH_DICConc)) *data = m_chOutDICConc;
+	else if (StringMatch(sk, VAR_CH_DIC)) *data = m_chOutDIC;
+
+	else if (StringMatch(sk, VAR_CHSTR_LDOC)) *data = m_chLDOC;
+	else if (StringMatch(sk, VAR_CH_LDOCConc)) *data = m_chOutLDOCConc;
+	else if (StringMatch(sk, VAR_CH_LDOC)) *data = m_chOutLDOC;
+
+	else if (StringMatch(sk, VAR_CHSTR_LPOC)) *data = m_chLPOC;
+	else if (StringMatch(sk, VAR_CH_LPOCConc)) *data = m_chOutLPOCConc;
+	else if (StringMatch(sk, VAR_CH_LPOC)) *data = m_chOutLPOC;
+
+	else if (StringMatch(sk, VAR_CHSTR_RPOC)) *data = m_chRPOC;
+	else if (StringMatch(sk, VAR_CH_RPOCConc)) *data = m_chOutRPOCConc;
+	else if (StringMatch(sk, VAR_CH_RPOC)) *data = m_chOutRPOC;
+
+	else if (StringMatch(sk, VAR_CHSTR_RDOC)) *data = m_chRDOC;
+	else if (StringMatch(sk, VAR_CH_RDOCConc)) *data = m_chOutRDOCConc;
+	else if (StringMatch(sk, VAR_CH_RDOC)) *data = m_chOutRDOC;
+
+    else if (StringMatch(sk, VAR_CH_TOTDOC)) *data = m_chOutTotDOC;
+	else if (StringMatch(sk, VAR_CH_TOTDOCConc)) *data = m_chOutTotDOCConc;
+
+    else if (StringMatch(sk, VAR_CH_SURFRDOC)) *data = m_chOutsurfRDOC;
+    else if (StringMatch(sk, VAR_CH_LATRDOC)) *data = m_chOutlatRDOC;
+    else if (StringMatch(sk, VAR_CH_GWDRDOC)) *data = m_chOutgwdRDOC;
+    else if (StringMatch(sk, VAR_CH_GWSRDOC)) *data = m_chOutgwsRDOC;
+    else if (StringMatch(sk, VAR_CHSTR_SURFRDOC)) *data = m_chsurfRDOC;
+    else if (StringMatch(sk, VAR_CHSTR_LATRDOC)) *data = m_chlatRDOC;
+    else if (StringMatch(sk, VAR_CHSTR_GWDRDOC)) *data = m_chgwdRDOC;
     else {
         throw ModelException(MID_NUTRCH_QUAL2E, "Get1DData", "Parameter " + sk + " does not exist.");
     }

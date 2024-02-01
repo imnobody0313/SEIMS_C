@@ -628,7 +628,6 @@ void NutrientTransportSediment::OrgNRemovedInRunoffCenturyModel(const int i) {
         /// calculate nitrate in percolate and lateral flow
         perc_clyr += m_soilPercoCbn[i][k];
         latc_clyr += m_soilIfluCbn[i][k];
-        m_soilPercoCbnLowest[i] = m_soilPercoCbn[i][k];
         
         float DIC_ly = 0.f;
         DIC_ly = m_soilWtrDIC[i][k] + m_soilPercoInOrgnCbn[i][k - 1] + m_sol_RSPC[i][k]; 
@@ -653,6 +652,7 @@ void NutrientTransportSediment::OrgNRemovedInRunoffCenturyModel(const int i) {
     }
     m_soilIfluCbnPrfl[i] = latc_clyr;
     m_soilPercoCbnPrfl[i] = perc_clyr;
+    m_soilPercoCbnLowest[i] = m_soilPercoCbn[i][CVT_INT(m_nSoilLyrs[i])-1];
 }
 
 void NutrientTransportSediment::OrgPAttachedtoSed(const int i) {

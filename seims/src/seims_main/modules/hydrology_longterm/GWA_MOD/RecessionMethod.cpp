@@ -150,7 +150,7 @@ int ReservoirMethod::Execute() {
         groundRunoff = m_gw_q[subID];
 
         float groundQ = groundRunoff * curBasinArea * QGConvert;     // groundwater discharge (m3/s)
-        groundStorage += (- groundRunoff);
+        groundStorage = (groundStorage- groundRunoff);
 
         //gw_height[subID] = gw_height[subID]* alpha_bfe + ((perco - percoDeep -revap) * (1. - alpha_bfe)) / (800. * m_gw_spyld[subID] * m_alpha_bf+ 1.e-6);
         m_gw_shallow[subID] += (perco - percoDeep -revap)* curBasinArea / 1000.f;

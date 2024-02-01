@@ -180,3 +180,19 @@ CarbonTransport,lat_DICtoCH,DIC amount transported by lateral runoff in subbasin
 CarbonTransport,LDOCtoCH,LDOC amount transported by sediment in subbasin,kg,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,1,DAY,OUTLET,LDOCtoCH.txt,1
 CarbonTransport,surf_RDOCtoCH,RDOC amount transported by surf runoff in subbasin,kg,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,1,DAY,OUTLET,surf_RDOCtoCH.txt,1
 CarbonTransport,lat_RDOCtoCH,RDOC amount transported by lateral runoff in subbasin,kg,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,1,DAY,OUTLET,lat_RDOCtoCH.txt,1
+CarbonTransport,CH_DIC,total DIC amount in reach,kg,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,ALL,CH_DIC.txt,1
+CarbonTransport,CH_DICConc,total DIC concentration in reach,mg/L,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,OUTLET,CH_DICConc.txt,1
+CarbonTransport,CH_LPOC,total LPOC amount in reach,kg,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,ALL,CH_LPOC.txt,1
+CarbonTransport,CH_LPOCConc,total LPOC concentration in reach,mg/L,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,OUTLET,CH_LPOCConc.txt,1
+CarbonTransport,CH_RPOC,total RPOC amount in reach,kg,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,ALL,CH_RPOC.txt,1
+CarbonTransport,CH_RPOCConc,total RPOC concentration in reach,mg/L,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,OUTLET,CH_RPOCConc.txt,1
+CarbonTransport,CH_LDOC,total LDOC amount in reach,kg,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,ALL,CH_LPOC.txt,1
+CarbonTransport,CH_LDOCConc,total LDOC concentration in reach,mg/L,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,OUTLET,CH_LDOCConc.txt,1
+CarbonTransport,CH_RDOC,total RDOC amount in reach,kg,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,ALL,CH_RPOC.txt,1
+CarbonTransport,CH_RDOCConc,total RDOC concentration in reach,mg/L,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,OUTLET,CH_RDOCConc.txt,1
+CarbonTransport,CH_TOTDOC,total TOTDOC amount in reach,kg,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,ALL,CH_TOTDOC.txt,1
+CarbonTransport,CH_TOTDOCConc,total TOTDOC concentration in reach,mg/L,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,OUTLET,CH_TOTDOCConc.txt,1
+CarbonTransport,CH_SURFRDOC,surf RDOC amount in reach,kg,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,ALL,CH_SURFRDOC.txt,1
+CarbonTransport,CH_LATRDOC,surf RDOC amount in reach,kg,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,ALL,CH_LATRDOC.txt,1
+CarbonTransport,CH_GWDRDOC,surf RDOC amount in reach,kg,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,ALL,CH_GWDRDOC.txt,1
+CarbonTransport,CH_GWSRDOC,surf RDOC amount in reach,kg,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,ALL,CH_GWSRDOC.txt,1
