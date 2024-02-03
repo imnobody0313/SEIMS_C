@@ -40,6 +40,8 @@ NutrCH_QUAL2E::NutrCH_QUAL2E() :
     m_chOutTP(nullptr), m_chOutTPConc(nullptr),
     m_chDaylen(nullptr), m_chSr(nullptr), m_chCellCount(nullptr),
     //ljj++
+    m_klrd(-1.f), m_kld(-1.f), m_krd(-1.f), m_sv_lp(-1.f), m_sv_rp(-1.f), m_klp(-1.f), m_kd_lp(-1.f), m_klrp(-1.f),
+    m_krp(-1.f), m_kd_rp(-1.f),m_npoc(-1.f),
     m_seepage(nullptr),m_gws_RDOCconc(nullptr),m_gws_RDOCsto(nullptr),
 	m_surfRDOCToCH(nullptr),m_latRDOCToCH(nullptr),m_gwdRDOCToCH(nullptr),m_latDICToCH(nullptr),m_surfDICToCH(nullptr),
     m_LPOCToCH(nullptr),m_RPOCToCH(nullptr),m_LDOCToCH(nullptr),
@@ -50,7 +52,10 @@ NutrCH_QUAL2E::NutrCH_QUAL2E() :
 	m_chOutRDOC(nullptr), m_chOutRDOCConc(nullptr), m_chRDOC(nullptr),
     m_chsurfRDOC(nullptr), m_chlatRDOC(nullptr), m_chgwdRDOC(nullptr), 
     m_chOutlatRDOC(nullptr), m_chOutsurfRDOC(nullptr), m_chOutgwdRDOC(nullptr),
-    m_chOutTotDOC(nullptr),m_chOutTotDOCConc(nullptr),m_chOutgwsRDOC(nullptr)
+    m_chOutTotDOC(nullptr),m_chOutTotDOCConc(nullptr),m_chOutgwsRDOC(nullptr),
+    m_Ab(nullptr), m_AbDeath(nullptr), m_AbINb(nullptr), m_AbIPb(nullptr),
+    m_INb(nullptr), m_IPb(nullptr), m_sedst(nullptr), m_photo(nullptr),
+	m_resp(nullptr), m_scbn(nullptr)
  {
 }
 
@@ -119,6 +124,15 @@ NutrCH_QUAL2E::~NutrCH_QUAL2E() {
 	if (nullptr != m_chOutRDOCConc) Release1DArray(m_chOutRDOCConc);
     if (nullptr != m_chOutTotDOC) Release1DArray(m_chOutTotDOC);
     if (nullptr != m_chOutTotDOCConc) Release1DArray(m_chOutTotDOCConc);
+    if (nullptr != m_Ab) Release1DArray(m_Ab);
+    if (nullptr != m_AbDeath) Release1DArray(m_AbDeath);
+    if (nullptr != m_INb) Release1DArray(m_INb);
+    if (nullptr != m_IPb) Release1DArray(m_IPb);
+    if (nullptr != m_photo) Release1DArray(m_photo);
+    if (nullptr != m_resp) Release1DArray(m_resp);
+    if (nullptr != m_scbn) Release1DArray(m_scbn);
+    if (nullptr != m_AbINb) Release1DArray(m_AbINb);
+    if (nullptr != m_AbIPb) Release1DArray(m_AbIPb);
 
     if (nullptr != m_chOutsurfRDOC) Release1DArray(m_chOutsurfRDOC);
     if (nullptr != m_chOutlatRDOC) Release1DArray(m_chOutlatRDOC);
@@ -291,6 +305,18 @@ void NutrCH_QUAL2E::SetValue(const char* key, const float value) {
     else if (StringMatch(sk, VAR_RHOQ)) m_rhoq = value;
     else if (StringMatch(sk, VAR_CH_ONCO)) m_chOrgNCo = value;
     else if (StringMatch(sk, VAR_CH_OPCO)) m_chOrgPCo = value;
+    //ljj
+    else if (StringMatch(sk, VAR_KLRD)) m_klrd = value;
+    else if (StringMatch(sk, VAR_KLD)) m_kld = value;
+    else if (StringMatch(sk, VAR_KRD)) m_krd = value;
+    else if (StringMatch(sk, VAR_SVLP)) m_sv_lp = value;
+    else if (StringMatch(sk, VAR_SVRP)) m_sv_rp = value;
+    else if (StringMatch(sk, VAR_KLP)) m_klp = value;
+    else if (StringMatch(sk, VAR_KDLP)) m_kd_lp = value;
+    else if (StringMatch(sk, VAR_KLRP)) m_klrp = value;
+    else if (StringMatch(sk, VAR_KRP)) m_krp = value;
+    else if (StringMatch(sk, VAR_KDRP)) m_kd_rp = value;
+    else if (StringMatch(sk, VAR_NPOC)) m_npoc = value;
     else {
         throw ModelException(MID_NUTRCH_QUAL2E, "SetValue", "Parameter " + sk + " does not exist.");
     }
@@ -441,6 +467,7 @@ void NutrCH_QUAL2E::Set1DData(const char* key, const int n, float* data) {
 	else if (StringMatch(sk, VAR_surfRDOCtoCH)) m_surfRDOCToCH = data;
 	else if (StringMatch(sk, VAR_latRDOCtoCH)) m_latRDOCToCH = data;
 	else if (StringMatch(sk, VAR_GWD_RDOCtoCH)) m_gwdRDOCToCH = data;
+    else if (StringMatch(sk, VAR_SEDSTO_CH)) m_sedst = data;
     else {
         throw ModelException(MID_NUTRCH_QUAL2E, "Set1DData", "Parameter " + sk + " does not exist.");
     }
@@ -557,6 +584,15 @@ void NutrCH_QUAL2E::InitialOutputs() {
         Initialize1DArray(m_nReaches + 1, m_chOutlatRDOC, 0.f);
         Initialize1DArray(m_nReaches + 1, m_chOutgwdRDOC, 0.f);
         Initialize1DArray(m_nReaches + 1, m_chOutgwsRDOC, 0.f);
+		Initialize1DArray(m_nReaches + 1, m_Ab, 0.001f);
+		Initialize1DArray(m_nReaches + 1, m_AbDeath, 0.f);
+		Initialize1DArray(m_nReaches + 1, m_INb, 0.f);
+		Initialize1DArray(m_nReaches + 1, m_IPb, 0.f);
+		Initialize1DArray(m_nReaches + 1, m_photo, 0.f);
+		Initialize1DArray(m_nReaches + 1, m_resp, 0.f);
+		Initialize1DArray(m_nReaches + 1, m_scbn, 0.01f);
+		Initialize1DArray(m_nReaches + 1, m_AbINb, 0.01f);
+		Initialize1DArray(m_nReaches + 1, m_AbIPb, 0.01f);
     }
 }
 
@@ -716,6 +752,9 @@ void NutrCH_QUAL2E::AddInputNutrient(const int i) {
         m_chRDOC[i] -= m_chOutgwsRDOC[i]*m_chRDOC[i] / (m_chRDOC[i] + m_chLDOC[i]+UTIL_ZERO);
         m_chLDOC[i] -= m_chOutgwsRDOC[i]*m_chLDOC[i] / (m_chRDOC[i] + m_chLDOC[i]+UTIL_ZERO);
     }
+    if(m_chRDOC[i] <UTIL_ZERO)  m_chRDOC[i]  = 0.f;
+    if(m_chLDOC[i] <UTIL_ZERO)  m_chLDOC[i]  = 0.f;
+    if(m_gws_RDOCsto[i] <UTIL_ZERO)  m_gws_RDOCsto[i]  = 0.f;
 
     /// organic N, P contribution from channel erosion
     if (nullptr != m_rchDeg && m_chOrgPCo != NODATA_VALUE && m_chOrgNCo != NODATA_VALUE) {
@@ -937,10 +976,10 @@ void NutrCH_QUAL2E::NutrientTransform(const int i) {
 		m_chLPOC[i] = 0.f;
 		m_chRPOC[i] = 0.f;
 		m_chRDOC[i] = 0.f;
-        m_chsurfRDOC[i] = 0.f;
-        m_chlatRDOC[i] = 0.f;
-        m_chgwdRDOC[i] = 0.f;
         return; // return and route out with 0.f
+    }
+    if (wtrTotal <= 1.e-6f) {
+        return;
     }
     // initial algal biomass concentration in reach (algcon mg/L, i.e. g/m3)   kg ==> mg/L
     float cvt_amout2conc = 1000.f / wtrTotal;
@@ -961,7 +1000,20 @@ void NutrCH_QUAL2E::NutrientTransform(const int i) {
     float cbodcon = cvt_amout2conc * m_chCOD[i];
     // initial dissolved oxygen concentration in reach (o2con mg/L)
     float o2con = cvt_amout2conc * m_chDOx[i];
-
+	//ljj++
+	float diccon = cvt_amout2conc * m_chDIC[i];
+	float ldoccon = cvt_amout2conc * m_chLDOC[i];
+	float lpoccon = cvt_amout2conc * m_chLPOC[i];
+	float rpoccon = cvt_amout2conc * m_chRPOC[i];
+	float rdoccon = cvt_amout2conc * m_chRDOC[i];
+	float rpocon = cvt_amout2conc * m_chDOx[i];
+    lpoccon = Max(0.f,lpoccon);
+    rpoccon = Max(0.f,rpoccon);
+    rdoccon = Max(0.f,rdoccon);
+    ldoccon = Max(0.f,ldoccon);
+    diccon = Max(0.f,diccon);
+    o2con = Max(0.f,o2con);
+    //cout<<nh4con<<"        "<<no2con<<"        "<<solpcon<<"        "<<no3con<<", ";
     // temperature of water in reach (wtmp deg C)
     float wtmp = Max(m_chTemp[i], 0.1f);
     // calculate effective concentration of available nitrogen (cinn), QUAL2E equation III-15
@@ -1256,6 +1308,271 @@ void NutrCH_QUAL2E::NutrientTransform(const int i) {
         dsolp = dcoef * solpcon;
     }
     /////////end phosphorus calculations/////////
+
+    //ljj++ OC riverine Metabolism
+    //paramters for bottom algae in the reach
+    int light = 1;       //light limitation option(1, 2, 3)
+    int ipho = 1;       //photosynthesis model option (0, zero order; 1, first order)
+    float Abmax = 200.0;//First - order carrying capacity of bottom algae[gD / m2 / d]
+    float klb = 1.5807; //bottom algae light parameter(MJ / m2 / day)
+    float kph = 36.2;   //maximum photosynthesis rate[d - 1 or gD / m2 / d]
+    float kdb  = 0.02;  //bottom algae death rate (/day)
+    float fdic = 0.6;   //the fraction of DIC in H2CO3* and HCO3-,for calculating nutrient limitation
+    float qoN = 4.17;   // minimum cell quotas of N (mgN/gD/day)
+    float qoP = 1.93;   // minimum cell quotas of P (mgN/gD/day)
+    float pmN = 284.7;  //maximum uptake rate for N(mgN / gD / day)
+    float pmP = 37.85;  //maximum uptake rate for P(mgP / gD / day)
+    float kscb = 0.792; //Inorganic carbon half saturation constant(mg / L, unit converted)
+    float Ksnb = 0.07;  //external N half - saturation constant(mg N / L)
+    float Kspb = 0.098; // external P half - saturation constant(mg P / L)
+    float KqN = 2.54;   //intracelluar N half - saturation constant(mgN / gD)
+    float KqP = 4.93;   //intracelluar P half - saturation constant(mgP / gD)
+    float kexb = 0.21;  //bottom algae excretion rate(/ day)
+    float keb = 0.02;     //background light extinction coefficient(/ m)
+    float kiss = 0.052;   //light extinction coefficient by inorganic suspended solids(L / mgD / m)
+    float kpom = 0.174;   //light extinction coefficient by particular organic matter(POM) (L / mgD / m)
+    float kap = 0.0088;   //linear light extinction coefficient by algae(L / ugA / m)
+    float kapn = 0.054;   //non - linear light extinction coefficient by algae(L / ugA)2 / 3 / m
+    float kAb = 0.024;    //linear light extinction coefficient by bottom[m3 / gD / m]
+    float f_ldp = 0.05; //fraction of algal mortality into LDOC
+    float f_ldb = 0.05; //fraction of bottom algal mortality into LDOC
+    float rca = 0.4;  //algal carbon to biomass ratio
+    float ksdocf = 1.0; //half-saturation oxygen attenuation for DOC oxidation (mgO2/L)
+    float ksoxdn = 0.1; //half-saturation oxygen attenuation for denitrification (mgO2/L)
+    float kdnit = 0.002; //NO3 denitrification rate (/day) LDOC consumned
+    float f_lpp = 0.1; //fraction of algal mortality into LPOC
+    float f_rpp = 0.8; //fraction of algal mortality into RPOC
+    float f_lpb = 0.1; //fraction of bottom algal mortality into LPOC
+    float f_rpb = 0.8; // fraction of bottom algal mortality into RPOC
+    float krb1 = 0.042;      //bottom algae basal respiration
+    float krb2 = 0.389;      //photo - respiration rate parameter
+    float ksob = 0.6;        //half - saturation oxygen inhibition constant for respiration
+    float p_co2 = 391.0;      //partial pressure of CO2(ppm, parts per million)
+    float f_co2 = 0.2;        //fraction of DIC in CO2
+    float ksed = 0.02;        //first-order sediment decay rate (/day)
+    float kbur = 0.05;        //first - order sediment burial rate(/ day)
+        
+    //bottom algea death procese
+    float Ab_con = 0.f;	
+    Ab_con = m_Ab[i];
+    m_AbDeath[i] = 0.f;
+    m_AbDeath[i] = Ab_con * corTempc(kdb, 1.04f, wtmp); //bottom algea death biomass(g / m2 / day)
+
+    //bottom algae photosynthesis/growth process
+    //kinetics for intracellular N and P process in bottom algae
+    float Ab_UN = 0.f;
+    float Ab_UP = 0.f;
+    float qN_Ab, qP_Ab;
+    qN_Ab = m_AbINb[i] / Ab_con;
+    qP_Ab = m_AbIPb[i] / Ab_con;
+    float DIN_con = nh4con + no3con + no2con; //DIN_con = nh3con + no3con + no2con !calculate DIN concentration in the reach(mgN / L)
+    // N&P uptakes in bottom algae
+    Ab_UN = pmN * (DIN_con / (DIN_con + Ksnb)) * Ab_con * (KqN / (KqN + qN_Ab - qoN));
+    if (Ab_UN < 0.f) Ab_UN = 0.f;
+    Ab_UP = pmP * (solpcon / (solpcon + Kspb)) * Ab_con * (KqP / (KqP + qP_Ab - qoP));
+    if (Ab_UP < 0.f) Ab_UP = 0.f;
+
+    //intracellular N&P mass balance
+    m_AbINb[i] = m_AbINb[i] + Ab_UN - qN_Ab * m_AbDeath[i] - qN_Ab * corTempc(kexb, 1.04f, wtmp) *Ab_con;
+    if (m_AbINb[i] < 0.f) m_AbINb[i] = 0.f;
+    m_AbIPb[i] = m_AbIPb[i] + Ab_UP - qP_Ab * m_AbDeath[i] - qP_Ab * corTempc(kexb, 1.04f, wtmp) *Ab_con;
+    if (m_AbIPb[i] < 0.f) m_AbIPb[i] = 0.f;
+
+    //For calculating nutrient limitation factor
+    float fnl_dic = 0.f;
+    fdic = 0.f; //!!ljj, test as DIC almost is CO2
+    fnl_dic = fdic * diccon;
+    float fnl_Ab = 0.f;
+    fnl_Ab = Min((1.f - qoN/ qN_Ab), (1.f - qoP/ qP_Ab));
+    fnl_Ab = Min(fnl_Ab, (fnl_dic/ (fnl_dic + kscb)));
+    if (fnl_Ab < 0.f) fnl_Ab = 0.f;
+
+    //For calculating light limation factor
+    float I0_Ab = 0.f;
+    I0_Ab = m_chSr[i]*tfact;
+    float POMcon = (lpoccon + rpoccon) / 0.58;
+    float sedc = 0.f;
+    if (wtrTotal > 0.f) sedc = m_sedst[i] * cvt_amout2conc; //TSS concentration  kg to mg/L
+    float ke_Ab = keb + kiss * sedc + kpom * POMcon + kap * algcon + kapn * pow(algcon, 0.66667f) + kAb * Ab_con / m_chWtrDepth[i];
+    ke_Ab = Min(ke_Ab, 1e6);  //ljj
+    ke_Ab = Max(ke_Ab, 0.f);
+    float IH_Ab = 0.f;
+    IH_Ab = I0_Ab * exp(-ke_Ab * m_chWtrDepth[i]);
+
+    float fll_Ab = 0.f;
+    if (light == 1) {
+        fll_Ab = IH_Ab / (klb + IH_Ab);
+    }
+    else if (light == 2) {
+        fll_Ab = IH_Ab / pow((klb*klb + IH_Ab * IH_Ab), 0.5);
+    }
+    else if (light == 3) {
+        fll_Ab = (IH_Ab / klb) * exp (1 + IH_Ab / klb);
+    }
+
+    //temperature correction for photosynthesis rate
+    float kph_Ab = 0.f;
+    kph_Ab = corTempc(kph, 1.04f, wtmp);
+    m_photo[i] = 0.f;
+    if (ipho = 0) {
+        m_photo[i] = kph_Ab * fll_Ab * fnl_Ab;
+    }
+    else {
+        //Space limitation factor
+        float fsl_Ab = 0.f;
+        fsl_Ab = Max(0.f, 1.f - Ab_con / Abmax);
+        m_photo[i] = kph_Ab * fll_Ab * fnl_Ab*fsl_Ab*Ab_con;
+    }
+    if (m_photo[i] < 0.f) m_photo[i] = 0.000001;
+    m_photo[i] = kph_Ab * fll_Ab * fnl_Ab;
+
+    //bottom algea respiration process
+    float foxb_Ab = 0.f;
+    foxb_Ab = o2con / (o2con + ksob);
+    m_resp[i] = 0.f;
+    m_resp[i] = foxb_Ab * (krb1 * Ab_con + krb2 * m_photo[i]);
+    if (m_resp[i] < 0.f) m_resp[i] = 0.000001;
+    //Bottom algae biomass mass balance
+    xx = 0.f;
+    xx = m_Ab[i];
+    m_Ab[i] = m_Ab[i] + m_photo[i] - m_resp[i] - m_AbDeath[i];
+    if (m_Ab[i] < 0.f) m_Ab[i] = 0.000001;
+    m_Ab[i] = Min(m_Ab[i], 1e6);  //ljj m_Ab[i] actually always <1
+    m_Ab[i] = Max(m_Ab[i], 0.f);
+    //calculating algal death to organic carbon
+    float Alg_cbn = 0.f;
+    Alg_cbn = rca * corTempc(m_rhoq, thrho, wtmp) * algcon;  //Algal death to total organic carbon (mg/L)
+    float Ab_cbn = 0.f;
+    Ab_cbn = rca * m_AbDeath[i] / m_chWtrDepth[i];    //bottom algae death to total organic carbon (mg/L)
+
+    //LPOC's 6 reaction pathways
+    float Alg_LP = 0.f;
+    Alg_LP = f_lpp * Alg_cbn;
+    float Ab_LP = 0.f;
+    Ab_LP = f_lpb * Ab_cbn;
+    float LP_set = 0.f;
+    LP_set = m_sv_lp  / m_chWtrDepth[i] * lpoccon;
+    float LP_LD = 0.f;
+    LP_LD = corTempc(m_klp, 1.047f, wtmp) * lpoccon;
+    float LP_DIC = 0.f;
+    LP_DIC = corTempc(m_kd_lp, 1.047f, wtmp) * lpoccon;
+    float LR_POC = 0.f;
+    LR_POC = corTempc(m_klrp, 1.047f, wtmp) * lpoccon;
+    //ljj modified
+    float blclpoc =  m_npoc;  //!!todo 用户自定义的平衡浓度
+    //黄河：80%以上的POC集中在<16μm的TSS中,而粒径<32μm的TSS承载了95%以上的POC
+    float lpoc_stlr = exp(-.184 * 30); //怎么定义POC的粒径呢？？
+    float LP_set2 = 0.f;
+    if (lpoccon > blclpoc) {
+        float inilpoc = lpoccon;
+        float finlpoc = (lpoccon - blclpoc) *lpoc_stlr + blclpoc;
+        LP_set2 = inilpoc - finlpoc;
+    }
+    LP_set = LP_set2;
+    m_chLPOC[i] = lpoccon + (Alg_LP + Ab_LP - LP_set2 - LP_LD - LP_DIC - LR_POC) * tday;
+    if (m_chLPOC[i] <= 0.f) {
+        m_chLPOC[i] = 0.f;
+        LP_set = lpoccon / tday + Alg_LP + Ab_LP - LP_LD - LP_DIC - LR_POC;
+    }
+
+    //RPOC reaction pathway
+    float Alg_RP = 0.f;
+    Alg_RP = f_rpp * Alg_cbn;
+    float Ab_RP = 0.f;
+    Ab_RP = f_rpb * Ab_cbn;
+    float RP_LD = 0.f;
+    RP_LD = corTempc(m_krp, 1.047f, wtmp) * rpoccon;
+    float RP_DIC = 0.f;
+    RP_DIC = corTempc(m_kd_rp, 1.047f, wtmp) * rpoccon;
+    float RP_set = 0.f;
+    RP_set = m_sv_rp / m_chWtrDepth[i] * rpoccon;
+    //ljj modified
+    float blcrpoc =  m_npoc;  //!!todo 用户自定义的平衡浓度
+    //黄河：80%以上的POC集中在<16μm的TSS中,而粒径<32μm的TSS承载了95%以上的POC
+    float rpoc_stlr = exp(-.184 * 30); //怎么定义POC的粒径呢？？
+    float RP_set2 = 0.f;
+    if (rpoccon > blcrpoc) {
+        float inirpoc = rpoccon;
+        float finrpoc = (rpoccon - blcrpoc) *rpoc_stlr + blcrpoc;
+        RP_set2 = inirpoc - finrpoc;
+    }
+    RP_set = RP_set2;
+    m_chRPOC[i] = rpoccon + (Alg_RP + Ab_RP - RP_set2 - RP_LD - RP_DIC + LR_POC) * tday;
+    if (m_chRPOC[i] <= 0.f) {
+        m_chRPOC[i] = 0.f;
+        RP_set = rpoccon / tday + Alg_RP + Ab_RP - RP_LD - RP_DIC + LR_POC;
+    }
+
+    //LDOC reaction pathways
+    float Alg_LD = 0.f;
+    Alg_LD = f_ldp * Alg_cbn;
+    float Ab_LD = 0.f;
+    Ab_LD = f_ldb * Ab_cbn;
+    float LD_DIC = 0.f;
+    float Foxc = 0.f;
+    Foxc = o2con / (o2con + ksdocf);
+    LD_DIC = Foxc * corTempc (m_kld, 1.047, wtmp)*ldoccon;
+    float LR_DOC = 0.f;
+    LR_DOC = corTempc(m_klrd, 1.047, wtmp)*ldoccon;
+    float LD_NO3 = 0.f;
+    float Fxodn = 0.f;
+    Fxodn = o2con / (o2con + ksoxdn);
+    LD_NO3 = no3con * (15.f / 14.f)*(1.f - Fxodn) * corTempc(kdnit, 1.045, wtmp);
+    m_chLDOC[i] = ldoccon + (Alg_LD + Ab_LD - LR_DOC - LD_DIC - LD_NO3 + LP_LD + RP_LD)* tday;
+    if (m_chLDOC[i] <= 0.f) m_chLDOC[i] = 0.f;
+
+    //RDOC reation pathways
+    float Alg_RD = 0.f;
+    float f_rdp = 1 - f_lpp - f_rpp - f_ldp;
+    float f_rdb = 1 - f_lpb - f_rpb - f_ldb;
+    Alg_RD = f_rdp * Alg_cbn;
+    float Ab_RD = 0.f;
+    Ab_RD = f_rdb * Ab_cbn;
+    float RD_DIC = 0.f;
+    RD_DIC = Foxc * corTempc(m_krd, 1.047, wtmp)*rdoccon;
+    m_chRDOC[i] = rdoccon + (Alg_RD + Ab_RD + LR_DOC - RD_DIC)* tday;
+    if (m_chRDOC[i] <= 0.f) m_chRDOC[i] = 0.f;
+
+    //DIC reaction pathways
+    float Atm_DIC = 0.f;
+    float kac = corTempc(m_rk2[i], thm_rk2, wtmp)*0.923;          //CO2 reaeration rate(/ day)
+    float wtmpk = wtmp + 273.15;  //convet the unit of water temp to Kelvin
+    float kh_DIC = pow(10.0f,((2385.73f / wtmpk) + 0.0152642f * wtmpk - 14.0184f));   //Henry's constant [mol/L/atm] 
+    float CO2_sat = 12.0f * kh_DIC * p_co2 / 1000.0f;        //CO2 saturation(unit converting to mg / L)
+    Atm_DIC = kac * (CO2_sat - f_co2 * diccon);   //Atmospheric CO2 reaeration
+    if(CO2_sat - f_co2 * diccon >0) Atm_DIC = Min(Atm_DIC, (CO2_sat - f_co2 *diccon));
+    if(CO2_sat - f_co2 * diccon <0) Atm_DIC = Max(Atm_DIC, (CO2_sat - f_co2 *diccon));
+
+    float Alg_DIC = 0.f;
+    Alg_DIC = Alg_cbn;    //algae respiration to DIC
+    float DIC_Alg = 0.f;
+    DIC_Alg = rca * corTempc(gra, thgra, wtmp) * algcon;  //DIC consumbed by algal photosynthesis
+    float Ab_DIC = 0.f;
+    Ab_DIC = rca * m_resp[i] / m_chWtrDepth[i];      //bottom algae respiration to DIC
+    if (m_chWtrDepth[i] < 0.001f)Ab_DIC = rca * m_resp[i] / 0.001f;
+    float DIC_Ab = 0.f;
+    DIC_Ab = rca * m_photo[i] / m_chWtrDepth[i];      //DIC consumbed by bottom algae photosynthesis
+    if (m_chWtrDepth[i] < 0.001f) DIC_Ab = rca * m_photo[i] / 0.001f;
+    float CBOD_DIC = 0.f;
+    CBOD_DIC = corTempc(m_rk1[i], thm_rk1, wtmp) * cbodcon * (12.0f / 32.0f);   //CBOD oxidation to DIC
+    //first order sediment diagenesis model - from W2 model
+    float algset = 0.f;
+    algset = corTempc(m_rs1[i], thrs1, wtmp) / m_chWtrDepth[i] * algcon * rca;  //Algae settling to bed sediment
+    if (m_chWtrDepth[i] < 0.001f) algset = corTempc(m_rs1[i], thrs1, wtmp) / 0.001f * algcon * rca;
+    m_scbn[i] = m_scbn[i] + RP_set + LP_set + algset; //add RPOC and LPOC settling from water column to bed sediment
+    float dic_bed = 0.f;
+    dic_bed = m_scbn[i] * ksed;   //DIC release from bed sediment compartment(first - order equation)
+    float cbn_bur = 0.f;
+    cbn_bur = m_scbn[i] * kbur;  // sediment burial amount
+    m_scbn[i] = m_scbn[i] - dic_bed - cbn_bur; //update sediment carbon amount after loss
+    if (m_scbn[i] < 0.f) m_scbn[i] = 0.f;
+    float bed_DIC = dic_bed;          //DIC release from bed sediment
+    m_chDIC[i] = diccon + (Atm_DIC + LP_DIC + RP_DIC + LD_DIC + RD_DIC  //transformations from organic carbon pools
+                        + Alg_DIC + Ab_DIC - DIC_Alg - DIC_Ab   //!from algae
+                        + CBOD_DIC + bed_DIC)*tday;             //!update DIC concentration change after transformation
+    if (m_chDIC[i] < 0.f) m_chDIC[i] = 0.f;
+	////ljj-- end OC Metabolism/////
+    
     // storage amount (kg) at end of day
     m_chAlgae[i] = dalgae * wtrTotal * 0.001f;
     m_chChlora[i] = m_chAlgae[i] * m_ai0;
@@ -1267,6 +1584,12 @@ void NutrCH_QUAL2E::NutrientTransform(const int i) {
     m_chSolP[i] = dsolp * wtrTotal * 0.001f;
     m_chCOD[i] = dbod * wtrTotal * 0.001f;
     m_chDOx[i] = ddisox * wtrTotal / 1000.f;
+    //ljj++
+    m_chDIC[i] = m_chDIC[i] * wtrTotal * 0.001f;    //mg/L to kg
+    m_chLDOC[i] = m_chLDOC[i] * wtrTotal * 0.001f;
+    m_chLPOC[i] = m_chLPOC[i] * wtrTotal * 0.001f;
+    m_chRPOC[i] = m_chRPOC[i] * wtrTotal * 0.001f;
+    m_chRDOC[i] = m_chRDOC[i] * wtrTotal * 0.001f;
 }
 
 float NutrCH_QUAL2E::corTempc(const float r20, const float thk, const float tmp) {

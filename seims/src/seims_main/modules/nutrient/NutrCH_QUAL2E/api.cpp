@@ -117,6 +117,18 @@ extern "C" SEIMS_MODULE_API const char* MetadataInformation() {
     mdi.AddInOutput(VAR_CHSTR_TP, UNIT_KG, DESC_CHSTR_TP, DT_Array1D, TF_SingleValue);
 
     //ljj++
+    mdi.AddParameter(VAR_KLRD, UNIT_NON_DIM, DESC_KLRD, Source_ParameterDB, DT_Single);
+    mdi.AddParameter(VAR_KLD, UNIT_NON_DIM, DESC_KLD, Source_ParameterDB, DT_Single);
+    mdi.AddParameter(VAR_KLP, UNIT_NON_DIM, DESC_KLP, Source_ParameterDB, DT_Single);
+    mdi.AddParameter(VAR_KRD, UNIT_NON_DIM, DESC_KRD, Source_ParameterDB, DT_Single);
+    mdi.AddParameter(VAR_SVLP, UNIT_NON_DIM, DESC_SVLP, Source_ParameterDB, DT_Single);
+    mdi.AddParameter(VAR_SVRP, UNIT_NON_DIM, DESC_SVRP, Source_ParameterDB, DT_Single);
+    mdi.AddParameter(VAR_KDLP, UNIT_NON_DIM, DESC_KDLP, Source_ParameterDB, DT_Single);
+    mdi.AddParameter(VAR_KLRP, UNIT_NON_DIM, DESC_KLRP, Source_ParameterDB, DT_Single);
+    mdi.AddParameter(VAR_KRP, UNIT_NON_DIM, DESC_KRP, Source_ParameterDB, DT_Single);
+    mdi.AddParameter(VAR_KDRP, UNIT_NON_DIM, DESC_KDRP, Source_ParameterDB, DT_Single);
+    mdi.AddParameter(VAR_NPOC, UNIT_CONCENTRATION, DESC_NPOC, Source_ParameterDB, DT_Single);
+
     mdi.AddInput(VAR_CHSEEPAGE, UNIT_VOL_M3, DESC_SEEPAGE, Source_Module, DT_Array1D);
     mdi.AddInput(VAR_GWS_RDOCconc, UNIT_VOL_M3, DESC_GWS_RDOCconc, Source_Module, DT_Array1D);
     mdi.AddInput(VAR_GWS_RDOCsto, UNIT_VOL_M3, DESC_GWS_RDOCsto, Source_Module, DT_Array1D);
@@ -129,6 +141,7 @@ extern "C" SEIMS_MODULE_API const char* MetadataInformation() {
 	mdi.AddInput(VAR_GWD_RDOCtoCH, UNIT_KG, DESC_GWD_RDOCtoCH, Source_Module, DT_Array1D);
 	mdi.AddInput(VAR_LPOCtoCH, UNIT_KG, DESC_LPOCtoCH, Source_Module, DT_Array1D);
 	mdi.AddInput(VAR_RPOCtoCH, UNIT_KG, DESC_RPOCtoCH, Source_Module, DT_Array1D);
+    mdi.AddInput(VAR_SEDSTO_CH, UNIT_KG, DESC_SEDSTO_CH, Source_Module, DT_Array1D);
 
 	mdi.AddInOutput(VAR_CH_DIC, UNIT_KG, DESC_CH_DIC, DT_Array1D, TF_SingleValue);
 	mdi.AddInOutput(VAR_CH_LDOC, UNIT_KG, DESC_CH_LDOC, DT_Array1D, TF_SingleValue);

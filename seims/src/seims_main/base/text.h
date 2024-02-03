@@ -2049,6 +2049,17 @@ CONST_CHARS_LIST Tag_Weight[] = {"WEIGHT", "Weight used for interpolation"};
 #define VAR_CHSTR_SURFRDOC                  "CHSTR_SURFRDOC"
 #define VAR_CHSTR_LATRDOC                   "CHSTR_LATRDOC"
 #define VAR_CHSTR_GWDRDOC                   "CHSTR_GWDRDOC"
+#define VAR_KLRD                            "klrd"
+#define VAR_KLD                             "kld"
+#define VAR_KLP                             "klp"
+#define VAR_KRD                             "krd"
+#define VAR_SVLP                            "sv_lp"
+#define VAR_SVRP                            "sv_rp"
+#define VAR_KDLP                            "kd_lp"
+#define VAR_KLRP                            "klrp"
+#define VAR_KRP                             "krp"
+#define VAR_KDRP                            "kd_rp"
+#define VAR_NPOC                            "npoc"
 
 #define REACH_PERMAFORST                    "is_permafrost"
 #define REACH_SPYLD                         "GW_SPYLD"
@@ -2134,6 +2145,18 @@ CONST_CHARS_LIST Tag_Weight[] = {"WEIGHT", "Weight used for interpolation"};
 #define DESC_CH_LATRDOC                      "lateral RDOC mass in reach"
 #define DESC_CH_GWDRDOC                      "deep gw RDOC mass in reach"
 #define DESC_CH_GWSRDOC                      "deep gw RDOC mass in reach"
+#define DESC_KLRD                            "decay rate of LDOC to RDOC (/day) LDOC->RDOC"
+#define DESC_KLD                             "LDOC mineralization rate (/day)  LDOC->DIC"
+#define DESC_KLP                             "LPOC dissolution rate (/day) LPOC->LDOC"
+#define DESC_KRD                             "RDOC mineralization rate (/day)  RDOC->DIC"
+#define DESC_SVLP                            "LPOC settling velocity (m/day)"
+#define DESC_SVRP                            "RPOC settling velocity (m/day)"
+#define DESC_KDLP                            "LPOC decay rate to DIC (/day) LPOC->DIC"
+#define DESC_KLRP                            "decay rate of LPOC to RPOC (/day) LPOC->RPOC"
+#define DESC_KRP                             "RPOC dissolution rate (/day) RPOC->LDOC"
+#define DESC_KDRP                            "RPOC decay rate to DIC (/day) RPOC->DIC"
+#define DESC_NPOC                            "equilibrium concentration for POC"
+
 //////////////////////////////////////////////////////////////////////////
 /// Define Raster/ related constant strings used in SEIMS and preprocess//
 /// By LiangJun Zhu, May. 5, 2016  ///////////////////////////////////////

@@ -634,7 +634,7 @@ void NutrientTransportSediment::OrgNRemovedInRunoffCenturyModel(const int i) {
         if (DIC_ly >= 0.f) {
             V = m_soilPerco[i][k] + m_subSurfRf[i][k];
             cw_DIC = 0.f;
-            if (V > 0.f) cw_DIC = DIC_ly * (1.f - exp(-V / m_soilPor[i][k] * m_soilDepth[i][k])) / V;
+            if (V > 0.f) cw_DIC = DIC_ly * (1.f - exp(-V / (m_soilPor[i][k] * m_soilDepth[i][k]))) / V;
             m_soilIfluInOrgnCbn[i][k] = cw_DIC * m_subSurfRf[i][k];
             m_soilPercoInOrgnCbn[i][k] = cw_DIC * m_soilPerco[i][k];
             m_soilWtrDIC[i][k] = DIC_ly - cw_DIC * V;

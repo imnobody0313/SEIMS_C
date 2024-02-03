@@ -319,9 +319,22 @@ private:
     int* m_chCellCount;
 
     //ljj+
+	float m_klrd;
+	float m_kld;
+	float m_krd;
+	float m_klp;
+	float m_sv_lp;
+	float m_sv_rp;
+	float m_kd_lp;
+	float m_klrp;
+	float m_krp;
+	float m_kd_rp;
+    float m_npoc;
+    
     float* m_seepage;
     float* m_gws_RDOCconc;
     float* m_gws_RDOCsto;
+    float* m_sedst;
 
     float* m_surfRDOCToCH;
     float* m_latRDOCToCH;
@@ -358,6 +371,16 @@ private:
     float* m_chOutLPOCConc;
     float* m_chOutRPOCConc;
     float* m_chOutTotDOCConc;
+
+    float* m_INb;
+	float* m_IPb;
+	float* m_photo;
+	float* m_resp;
+	float* m_scbn; //find out this var
+	float* m_Ab;
+	float* m_AbDeath;
+	float* m_AbINb;
+	float* m_AbIPb;
 };
 
 #endif /* SEIMS_MODULE_NUTRCH_QUAL2E_H */

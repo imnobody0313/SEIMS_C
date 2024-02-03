@@ -156,9 +156,7 @@ NutrientTransport,CHSTR_NH4,NH4-N stored in reach,kg,NONE,1970-01-01 00:00:00,19
 NutrientTransport,CHSTR_NO3,NO3-N stored in reach,kg,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,OUTLET,CHSTR_NO3.txt,0
 NutrientTransport,GWNO3,nitrate N amount in groundwater,mg/L,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,OUTLET,GWNO3.txt,0
 NutrientTransport,GWSOLP,soluble P amount in groundwater,mg/L,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,OUTLET,GWSOLP.txt,0
-
-
-//ljj++
+#ljj++
 Groundwater,GW_HEIGHT,groundwater height,m,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,OUTLET,GW_HEIGHT.txt,1
 Groundwater,CHSEEPAGE,channel to groundwater,mm,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,OUTLET,CHSEEPAGE.txt,1
 ChannelRouting,QGS,Shallow Groundwater discharge at each reach outlet,m3/s,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,OUTLET,QGS.txt,1

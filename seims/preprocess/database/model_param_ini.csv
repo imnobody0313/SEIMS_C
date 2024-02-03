@@ -236,3 +236,18 @@ SoilTemperature,tsoi5,dsoil heat capacity, ,STP_FP,1,0,AC,10,0
 LAKE,LAKE_EVP,lake evaporation coefficient,%,ChannelRouting,0.6,0,AC,1,0
 LAKE,LAKE_SEEP,shydraulic conductivity of the lake bottom,%,ChannelRouting,0.005,0,AC,1,0
 LAKE,LAKE_MNVOL,min volume of water to flow out for a lake,%,ChannelRouting,0.7,0,AC,1,0
+Carbon,enr_poc,POC enrichment ratio , ,CarbonProcess,1.5,0,AC,5,0
+Carbon,kd_oc,organic carbon partition coefficient, ,CarbonProcess,1000,0,AC,5000,0
+Carbon,perco_doc,DOC percolation coefficient,%,CarbonProcess,0.7,0,AC,1,0
+Carbon,hlife_docgw,DOC half life (days) in groudwater, ,CarbonProcess,50,0,AC,500,0
+Carbon,klrd,decay rate of LDOC to RDOC (/day) LDOC->RDOC, ,CarbonProcess,0.02,0,AC,0.03,0.004
+Carbon,kld,LDOC mineralization rate (/day)  LDOC->DIC, ,CarbonProcess,0.25,0,AC,0.3,0.05
+Carbon,krd,RDOC mineralization rate (/day)  RDOC->DIC, ,CarbonProcess,0.006,0,AC,0.01,0.001
+Carbon,sv_lp,LPOC settling velocity (m/day), ,CarbonProcess,2.5,0,AC,5,0
+Carbon,sv_rp,RPOC settling velocity (m/day), ,CarbonProcess,2.5,0,AC,5,0
+Carbon,klp,LPOC dissolution rate (/day) LPOC->LDOC, ,CarbonProcess,0.075,0,AC,0.15,0.0375
+Carbon,kd_lp,LPOC decay rate to DIC (/day) LPOC->DIC, ,CarbonProcess,0.08,0,AC,0.1,0.001
+Carbon,klrp,decay rate of LPOC to RPOC (/day) LPOC->RPOC, ,CarbonProcess,0.01,0,AC,0.015,0.005
+Carbon,krp,RPOC dissolution rate (/day) RPOC->LDOC, ,CarbonProcess,0.0025,0,AC,0.0075,0.0025
+Carbon,kd_rp,RPOC decay rate to DIC (/day) RPOC->DIC, ,CarbonProcess,0.001,0,AC,0.1,0.001
+Carbon,npoc,equilibrium concentration for POC,mg/L,CarbonProcess,20,0,AC,100,0.001
