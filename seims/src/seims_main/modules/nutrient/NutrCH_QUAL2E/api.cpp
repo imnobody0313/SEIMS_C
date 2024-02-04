@@ -128,6 +128,7 @@ extern "C" SEIMS_MODULE_API const char* MetadataInformation() {
     mdi.AddParameter(VAR_KRP, UNIT_NON_DIM, DESC_KRP, Source_ParameterDB, DT_Single);
     mdi.AddParameter(VAR_KDRP, UNIT_NON_DIM, DESC_KDRP, Source_ParameterDB, DT_Single);
     mdi.AddParameter(VAR_NPOC, UNIT_CONCENTRATION, DESC_NPOC, Source_ParameterDB, DT_Single);
+    mdi.AddParameter(VAR_AHRU, UNIT_AREA_M2, DESC_AHRU, Source_ParameterDB, DT_Raster1D);   
 
     mdi.AddInput(VAR_CHSEEPAGE, UNIT_VOL_M3, DESC_SEEPAGE, Source_Module, DT_Array1D);
     mdi.AddInput(VAR_GWS_RDOCconc, UNIT_VOL_M3, DESC_GWS_RDOCconc, Source_Module, DT_Array1D);

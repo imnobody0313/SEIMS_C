@@ -130,6 +130,8 @@ class DataType(object):
     phu_tot = 'PHUTOT'  # DataType_YearlyHeatUnit
     phu0 = 'PHU0'  # Datatype_PHU0
     mean_tmp0 = 'TMEAN0'  # DataType_MeanTemperature0, multiply annuals
+    Maxmon_tmp = 'MAXMONT'
+    Minmon_tmp = 'MINMONT'
 
 
 class ModelParamFields(object):

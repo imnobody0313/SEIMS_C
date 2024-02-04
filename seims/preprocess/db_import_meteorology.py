@@ -88,7 +88,8 @@ class ImportMeteoData(object):
         hydro_climate_stats = dict()
         required_flds = [DataType.max_tmp, DataType.min_tmp, DataType.rm, DataType.ws]
         output_flds = [DataType.mean_tmp, DataType.max_tmp, DataType.min_tmp,
-                       DataType.rm, DataType.pet, DataType.ws, DataType.sr]
+                       DataType.rm, DataType.pet, DataType.ws, DataType.sr,
+                       DataType.Maxmon_tmp,DataType.Minmon_tmp]
         # remove existed records
         for fld in output_flds:
             climdb[DBTableNames.data_values].remove({'TYPE': fld})
@@ -123,6 +124,10 @@ class ImportMeteoData(object):
                     dic[DataType.rm] = float(clim_data_v) * 0.01
                 elif StringClass.string_match(clim_flds[j], DataType.ssd):
                     cur_ssd = float(clim_data_v)
+                elif StringClass.string_match(clim_flds[j], DataType.Maxmon_tmp):
+                    dic[DataType.Maxmon_tmp] = float(clim_data_v)
+                elif StringClass.string_match(clim_flds[j], DataType.Minmon_tmp):
+                    dic[DataType.Minmon_tmp] = float(clim_data_v)
             # Get datetime and utc/local transformation
             utc_time = HydroClimateUtilClass.get_utcdatetime_from_field_values(clim_flds,
                                                                                cur_clim_data_item,

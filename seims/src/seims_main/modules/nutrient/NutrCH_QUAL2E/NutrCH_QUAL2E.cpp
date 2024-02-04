@@ -41,7 +41,7 @@ NutrCH_QUAL2E::NutrCH_QUAL2E() :
     m_chDaylen(nullptr), m_chSr(nullptr), m_chCellCount(nullptr),
     //ljj++
     m_klrd(-1.f), m_kld(-1.f), m_krd(-1.f), m_sv_lp(-1.f), m_sv_rp(-1.f), m_klp(-1.f), m_kd_lp(-1.f), m_klrp(-1.f),
-    m_krp(-1.f), m_kd_rp(-1.f),m_npoc(-1.f),
+    m_krp(-1.f), m_kd_rp(-1.f),m_npoc(-1.f),m_area(nullptr),
     m_seepage(nullptr),m_gws_RDOCconc(nullptr),m_gws_RDOCsto(nullptr),
 	m_surfRDOCToCH(nullptr),m_latRDOCToCH(nullptr),m_gwdRDOCToCH(nullptr),m_latDICToCH(nullptr),m_surfDICToCH(nullptr),
     m_LPOCToCH(nullptr),m_RPOCToCH(nullptr),m_LDOCToCH(nullptr),
@@ -179,10 +179,10 @@ void NutrCH_QUAL2E::ParametersSubbasinForChannel() {
                 throw ModelException(MID_NUTRCH_QUAL2E, "Execute",
                                      "The subbasin " + ValueToString(irch) + " is invalid.");
             }
-            tmp_chDaylen[irch] += m_dayLen[i];
-            tmp_chSr[irch] += m_sr[i];
-            tmp_chTemp[irch] += m_soilTemp[i];
-            tmp_chCellCount[irch] += 1;
+            tmp_chDaylen[irch] += m_dayLen[i]*m_area[i];
+            tmp_chSr[irch] += m_sr[i]*m_area[i];
+            tmp_chTemp[irch] += m_soilTemp[i]*m_area[i];
+            tmp_chCellCount[irch] += m_area[i];
         }
 #pragma omp critical
         {
@@ -410,7 +410,12 @@ void NutrCH_QUAL2E::Set1DData(const char* key, const int n, float* data) {
         m_soilTemp = data;
         return;
     }
-
+//ljj++
+    if (StringMatch(sk, VAR_AHRU)) {
+        CheckInputCellSize(key, n);
+        m_area = data;
+        return;
+    }
     CheckInputSize(MID_NUTRCH_QUAL2E, key, n - 1, m_nReaches);
     if (StringMatch(sk, VAR_QRECH)) m_qRchOut = data;
     else if (StringMatch(sk, VAR_CHST)) {

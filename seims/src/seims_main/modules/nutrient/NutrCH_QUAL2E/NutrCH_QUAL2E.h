@@ -335,6 +335,7 @@ private:
     float* m_gws_RDOCconc;
     float* m_gws_RDOCsto;
     float* m_sedst;
+    float* m_area;
 
     float* m_surfRDOCToCH;
     float* m_latRDOCToCH;

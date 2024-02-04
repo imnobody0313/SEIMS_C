@@ -33,7 +33,7 @@ from postprocess.config import PostConfig
 from parameters_sensitivity.config import PSAConfig
 from calibration.config import CaliConfig
 
-DEMO_MODELS = {'youwuzhen': 'demo_youwuzhen30m_longterm_model','hlg_hband': 'hlg_hband_longterm_model','hlg': 'hlg_longterm_model'}
+DEMO_MODELS = {'youwuzhen': 'demo_youwuzhen30m_longterm_model','hlg_hband': 'hlg_hband_longterm_model','hulugou': 'hulugou_longterm_model'}
 
 
 def get_watershed_name(desc='Specify watershed name to run this script.'):

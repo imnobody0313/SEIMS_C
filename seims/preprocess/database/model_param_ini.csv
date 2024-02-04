@@ -228,11 +228,11 @@ Groundwater,delay,time required for water leaving the bottom of the root zone to
 Groundwater,gw_spyld,specific yield for shallow aquifer,days,GW_MOD,-9999,1,RC,100,0
 SoilTemperature,DDEPTH1,dampling depth in the non-permafrost,mm,STP_FP,3000,0,AC,100000,10
 SoilTemperature,DDEPTH2,dampling depth in the permafrost,mm,STP_FP,1800,0,AC,5000,10
-SoilTemperature,tsoi1,Effective air-to-ground conductance ratio, ,STP_FP,8,0,AC,100,1
-SoilTemperature,tsoi2,Thermal conductivity of soil, ,STP_FP,1,0,AC,20,0
-SoilTemperature,tsoi3,Thermal conductivity of soil, ,STP_FP,1,0,AC,20,0
-SoilTemperature,tsoi4,snow heat conduc, ,STP_FP,1,0,AC,10,0
-SoilTemperature,tsoi5,dsoil heat capacity, ,STP_FP,1,0,AC,10,0
+SoilTemperature,tsoil1,Effective air-to-ground conductance ratio, ,STP_FP,8,0,AC,100,1
+SoilTemperature,tsoil2,Thermal conductivity of soil, ,STP_FP,1,0,AC,20,0
+SoilTemperature,tsoil3,Thermal conductivity of soil, ,STP_FP,1,0,AC,20,0
+SoilTemperature,tsoil4,snow heat conduc, ,STP_FP,1,0,AC,10,0
+SoilTemperature,tsoil5,dsoil heat capacity, ,STP_FP,1,0,AC,10,0
 LAKE,LAKE_EVP,lake evaporation coefficient,%,ChannelRouting,0.6,0,AC,1,0
 LAKE,LAKE_SEEP,shydraulic conductivity of the lake bottom,%,ChannelRouting,0.005,0,AC,1,0
 LAKE,LAKE_MNVOL,min volume of water to flow out for a lake,%,ChannelRouting,0.7,0,AC,1,0
