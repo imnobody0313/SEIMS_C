@@ -60,7 +60,7 @@ class ImportObservedData(object):
             # the site is not inside the basin and not the outlet either.
             return False, None
         if site_type == 0:
-            return True, [subbasin_id]
+            return True, [int(subbasin_id)]
         elif site_type == 1:
             outid = int(MongoQuery.get_init_parameter_value(maindb, SubbsnStatsName.outlet))
             return True, [outid]

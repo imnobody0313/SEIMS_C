@@ -73,7 +73,6 @@ def read_field_arrays_from_csv(csvf):
         for fld_idx, fld_name in enumerate(flds):
             if fld_idx == 0 or StringClass.string_match(fld_name, 'FID'):
                 continue
-            #print (fld_idx)
             if fld_name not in flds_array:
                 flds_array[fld_name] = list()
             flds_array[fld_name].append(data_item_values[fld_idx])
@@ -249,8 +248,8 @@ def workflow(cfg, db_name, csv_path,field_num):
             array = (df.loc[:,'routing_layers_down_up'])
             import_array_to_mongodb_flowinindex(spatial_gfs, array, '%d_%s' % (prefix, 'ROUTING_LAYERS_DOWN_UP'))
         else:
-            param_arrays = read_field_arrays_from_csv(csv_file)
             print (csv_file)
+            param_arrays = read_field_arrays_from_csv(csv_file)
             for key, value in list(param_arrays.items()):
                 pondVal = value
                 import_array_to_mongodb(spatial_gfs, pondVal, '%d_%s' % (prefix, key))

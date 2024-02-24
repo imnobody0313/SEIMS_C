@@ -157,6 +157,12 @@ NutrientTransport,CHSTR_NO3,NO3-N stored in reach,kg,NONE,1970-01-01 00:00:00,19
 NutrientTransport,GWNO3,nitrate N amount in groundwater,mg/L,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,OUTLET,GWNO3.txt,0
 NutrientTransport,GWSOLP,soluble P amount in groundwater,mg/L,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,OUTLET,GWSOLP.txt,0
 #ljj++
+SoilTemperature,SOTE1,Soil temperature at 1cm,deg C,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,ALL,SOTE1.txt,1
+SoilTemperature,SOTE20,Soil temperature at 20cm,deg C,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,ALL,SOTE20.txt,1
+SoilTemperature,SOTE50,Soil temperature at 50cm,deg C,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,ALL,SOTE50.txt,1
+SoilTemperature,SOTE60,Soil temperature at 60cm,deg C,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,ALL,SOTE60.txt,1
+SoilTemperature,SOTE100,Soil temperature at 100cm,deg C,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,ALL,SOTE100.txt,1
+SoilTemperature,SOTE200,Soil temperature at 200cm,deg C,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,ALL,SOTE200.txt,1
 Groundwater,GW_HEIGHT,groundwater height,m,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,OUTLET,GW_HEIGHT.txt,1
 Groundwater,CHSEEPAGE,channel to groundwater,mm,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,OUTLET,CHSEEPAGE.txt,1
 ChannelRouting,QGS,Shallow Groundwater discharge at each reach outlet,m3/s,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,OUTLET,QGS.txt,1
@@ -188,8 +194,8 @@ CarbonTransport,CH_LDOC,total LDOC amount in reach,kg,NONE,1970-01-01 00:00:00,1
 CarbonTransport,CH_LDOCConc,total LDOC concentration in reach,mg/L,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,OUTLET,CH_LDOCConc.txt,1
 CarbonTransport,CH_RDOC,total RDOC amount in reach,kg,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,OUTLET,CH_RPOC.txt,1
 CarbonTransport,CH_RDOCConc,total RDOC concentration in reach,mg/L,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,OUTLET,CH_RDOCConc.txt,1
-CarbonTransport,CH_TOTDOC,total TOTDOC amount in reach,kg,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,OUTLET,CH_TOTDOC.txt,1
-CarbonTransport,CH_TOTDOCConc,total TOTDOC concentration in reach,mg/L,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,OUTLET,CH_TOTDOCConc.txt,1
+CarbonTransport,CH_TOTDOC,total TOTDOC amount in reach,kg,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,OUTLET,CHTOTDOC.txt,1
+CarbonTransport,CH_TOTDOCConc,total TOTDOC concentration in reach,mg/L,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,OUTLET,CHTOTDOCConc.txt,1
 CarbonTransport,CH_SURFRDOC,surf RDOC amount in reach,kg,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,OUTLET,CH_SURFRDOC.txt,1
 CarbonTransport,CH_LATRDOC,surf RDOC amount in reach,kg,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,OUTLET,CH_LATRDOC.txt,1
 CarbonTransport,CH_GWDRDOC,surf RDOC amount in reach,kg,NONE,1970-01-01 00:00:00,1970-01-01 00:00:00,-9999,-9999,OUTLET,CH_GWDRDOC.txt,1

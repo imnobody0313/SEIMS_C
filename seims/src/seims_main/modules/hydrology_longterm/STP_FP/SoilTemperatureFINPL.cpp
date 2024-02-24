@@ -35,7 +35,7 @@ SoilTemperatureFINPL::SoilTemperatureFINPL() :
     m_asno(nullptr),m_bsno(nullptr),m_csno(nullptr),m_dsno(nullptr),m_psno(nullptr),m_qsno(nullptr),
     m_soltmp1(nullptr),m_snotmp1(nullptr),m_presnotmp(nullptr), m_soilt(nullptr),
     m_smp(nullptr),m_supercool(nullptr),m_sand(nullptr),m_clay(nullptr),
-    m_SOTE1(nullptr),m_SOTE20(nullptr),m_SOTE50(nullptr),m_SOTE100(nullptr),m_SOTE200(nullptr)
+    m_SOTE1(nullptr),m_SOTE20(nullptr),m_SOTE50(nullptr),m_SOTE60(nullptr),m_SOTE100(nullptr),m_SOTE200(nullptr)
     {
 }
 
@@ -79,6 +79,7 @@ SoilTemperatureFINPL::~SoilTemperatureFINPL() {
     if (m_SOTE1 != nullptr) Release1DArray(m_SOTE1);
     if (m_SOTE20 != nullptr) Release1DArray(m_SOTE20);
     if (m_SOTE50 != nullptr) Release1DArray(m_SOTE50);
+    if (m_SOTE60 != nullptr) Release1DArray(m_SOTE60);
     if (m_SOTE100 != nullptr) Release1DArray(m_SOTE100);
     if (m_SOTE200 != nullptr) Release1DArray(m_SOTE200);
 
@@ -147,34 +148,39 @@ int SoilTemperatureFINPL::Execute() {
         m_soilTemp[i] = m_soilt[i][0];
     }
     //output
-    int outputID = 7;  //subbasinID for calibration
-    int HRUID = 90;
-
     int nlyr=5; //!!????ljj
     //assume the depth below the deepest soil layer is devided into 5 layer
     int nly1=0;
-    nly1 = m_nSoilLyrs[HRUID]+ nlyr;
-    for (int k = 0; k < nlyr; k++) {
-        if (m_solnd[HRUID][k+1]>10. && m_solnd[HRUID][k]<=10.) {
-            m_SOTE1[outputID] = m_soltmp1[HRUID][k] * ( (m_solnd[HRUID][k+1]-10) / (m_solnd[HRUID][k+1]-m_solnd[HRUID][k]) ) 
-                        + m_soltmp1[HRUID][k+1] * ((10- m_solnd[HRUID][k]) / (m_solnd[HRUID][k+1]-m_solnd[HRUID][k]) );
-        } 
-        if (m_solnd[HRUID][k+1]>200. && m_solnd[HRUID][k]<=200.) {
-            m_SOTE20[outputID] = m_soltmp1[HRUID][k] * ( (m_solnd[HRUID][k+1]-200) / (m_solnd[HRUID][k+1]-m_solnd[HRUID][k]) ) 
-                        + m_soltmp1[HRUID][k+1] * ((200- m_solnd[HRUID][k]) / (m_solnd[HRUID][k+1]-m_solnd[HRUID][k]) );
-        } 
-        if (m_solnd[HRUID][k+1]>500. && m_solnd[HRUID][k]<=500.) {
-            m_SOTE50[outputID] = m_soltmp1[HRUID][k] * ( (m_solnd[HRUID][k+1]-500) / (m_solnd[HRUID][k+1]-m_solnd[HRUID][k]) ) 
-                        + m_soltmp1[HRUID][k+1] * ((500- m_solnd[HRUID][k]) / (m_solnd[HRUID][k+1]-m_solnd[HRUID][k]) );
-        } 
-        if (m_solnd[HRUID][k+1]>1000. && m_solnd[HRUID][k]<=1000.) {
-            m_SOTE100[outputID] = m_soltmp1[HRUID][k] * ( (m_solnd[HRUID][k+1]-1000) / (m_solnd[HRUID][k+1]-m_solnd[HRUID][k]) ) 
-                        + m_soltmp1[HRUID][k+1] * ((1000- m_solnd[HRUID][k]) / (m_solnd[HRUID][k+1]-m_solnd[HRUID][k]) );
+    
+    for (int i = 0; i < m_nCells; i++) {
+        nly1 = m_nSoilLyrs[i]+ nlyr;
+        for (int k = 0; k < CVT_INT(m_nSoilLyrs[i]); k++) {
+            if (m_solnd[i][k+1]>10. && m_solnd[i][k]<=10.) {
+                m_SOTE1[i] = m_soltmp1[i][k] * ( (m_solnd[i][k+1]-10) / (m_solnd[i][k+1]-m_solnd[i][k]) ) 
+                            + m_soltmp1[i][k+1] * ((10- m_solnd[i][k]) / (m_solnd[i][k+1]-m_solnd[i][k]) );
+            } 
+            if (m_solnd[i][k+1]>200. && m_solnd[i][k]<=200.) {
+                m_SOTE20[i] = m_soltmp1[i][k] * ( (m_solnd[i][k+1]-200) / (m_solnd[i][k+1]-m_solnd[i][k]) ) 
+                            + m_soltmp1[i][k+1] * ((200- m_solnd[i][k]) / (m_solnd[i][k+1]-m_solnd[i][k]) );
+            } 
+            if (m_solnd[i][k+1]>500. && m_solnd[i][k]<=500.) {
+                m_SOTE50[i] = m_soltmp1[i][k] * ( (m_solnd[i][k+1]-500) / (m_solnd[i][k+1]-m_solnd[i][k]) ) 
+                            + m_soltmp1[i][k+1] * ((500- m_solnd[i][k]) / (m_solnd[i][k+1]-m_solnd[i][k]) );
+            }
+            if (m_solnd[i][k+1]>600. && m_solnd[i][k]<=600.) {
+                m_SOTE60[i] = m_soltmp1[i][k] * ( (m_solnd[i][k+1]-600) / (m_solnd[i][k+1]-m_solnd[i][k]) ) 
+                            + m_soltmp1[i][k+1] * ((600- m_solnd[i][k]) / (m_solnd[i][k+1]-m_solnd[i][k]) );
+            } 
+            if (m_solnd[i][k+1]>1000. && m_solnd[i][k]<=1000.) {
+                m_SOTE100[i] = m_soltmp1[i][k] * ( (m_solnd[i][k+1]-1000) / (m_solnd[i][k+1]-m_solnd[i][k]) ) 
+                            + m_soltmp1[i][k+1] * ((1000- m_solnd[i][k]) / (m_solnd[i][k+1]-m_solnd[i][k]) );
+            }
+            if (m_solnd[i][k+1]>2000. && m_solnd[i][k]<=2000.) {
+                
+                m_SOTE200[i] = m_soltmp1[i][k] * ( (m_solnd[i][k+1]-2000) / (m_solnd[i][k+1]-m_solnd[i][k]) ) 
+                            + m_soltmp1[i][k+1] * ((2000- m_solnd[i][k]) / (m_solnd[i][k+1]-m_solnd[i][k]) );
+            }  
         }
-        if (m_solnd[HRUID][k+1]>2000. && m_solnd[HRUID][k]<=2000.) {
-            m_SOTE100[outputID] = m_soltmp1[HRUID][k] * ( (m_solnd[HRUID][k+1]-2000) / (m_solnd[HRUID][k+1]-m_solnd[HRUID][k]) ) 
-                        + m_soltmp1[HRUID][k+1] * ((2000- m_solnd[HRUID][k]) / (m_solnd[HRUID][k+1]-m_solnd[HRUID][k]) );
-        }  
     }
     if (errCount > 0) {
         throw ModelException(MID_STP_FP, "Execute", "The calculation of soil temperature failed!");
@@ -272,6 +278,9 @@ void SoilTemperatureFINPL::Get1DData(const char* key, int* n, float** data) {
     else if (StringMatch(sk, VAR_SOTE50)) {
 		*data = m_SOTE50;
 	}
+    else if (StringMatch(sk, VAR_SOTE60)) {
+		*data = m_SOTE60;
+	}
     else if (StringMatch(sk, VAR_SOTE100)) {
 		*data = m_SOTE100;
 	}
@@ -300,6 +309,7 @@ void SoilTemperatureFINPL::InitialOutputs() {
         Initialize1DArray(m_nCells, m_SOTE1, 0.f);
         Initialize1DArray(m_nCells, m_SOTE20, 0.f);
         Initialize1DArray(m_nCells, m_SOTE50, 0.f);
+        Initialize1DArray(m_nCells, m_SOTE60, 0.f);
         Initialize1DArray(m_nCells, m_SOTE100, 0.f);
         Initialize1DArray(m_nCells, m_SOTE200, 0.f);
     }
@@ -359,10 +369,10 @@ void SoilTemperatureFINPL::InitialOutputs() {
                 m_solicev[i][k] = m_solice[i][k] / m_solthic[i][k];
                 m_solair[i][k]  = m_solpormm[i][k]- m_solwc[i][k]-m_solice[i][k];
             }
-            if(m_dem[i]<3400) {
+            if(m_dem[i]<3650) {
                 m_basedep[i] = m_ddepth1;
             }
-            if(m_dem[i]>=3400) {
+            if(m_dem[i]>=3650) {
                 m_basedep[i] = m_ddepth2;
             }
         }

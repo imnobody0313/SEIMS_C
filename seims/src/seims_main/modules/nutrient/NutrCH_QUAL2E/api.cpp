@@ -117,6 +117,7 @@ extern "C" SEIMS_MODULE_API const char* MetadataInformation() {
     mdi.AddInOutput(VAR_CHSTR_TP, UNIT_KG, DESC_CHSTR_TP, DT_Array1D, TF_SingleValue);
 
     //ljj++
+    mdi.AddParameter(VAR_SUBBASIN_PARAM, UNIT_NON_DIM, DESC_SUBBASIN_PARAM, Source_ParameterDB, DT_Subbasin);
     mdi.AddParameter(VAR_KLRD, UNIT_NON_DIM, DESC_KLRD, Source_ParameterDB, DT_Single);
     mdi.AddParameter(VAR_KLD, UNIT_NON_DIM, DESC_KLD, Source_ParameterDB, DT_Single);
     mdi.AddParameter(VAR_KLP, UNIT_NON_DIM, DESC_KLP, Source_ParameterDB, DT_Single);

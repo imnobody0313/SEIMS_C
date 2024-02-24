@@ -2004,6 +2004,7 @@ CONST_CHARS_LIST Tag_Weight[] = {"WEIGHT", "Weight used for interpolation"};
 #define VAR_SOTE1                           "SOTE1"
 #define VAR_SOTE20                          "SOTE20"
 #define VAR_SOTE50                          "SOTE50"
+#define VAR_SOTE60                          "SOTE60"
 #define VAR_SOTE100                         "SOTE100"
 #define VAR_SOTE200                         "SOTE200"
 #define VAR_LAKE_EVP                        "LAKE_EVP"

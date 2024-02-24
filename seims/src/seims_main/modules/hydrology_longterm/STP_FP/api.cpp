@@ -92,6 +92,7 @@ extern "C" SEIMS_MODULE_API const char* MetadataInformation() {
     mdi.AddOutput(VAR_SOTE1, UNIT_TEMP_DEG, DESC_SOTE, DT_Array1D);
     mdi.AddOutput(VAR_SOTE20, UNIT_TEMP_DEG, DESC_SOTE, DT_Array1D);
     mdi.AddOutput(VAR_SOTE50, UNIT_TEMP_DEG, DESC_SOTE, DT_Array1D);
+    mdi.AddOutput(VAR_SOTE60, UNIT_TEMP_DEG, DESC_SOTE, DT_Array1D);
     mdi.AddOutput(VAR_SOTE100, UNIT_TEMP_DEG, DESC_SOTE, DT_Array1D);
     mdi.AddOutput(VAR_SOTE200, UNIT_TEMP_DEG, DESC_SOTE, DT_Array1D);
     mdi.AddOutput(VAR_SOLICE, UNIT_TEMP_DEG, DESC_SOLICE, DT_Array2D);

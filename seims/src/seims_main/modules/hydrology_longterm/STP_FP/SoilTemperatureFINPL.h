@@ -186,6 +186,7 @@ private:
     float* m_SOTE1;
     float* m_SOTE20;
     float* m_SOTE50;
+    float* m_SOTE60;
     float* m_SOTE100;
     float* m_SOTE200;
 };

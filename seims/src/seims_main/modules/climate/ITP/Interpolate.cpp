@@ -31,7 +31,7 @@ int Interpolate::Execute() {
     CheckInputData();
     if (nullptr == m_itpOutput) { Initialize1DArray(m_nCells, m_itpOutput, 0.f); }
     size_t err_count = 0;
-    if(m_dataType == 0) m_lapse = 0.00012; //
+    if(m_dataType == 0) m_lapse = 0.00027; //
     if(m_dataType == 1) m_lapse = -0.005; //青藏高原多种分辨率月温度递减率网格数据集 zhangfan
     if(m_dataType == 2) m_lapse = 0;
     if(m_dataType == 3) m_lapse = 0;

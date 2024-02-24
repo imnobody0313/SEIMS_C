@@ -126,9 +126,10 @@ int DOCGroundwater::Execute() {
         perco *= ratio2gw;
         float percoDeep = perco * m_dp_co; ///< deep percolation
 
-        m_gwS_DOCSto[subID] += (perco - percoDeep)* curBasinArea[subID]*0.0001f;   //kg/ha
+        m_gwS_DOCSto[subID] += (perco - percoDeep);   //kg/ha
+		m_gwS_DOCSto[subID] = m_gwS_DOCSto[subID] * exp(-0.693f /m_hlife_docgw); 
 		m_gwS_DOCconc[subID] = 100* m_gwS_DOCSto[subID] / (m_gw_shallow[subID]/curBasinArea[subID]*1000.f);  //mg/L
- 		
+
 		m_gwD_DOCSto[subID] += percoDeep;
 		//if(subID == 1) cout<<m_dp_co<<"  "<<percoDeep<<"  "<<m_gwD_DOCSto[subID]<<"  "<<endl;
 		float m_deepWaterDepth = curSub->GetGw();

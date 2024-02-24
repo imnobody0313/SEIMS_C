@@ -40,6 +40,7 @@ NutrCH_QUAL2E::NutrCH_QUAL2E() :
     m_chOutTP(nullptr), m_chOutTPConc(nullptr),
     m_chDaylen(nullptr), m_chSr(nullptr), m_chCellCount(nullptr),
     //ljj++
+    m_subbasinsInfo(nullptr),curBasinArea(nullptr),
     m_klrd(-1.f), m_kld(-1.f), m_krd(-1.f), m_sv_lp(-1.f), m_sv_rp(-1.f), m_klp(-1.f), m_kd_lp(-1.f), m_klrp(-1.f),
     m_krp(-1.f), m_kd_rp(-1.f),m_npoc(-1.f),m_area(nullptr),
     m_seepage(nullptr),m_gws_RDOCconc(nullptr),m_gws_RDOCsto(nullptr),
@@ -598,7 +599,27 @@ void NutrCH_QUAL2E::InitialOutputs() {
 		Initialize1DArray(m_nReaches + 1, m_scbn, 0.01f);
 		Initialize1DArray(m_nReaches + 1, m_AbINb, 0.01f);
 		Initialize1DArray(m_nReaches + 1, m_AbIPb, 0.01f);
+        if (curBasinArea == nullptr) {
+            Initialize1DArray(m_nReaches + 1, curBasinArea, 0.f);
+            for (auto it = m_subbasinIDs.begin(); it != m_subbasinIDs.end(); ++it) {
+            int subID = *it;
+            Subbasin* curSub = m_subbasinsInfo->GetSubbasinByID(subID);
+            // get percolation from the bottom soil layer at the subbasin scale
+            int curCellsNum = curSub->GetCellCount();
+            int* curCells = curSub->GetCells();
+                for (int i = 0; i < curCellsNum; i++) {
+                    curBasinArea[subID] += m_area[curCells[i]];
+                }
+            }
+        }
     }
+}
+
+void NutrCH_QUAL2E::SetSubbasins(clsSubbasins* subbasins) {
+	if (nullptr == m_subbasinsInfo) {
+		m_subbasinsInfo = subbasins;
+		m_subbasinIDs = m_subbasinsInfo->GetSubbasinIDs();
+	}
 }
 
 void NutrCH_QUAL2E::PointSourceLoading() {
@@ -746,17 +767,18 @@ void NutrCH_QUAL2E::AddInputNutrient(const int i) {
     if(wtrTotal<UTIL_ZERO) ch_DOCconc = 0.f; 
     if(m_seepage[i]<0.f){
         m_chOutgwsRDOC[i] = m_gws_RDOCconc[i] * m_seepage[i] * 1.e-3f;
-        m_chOutgwsRDOC[i] = Max(m_chOutgwsRDOC[i],m_gws_RDOCsto[i]*-1.f);
-        m_gws_RDOCsto[i] += m_chOutgwsRDOC[i];
+        m_chOutgwsRDOC[i] = Max(m_chOutgwsRDOC[i],curBasinArea[i]*m_gws_RDOCsto[i]*-1.f);
+        m_gws_RDOCsto[i] += m_chOutgwsRDOC[i]/curBasinArea[i];   //kg/ha
         m_chRDOC[i] -= m_chOutgwsRDOC[i]*m_chRDOC[i] / (m_chRDOC[i] + m_chLDOC[i]+UTIL_ZERO);
         m_chLDOC[i] -= m_chOutgwsRDOC[i]*m_chLDOC[i] / (m_chRDOC[i] + m_chLDOC[i]+UTIL_ZERO);
     }else{
         m_chOutgwsRDOC[i] = ch_DOCconc * m_seepage[i] * 1.e-3f;
         m_chOutgwsRDOC[i] = Min((m_chRDOC[i] + m_chLDOC[i]),m_chOutgwsRDOC[i]);
-        m_gws_RDOCsto[i] += m_chOutgwsRDOC[i];
+        m_gws_RDOCsto[i] += m_chOutgwsRDOC[i]/curBasinArea[i];
         m_chRDOC[i] -= m_chOutgwsRDOC[i]*m_chRDOC[i] / (m_chRDOC[i] + m_chLDOC[i]+UTIL_ZERO);
         m_chLDOC[i] -= m_chOutgwsRDOC[i]*m_chLDOC[i] / (m_chRDOC[i] + m_chLDOC[i]+UTIL_ZERO);
     }
+    // if(i==1) cout<<m_chOutgwsRDOC[i]*1000.f / m_seepage[i]<<"   "<<m_gws_RDOCconc[i]<<"   "<<m_gws_RDOCsto[i]<<endl;
     if(m_chRDOC[i] <UTIL_ZERO)  m_chRDOC[i]  = 0.f;
     if(m_chLDOC[i] <UTIL_ZERO)  m_chLDOC[i]  = 0.f;
     if(m_gws_RDOCsto[i] <UTIL_ZERO)  m_gws_RDOCsto[i]  = 0.f;

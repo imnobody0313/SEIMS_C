@@ -60,6 +60,8 @@ public:
     void Get1DData(const char* key, int* n, float** data) OVERRIDE;
 
     TimeStepType GetTimeStepType() OVERRIDE { return TIMESTEP_CHANNEL; }
+    
+    void SetSubbasins(clsSubbasins* subbasins) OVERRIDE;
 
 private:
     bool CheckInputCellSize(const char* key, int n);
@@ -319,6 +321,14 @@ private:
     int* m_chCellCount;
 
     //ljj+
+	//parameters
+	int m_nSubbsns;
+	//! subbasin IDs
+	vector<int> m_subbasinIDs;
+	/// subbasins information
+	clsSubbasins* m_subbasinsInfo;
+	/// subbasin grid (subbasins ID)
+
 	float m_klrd;
 	float m_kld;
 	float m_krd;
@@ -336,6 +346,7 @@ private:
     float* m_gws_RDOCsto;
     float* m_sedst;
     float* m_area;
+    float* curBasinArea;
 
     float* m_surfRDOCToCH;
     float* m_latRDOCToCH;
